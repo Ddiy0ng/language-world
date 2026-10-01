@@ -1,3 +1,40 @@
+#기본 서버 설정
+server:
+  port: ${SERVER_PORT:8080}
+
 spring:
   application:
-    name: be
+    name: language-world
+
+  #db 설정
+  datasource:
+    url: jdbc:mysql://${DB_URL}:${DB_PORT}/${DB_SCHEMA}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  #jpa 설정
+  jpa:
+    hibernate:
+      ddl-auto: create #이후 변경 필요 create, update, validate
+
+  #multipart 설정
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
+
+#파일 업로드 경로 설정
+file:
+  upload-dir:
+    profile: ${PROFILE_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/profile}
+    post: ${POST_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/post}
+    term: ${TERM_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/term}
+
+#로깅 설정(차후 수정)
+logging:
+  level:
+    root: INFO
+
+  file:
+    name: ${LOG_FILE_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/logs/application.log}
+
