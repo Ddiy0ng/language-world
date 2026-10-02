@@ -3,8 +3,8 @@ package com.languageworld.be.global.response;
 import lombok.Builder;
 import lombok.Getter;
 
-@Getter
 @Builder
+@Getter
 public class ApiResponse<T> {
 
     private final String customCode;

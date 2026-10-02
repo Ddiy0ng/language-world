@@ -15,7 +15,7 @@ spring:
   #jpa 설정
   jpa:
     hibernate:
-      ddl-auto: create #이후 변경 필요 create, update, validate
+      ddl-auto: update #이후 변경 필요 create, update, validate
 
   #multipart 설정
   servlet:

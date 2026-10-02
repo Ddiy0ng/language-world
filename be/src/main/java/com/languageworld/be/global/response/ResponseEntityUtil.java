@@ -3,7 +3,6 @@ package com.languageworld.be.global.response;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.enumGroup.SuccessCode;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class ResponseEntityUtil {
