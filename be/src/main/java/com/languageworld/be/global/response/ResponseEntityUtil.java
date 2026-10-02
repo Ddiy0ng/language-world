@@ -1,14 +1,11 @@
 package com.languageworld.be.global.response;
 
+import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.enumGroup.SuccessCode;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-@Builder
-@RequiredArgsConstructor
 public class ResponseEntityUtil {
 
     // 성공 + 데이터 o
@@ -24,9 +21,9 @@ public class ResponseEntityUtil {
     }
 
     // 성공 + 데이터 x
-    public static <Null> ResponseEntity<ApiResponse<Null>> success (SuccessCode successCode) {
+    public static ResponseEntity<ApiResponse<Void>> success (SuccessCode successCode) {
 
-        ApiResponse<Null> apiResponse = ApiResponse.<Null>builder()
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
                 .customCode(successCode.getCustomCode())
                 .message(successCode.getMessage())
                 .build();
@@ -35,9 +32,9 @@ public class ResponseEntityUtil {
     }
 
     // 실패(예외처리용)
-    public static <Null> ResponseEntity<ApiResponse<Null>> fail (CustomException customException) {
+    public static ResponseEntity<ApiResponse<Void>> fail (CustomException customException) {
 
-        ApiResponse<Null> apiResponse = ApiResponse.<Null>builder()
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
                 .customCode(customException.getCustomCode())
                 .message(customException.getMessage())
                 .build();
@@ -46,13 +43,13 @@ public class ResponseEntityUtil {
     }
 
     // 미정의 실패
-    public static <Null> ResponseEntity<ApiResponse<Null>> fail (Exception e) {
+    public static ResponseEntity<ApiResponse<Void>> fail () {
 
-        ApiResponse<Null> apiResponse = ApiResponse.<Null>builder()
-                .customCode("UNDEFINED_EXCEPTION_500")
-                .message("500에러:정의되지 않은 오류가 발생했습니다.")
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+                .customCode(CustomExceptionCode.INTERNAL_SERVER_ERROR.getCustomCode())
+                .message(CustomExceptionCode.INTERNAL_SERVER_ERROR.getMessage())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+        return ResponseEntity.status(CustomExceptionCode.INTERNAL_SERVER_ERROR.getHttpStatus()).body(apiResponse);
     }
 }

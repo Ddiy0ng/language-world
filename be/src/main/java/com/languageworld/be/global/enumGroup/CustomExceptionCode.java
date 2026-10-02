@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum CustomExceptionCode {
 
-    CUSTOM_EXCEPTION_CODE(HttpStatus.BAD_REQUEST, "USER_400", "example message");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "UNDEFINED_500", "500에러:정의되지 않은 오류가 발생했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드
