@@ -1,7 +1,7 @@
 package com.languageworld.be.domain.user.entity;
 
-import com.languageworld.be.domain.auth.enumGroup.SignupTypeCode;
-import com.languageworld.be.domain.auth.enumGroup.UserRoleCode;
+import com.languageworld.be.global.auth.enumGroup.SignupTypeCode;
+import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;
 import com.languageworld.be.domain.user.enumGroup.NationCode;
