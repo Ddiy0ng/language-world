@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,6 +22,16 @@ public class SecurityConfig {
     private final JwtExceptionHandleFilter jwtExceptionHandleFilter;
     private final JwtFilter jwtFilter;
 
+    private final String[] WHITE_LIST_URL = {
+            "/",
+            "/signup/**",
+            "/login/**"
+    };
+    private final String[] TEST_URL = {
+            "/swagger-ui/**",
+            "/v3/api-docs"
+    };
+
     //SecurityFilterChain Bean
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -30,9 +41,17 @@ public class SecurityConfig {
 
                 .csrf(AbstractHttpConfigurer::disable)
 
+                // 인증 상태 세션으로 저장x
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                //기본 로그인 방식x
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/signup", "/login").permitAll()
-                        .requestMatchers("/admin").hasAuthority("ADMIN")
+                        .requestMatchers(WHITE_LIST_URL).permitAll()
+                        .requestMatchers(TEST_URL).permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
 
