@@ -35,7 +35,7 @@ public class JwtProvider {
         Date now = new Date();
 
         String accessToken = Jwts.builder()
-                .subject(user.getEmail())
+                .subject(user.getUuid().toString())
                 .claim("userRole", user.getUserRole().name())
                 .claim("tokenType", "ACCESS_TOKEN")
                 .issuedAt(now)
@@ -52,7 +52,7 @@ public class JwtProvider {
         Date now = new Date();
 
         String refreshToken = Jwts.builder()
-                .subject(user.getEmail())
+                .subject(user.getUuid().toString())
                 .claim("tokenType", "REFRESH_TOKEN")
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + REFRESH_EXPIRATION)) //만료 시각
