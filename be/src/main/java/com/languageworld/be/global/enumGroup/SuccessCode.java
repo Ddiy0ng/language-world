@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum SuccessCode {
 
-    SUCCESS_CODE_EXAMPLE(HttpStatus.OK, "USER_200", "example message");
+    LOGIN_SUCCESS(HttpStatus.OK, "USER_200", "로그인에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드
