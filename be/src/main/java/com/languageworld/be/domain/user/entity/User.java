@@ -1,24 +1,31 @@
 package com.languageworld.be.domain.user.entity;
 
+import com.languageworld.be.domain.game.entity.GameResult;
+import com.languageworld.be.domain.term.entity.AgreedTerm;
 import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
 import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;
 import com.languageworld.be.domain.user.enumGroup.NationCode;
+import com.languageworld.be.global.baseEntity.ChangeableEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Table(name = "users")
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 @Builder
 @Getter
-public class User {
+public class User extends ChangeableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,8 +83,17 @@ public class User {
     )
     private SocialAccount socialAccount;
 
-    @Column(name = "created_at", nullable = false)
-     private LocalDateTime createdAt;
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<AgreedTerm> agreedTermList = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "participant"
+    )
+    private List<GameResult> gameResultList = new ArrayList<>();
 
     @Column(name = "deleted_at")
      private LocalDateTime deletedAt;
