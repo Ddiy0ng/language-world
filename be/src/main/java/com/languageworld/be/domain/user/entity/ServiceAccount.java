@@ -1,11 +1,11 @@
 package com.languageworld.be.domain.user.entity;
 
-import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Table(name = "service_self_accounts")
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 @Builder
 @Getter

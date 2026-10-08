@@ -22,7 +22,7 @@ public record ServiceSignupRequestDto (
                 example = "password1234!"
         )
         @NotBlank
-        @Size(min = 7, max = 20)
+        @Size(min = 8, max = 20)
         String password,
 
         @Schema(

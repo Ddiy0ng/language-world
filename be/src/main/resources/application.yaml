@@ -35,10 +35,6 @@ file:
     post: ${POST_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/post}
     term: ${TERM_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/term}
 
-#로깅 설정(차후 수정)
-logging:
-  level:
-    root: INFO
 
   file:
     name: ${LOG_FILE_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/logs/application.log}

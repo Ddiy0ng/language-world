@@ -2,12 +2,13 @@ package com.languageworld.be.domain.user.entity;
 
 import com.languageworld.be.global.auth.enumGroup.SignupTypeCode;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Table(name = "social_accounts")
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class SocialAccount {
 
@@ -18,7 +19,7 @@ public class SocialAccount {
     @Enumerated(EnumType.STRING)
     private SignupTypeCode signupType;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "provider_user_id", nullable = false)
     private String providerUserId;
 
     @OneToOne
