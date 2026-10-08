@@ -23,7 +23,7 @@ public class CustomLogger {
     public static void warn(LogEventCode logEventCode, String result, LogEventReasonCode logEventReasonCode, String description, Long userId) {
 
         log.warn(
-                "event = {}  result = {}  reason = {} data = {} userId = {}",
+                "event = {}  result = {}  reason = {} description = {} userId = {}",
                 logEventCode,
                 result,
                 logEventReasonCode,
