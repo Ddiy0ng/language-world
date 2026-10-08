@@ -40,7 +40,8 @@ public enum LogEventReasonCode {
 
     // LANGUAGE
     UNSUPPORTED_LANGUAGE("지원하지 않는 언어입니다."),
-    LEVEL_NOT_FOUND("해당 등급이 존재하지 않습니다.");
+    LEVEL_NOT_FOUND("해당 등급이 존재하지 않습니다."),
+    NOT_PROPER_LEVEL_FOR_LANGUAGE("해당 언어에서 제공하는 등급이 아닙니다.");
 
     private final String message;
 }

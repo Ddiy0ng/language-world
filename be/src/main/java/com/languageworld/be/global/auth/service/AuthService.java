@@ -69,6 +69,18 @@ public class AuthService {
         Language motherTongue = languageService.getLanguageById(serviceSignupRequestDto.motherTongueId());
         Language learningLanguage = languageService.getLanguageById(serviceSignupRequestDto.learningLanguageId());
         Level learningLanguageLevel = languageService.getLevelById(serviceSignupRequestDto.learningLanguageLevelId());
+        if(!learningLanguage.equals(learningLanguageLevel.getLanguage())) {
+
+            CustomLogger.warn(
+                    LogEventCode.SIGNUP,
+                    "FAIL",
+                    LogEventReasonCode.NOT_PROPER_LEVEL_FOR_LANGUAGE,
+                    LogEventReasonCode.NOT_PROPER_LEVEL_FOR_LANGUAGE.getMessage() + " - LearningLanguage: " + learningLanguage.getType() + ", Level: " + learningLanguageLevel.getLevel(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.NOT_PROPER_LEVEL_FOR_LANGUAGE);
+        }
         Term serviceUseTerm = termService.getTermById(serviceSignupRequestDto.serviceUseTermId());
         Term personalInfoUseTerm = termService.getTermById(serviceSignupRequestDto.personalInfoUseTermId());
 
