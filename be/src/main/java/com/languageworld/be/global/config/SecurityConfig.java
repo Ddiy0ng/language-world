@@ -25,7 +25,8 @@ public class SecurityConfig {
     private final String[] WHITE_LIST_URL = {
             "/",
             "/signup/**",
-            "/login/**"
+            "/login/**",
+            "/**"
     };
     private final String[] TEST_URL = {
             "/swagger-ui/**",

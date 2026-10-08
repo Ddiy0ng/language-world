@@ -18,7 +18,14 @@ public enum CustomExceptionCode {
 
     TERM_NOT_FOUND(HttpStatus.NOT_FOUND, "TERM_404", "약관을 찾을 수 없습니다."),
     TERM_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "TERM_400", "이미 등록된 약관입니다."),
-    MULTIPART_FILE_REQUIRED(HttpStatus.BAD_REQUEST, "MULTIPART_FILE_400", "파일을 등록해주세요");
+    MULTIPART_FILE_REQUIRED(HttpStatus.BAD_REQUEST, "MULTIPART_FILE_400", "파일을 등록해주세요"),
+    UNSUPPORTED_UPLOAD_PURPOSE_REQUEST(HttpStatus.BAD_REQUEST, "MULTIPART_FILE_400","지원하지 않는 업로드 목적의 요청입니다"),
+    INVALID_FILE_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "MULTIPART_FILE_415", "잘못된 형식의 파일입니다."),
+    CREATE_DIR_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "MULTIPART_FILE_500", "파일 업로드 폴더 생성 중 문제가 발생했습니다."),
+    SAVE_FILE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "MULTIPART_FILE_500", "파일 업로드 중 문제가 발생했습니다."),
+
+    UNSUPPORTED_LANGUAGE(HttpStatus.BAD_REQUEST, "LANGUAGE_400", "지원하지 않는 언어입니다."),
+    LEVEL_NOT_FOUND(HttpStatus.BAD_REQUEST, "LANGUAGE_400", "해당 등급이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드

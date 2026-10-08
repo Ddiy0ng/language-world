@@ -1,14 +1,20 @@
 package com.languageworld.be.domain.term.entity;
 
 import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
+import com.languageworld.be.global.baseEntity.ChangeableEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
+@Builder
 @Table(name = "agreed_terms")
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class AgreedTerm {
+public class AgreedTerm extends ChangeableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,9 +31,14 @@ public class AgreedTerm {
     @JoinColumn(name= "term_id", nullable = false)
     private Term term;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    public static AgreedTerm of(Boolean isTermAgreed, User user, Term term) {
 
-    @Column(name = "modified_at")
-    private LocalDateTime modifiedAt;
+        AgreedTerm agreedTerm = AgreedTerm.builder()
+                .isAgreed(isTermAgreed)
+                .user(user)
+                .term(term)
+                .build();
+
+        return agreedTerm;
+    }
 }
