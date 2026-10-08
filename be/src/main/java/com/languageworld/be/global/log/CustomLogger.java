@@ -1,7 +1,7 @@
 package com.languageworld.be.global.log;
 
-import com.languageworld.be.global.enumGroup.LogEventCode;
-import com.languageworld.be.global.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.log.enumGroup.LogEventCode;
+import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

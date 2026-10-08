@@ -1,14 +1,19 @@
-package com.languageworld.be.global.enumGroup;
+package com.languageworld.be.global.log.enumGroup;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
 @Getter
 public enum LogEventReasonCode {
 
+    // AUTH_FILTER
+    UNAUTHORIZED("인증되지 않은 사용자입니다."),
+    ACCESS_REQUIRED("권한이 필요합니다."),
+    ADMIN_ACCESS_REQUIRED("관리자 권한이 필요합니다."),
+
     // AUTH
+    DELETED_USER("탈퇴한 사용자입니다."),
     EMAIL_ALREADY_EXIST("이미 가입된 이메일입니다."),
     EMAIL_NOT_FOUND("존재하지 않는 이메일입니다."),
     PASSWORD_MISMATCH("비밀번호가 일치하지 않습니다."),

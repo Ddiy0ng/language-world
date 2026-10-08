@@ -1,8 +1,8 @@
 package com.languageworld.be.global.jwt;
 
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
-import com.languageworld.be.global.enumGroup.LogEventCode;
-import com.languageworld.be.global.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.log.enumGroup.LogEventCode;
+import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
 import io.jsonwebtoken.Claims;
@@ -30,7 +30,7 @@ public class JwtUtil {
     }
 
     // jwt 추출
-    protected String resolveToken(HttpServletRequest httpServletRequest) {
+    public String resolveToken(HttpServletRequest httpServletRequest) {
 
         String authorizationHeader = httpServletRequest.getHeader("Authorization");
 
@@ -48,7 +48,7 @@ public class JwtUtil {
     }
 
     // Claim 추출
-    protected Claims getClaims(String token) {
+    public Claims getClaims(String token) {
 
         Claims claims;
 
@@ -84,7 +84,7 @@ public class JwtUtil {
     }
 
     // username 추출
-    protected String getUsername(Claims claims) {
+    public String getUsername(Claims claims) {
 
         String username = claims.getSubject();
 
@@ -92,7 +92,7 @@ public class JwtUtil {
     }
 
     // userRole 추출
-    protected String getUserRole(Claims claims) {
+    public String getUserRole(Claims claims) {
 
         String userRole = claims.get("userRole", String.class);
 
@@ -100,7 +100,7 @@ public class JwtUtil {
     }
 
     // tokenType 추출
-    protected String getTokenType(Claims claims) {
+    public String getTokenType(Claims claims) {
 
         String tokenType = claims.get("tokenType", String.class);
 

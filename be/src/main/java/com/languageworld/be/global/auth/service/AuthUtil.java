@@ -1,8 +1,8 @@
 package com.languageworld.be.global.auth.service;
 
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
-import com.languageworld.be.global.enumGroup.LogEventCode;
-import com.languageworld.be.global.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.log.enumGroup.LogEventCode;
+import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
 import lombok.RequiredArgsConstructor;

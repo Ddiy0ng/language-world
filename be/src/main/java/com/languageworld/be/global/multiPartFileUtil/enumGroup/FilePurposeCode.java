@@ -1,4 +1,4 @@
-package com.languageworld.be.global.multiPartFileUtil;
+package com.languageworld.be.global.multiPartFileUtil.enumGroup;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

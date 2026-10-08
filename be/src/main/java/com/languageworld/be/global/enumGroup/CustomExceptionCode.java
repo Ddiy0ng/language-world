@@ -10,7 +10,13 @@ public enum CustomExceptionCode {
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "UNDEFINED_500", "500에러:정의되지 않은 오류가 발생했습니다."),
 
+    // AUTH_FILTER
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH_FILTER_401", "인증되지 않은 사용자입니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "AUTH_FILTER_403", "권한이 없습니다."),
+    ADMIN_ACCESS_DENIED(HttpStatus.FORBIDDEN, "AUTH_FILTER_403", "관리자 권한이 없습니다."),
+
     // AUTH
+    DELETED_USER(HttpStatus.NOT_FOUND, "AUTH_404", "탈퇴한 사용자입니다."),
     LOGIN_FAILED(HttpStatus.BAD_REQUEST, "AUTH_400", "이메일 또는 비밀번호가 올바르지 않습니다."),
     EMAIL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "AUTH_400", "이미 가입된 이메일입니다."),
     PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "AUTH_400", "비밀번호를 입력해주세요."),

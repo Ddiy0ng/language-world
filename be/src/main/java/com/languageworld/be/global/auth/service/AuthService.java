@@ -18,8 +18,8 @@ import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.jwt.JwtProvider;
 import com.languageworld.be.global.log.CustomLogger;
-import com.languageworld.be.global.enumGroup.LogEventCode;
-import com.languageworld.be.global.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.log.enumGroup.LogEventCode;
+import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,8 +82,6 @@ public class AuthService {
             throw new CustomException(CustomExceptionCode.NOT_PROPER_LEVEL_FOR_LANGUAGE);
         }
 
-        // 서비스 약관, 개인정보 수집 약관 확인 로직 추가 필요!!!
-
         Term serviceUseTerm = termService.getTermById(serviceSignupRequestDto.serviceUseTermId());
         Term personalInfoUseTerm = termService.getTermById(serviceSignupRequestDto.personalInfoUseTermId());
 
@@ -143,6 +141,20 @@ public class AuthService {
 
         // 사용자 데이터 조회
         User user = serviceAccount.getUser();
+
+        // 사용자 탈퇴 여부 확인
+        if (user.getDeletedAt() != null) {
+
+            CustomLogger.warn(
+                    LogEventCode.LOGIN,
+                    "FAIL",
+                    LogEventReasonCode.DELETED_USER,
+                    LogEventReasonCode.DELETED_USER.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.DELETED_USER);
+        }
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);

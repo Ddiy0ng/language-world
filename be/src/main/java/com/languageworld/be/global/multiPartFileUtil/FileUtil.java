@@ -1,11 +1,13 @@
 package com.languageworld.be.global.multiPartFileUtil;
 
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
-import com.languageworld.be.global.enumGroup.LogEventCode;
-import com.languageworld.be.global.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.log.enumGroup.LogEventCode;
+import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import com.languageworld.be.global.enumGroup.SuccessCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
+import com.languageworld.be.global.multiPartFileUtil.enumGroup.FilePurposeCode;
+import com.languageworld.be.global.multiPartFileUtil.enumGroup.FileTypeCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

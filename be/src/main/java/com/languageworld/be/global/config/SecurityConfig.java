@@ -1,7 +1,5 @@
 package com.languageworld.be.global.config;
 
-import com.languageworld.be.global.exception.JwtExceptionHandleFilter;
-import com.languageworld.be.global.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,22 +17,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final AuthenticationExceptionHandleFilter authenticationExceptionHandleFilter;
+    private final AuthorizationExceptionHandleFilter authorizationExceptionHandleFilter;
     private final JwtExceptionHandleFilter jwtExceptionHandleFilter;
     private final JwtFilter jwtFilter;
 
     private final String[] WHITE_LIST_URL = {
             "/",
             "/auth/signup/**",
-            "/auth/login/**"
-    };
-    private final String[] TEST_URL = {
+            "/auth/login/**",
             "/swagger-ui/**",
             "/v3/api-docs"
+    };
+    private final String[] TEST_URL = {
+
     };
 
     //SecurityFilterChain Bean
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
 
         httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -44,10 +45,17 @@ public class SecurityConfig {
                 // 인증 상태 세션으로 저장x
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                //기본 로그인 방식x
+                // 기본 로그인 방식x
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
 
+                // 인증인가 예외처리
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationExceptionHandleFilter)
+                        .accessDeniedHandler(authorizationExceptionHandleFilter)
+                )
+
+                // 엔드포인트 인가 관리
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
                         .requestMatchers(TEST_URL).permitAll()

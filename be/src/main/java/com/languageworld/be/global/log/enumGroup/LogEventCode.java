@@ -1,4 +1,4 @@
-package com.languageworld.be.global.enumGroup;
+package com.languageworld.be.global.log.enumGroup;
 
 public enum LogEventCode {
 
@@ -6,5 +6,5 @@ public enum LogEventCode {
     TERM,
     MULTIPART_FILE,
     LANGUAGE,
-    JWT, LOGIN
+    JWT, AUTH_FILTER, LOGIN
 }
