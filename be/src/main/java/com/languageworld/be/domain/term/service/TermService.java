@@ -32,7 +32,7 @@ public class TermService {
         String version = termCreateRequestDto.purpose() + LocalDate.now().toString();
 
         //동일 약관 존재 확인(목적 + 버전)
-        boolean isTermExist = termRepository.existsByPurposeAndVersion(termCreateRequestDto.purpose(), version);
+        boolean isTermExist = termRepository.existsByPurposeAndVersion(version);
         if(isTermExist) {
             CustomLogger.warn(LogEventCode.TERM,
                     "FAIL",
