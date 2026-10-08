@@ -1,6 +1,7 @@
 package com.languageworld.be.domain.game.entity;
 
 import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "game_results")
 @Entity
 @Getter
-public class GameResult {
+public class GameResult extends CreatableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +31,4 @@ public class GameResult {
     @ManyToOne
     @JoinColumn(name = "participant_id", nullable = false)
     private User participant;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
 }

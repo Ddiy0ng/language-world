@@ -1,6 +1,5 @@
 package com.languageworld.be.global.auth.controller;
 
-import com.languageworld.be.global.auth.dto.LoginRequestDto;
 import com.languageworld.be.global.auth.dto.LoginResponseDto;
 import com.languageworld.be.global.auth.dto.ServiceLoginRequestDto;
 import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
