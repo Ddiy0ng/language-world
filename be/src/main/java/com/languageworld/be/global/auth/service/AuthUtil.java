@@ -26,6 +26,7 @@ public class AuthUtil {
                     LogEventCode.SIGNUP,
                     "FAIL",
                     LogEventReasonCode.PASSWORD_REQUIRED,
+                    LogEventReasonCode.PASSWORD_MISMATCH.getMessage(),
                     null
             );
 
@@ -39,6 +40,7 @@ public class AuthUtil {
                     LogEventCode.SIGNUP,
                     "FAIL",
                     LogEventReasonCode.INVALID_PASSWORD,
+                    LogEventReasonCode.INVALID_PASSWORD.getMessage(),
                     null
             );
 
@@ -62,6 +64,7 @@ public class AuthUtil {
                     LogEventCode.LOGIN,
                     "FAIL",
                     LogEventReasonCode.PASSWORD_MISMATCH,
+                    LogEventReasonCode.PASSWORD_MISMATCH.getMessage(),
                     null
             );
 
