@@ -1,6 +1,5 @@
 package com.languageworld.be.global.auth.controller;
 
-import com.languageworld.be.global.auth.dto.LoginRequestDto;
 import com.languageworld.be.global.auth.dto.LoginResponseDto;
 import com.languageworld.be.global.auth.dto.ServiceLoginRequestDto;
 import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
@@ -9,9 +8,12 @@ import com.languageworld.be.global.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +34,16 @@ public class AuthController {
     @Operation(
             summary = "서비스 자체 제공 회원가입",
             description = "사용자가 이메일과, 비밀번호를 직접 입력하여 가입하는 일반 회원가입 API 입니다."
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(
+                    encoding = {
+                            @Encoding(
+                                    name = "json",
+                                    contentType = MediaType.APPLICATION_JSON_VALUE
+                            )
+                    }
+            )
     )
     @PostMapping("/signup/service")
     public ResponseEntity<ApiResponse<Void>> signup(@Valid @RequestBody ServiceSignupRequestDto serviceSignupRequestDto) {
