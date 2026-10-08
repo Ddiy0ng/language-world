@@ -1,6 +1,7 @@
 package com.languageworld.be.domain.post.entity;
 
 import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "likes")
 @Entity
 @Getter
-public class Like {
+public class Like extends CreatableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +22,4 @@ public class Like {
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
 }

@@ -1,6 +1,7 @@
 package com.languageworld.be.domain.post.entity;
 
 import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.global.baseEntity.ChangeableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 @Entity
 @Getter
-public class Comment {
+public class Comment extends ChangeableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,12 +25,6 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "modified_at")
-    private LocalDateTime modifiedAt;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

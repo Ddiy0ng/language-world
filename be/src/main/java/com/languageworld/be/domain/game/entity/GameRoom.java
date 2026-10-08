@@ -4,6 +4,7 @@ import com.languageworld.be.domain.game.enumGroup.GameRoomStatusCode;
 import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;
 import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "game_rooms")
 @Entity
 @Getter
-public class GameRoom {
+public class GameRoom extends CreatableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,7 +50,4 @@ public class GameRoom {
     @ManyToOne
     @JoinColumn(name = "level_id", nullable = false)
     private Level level;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
 }

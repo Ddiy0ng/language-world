@@ -1,14 +1,21 @@
 package com.languageworld.be.domain.vocab.entity;
 
 import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.global.baseEntity.ChangeableEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Table(name = "saved_vocabs")
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 @Getter
-public class SavedVocab {
+public class SavedVocab extends ChangeableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +31,4 @@ public class SavedVocab {
     @ManyToOne
     @JoinColumn(name = "vocab_meaning_id", nullable = false)
     private VocabMeaning vocabMeaning;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "modified_at")
-    private LocalDateTime modifiedAt;
 }

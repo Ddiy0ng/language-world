@@ -4,7 +4,7 @@ import com.languageworld.be.domain.game.enumGroup.GameUserStatusCode;
 import lombok.Getter;
 
 @Getter
-public class GameUser {
+public class Participant {
 
     private Long userId;
 
