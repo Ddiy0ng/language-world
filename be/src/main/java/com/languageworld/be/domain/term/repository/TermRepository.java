@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TermRepository extends JpaRepository<Term, Long> {
-    boolean existsByPurposeAndVersion(TermPurposeCode purpose, String version);
+
+    boolean existsByVersion(String version);
 }

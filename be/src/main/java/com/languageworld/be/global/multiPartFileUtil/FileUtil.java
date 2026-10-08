@@ -3,6 +3,7 @@ package com.languageworld.be.global.multiPartFileUtil;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.enumGroup.LogEventCode;
 import com.languageworld.be.global.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.enumGroup.SuccessCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +43,7 @@ public class FileUtil {
             // 파일 업로드 경로
             Path fileUploadedPath = uploadPath.resolve(fileName);
 
+            // 확장자에 따른 처리
             switch(extension) {
                 case("pdf"):
 
@@ -56,22 +58,31 @@ public class FileUtil {
 
                     createFileUploadDir(uploadPath, LogEventReasonCode.CREATE_JPEG_DIR_EXCEPTION);
                     saveFile(requestedFile, fileUploadedPath, LogEventReasonCode.SAVE_JPEG_EXCEPTION);
+
                     break;
                 case("png"):
 
                     createFileUploadDir(uploadPath, LogEventReasonCode.CREATE_PNG_DIR_EXCEPTION);
                     saveFile(requestedFile, fileUploadedPath, LogEventReasonCode.SAVE_PNG_EXCEPTION);
+
                     break;
                 default:
                     CustomLogger.warn(
                             LogEventCode.MULTIPART_FILE,
                             "FAIL",
-                            LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST,
+                            LogEventReasonCode.UNSUPPORTED_CONTENT_TYPE,
+                            LogEventReasonCode.UNSUPPORTED_CONTENT_TYPE.getMessage() + " - File extension: " + extension,
                             null
                     );
 
                     throw new CustomException(CustomExceptionCode.INVALID_FILE_TYPE);
             }
+
+            // 성공 로그
+            CustomLogger.info(LogEventCode.MULTIPART_FILE,
+                    "SUCCESS",
+                    SuccessCode.FILE_UPLOAD_SUCCESS.getMessage(),
+                    null);
 
             return fileUploadedPath.toString();
         }
@@ -85,6 +96,7 @@ public class FileUtil {
                         LogEventCode.MULTIPART_FILE,
                         "FAIL",
                         logEventReasonCode,
+                        logEventReasonCode.getMessage() + " - IOException while creating file upload directory",
                         null
                 );
 
@@ -102,6 +114,7 @@ public class FileUtil {
                         LogEventCode.MULTIPART_FILE,
                         "FAIL",
                         logEventReasonCode,
+                        logEventReasonCode.getMessage() + " - IOException while saving file",
                         null
                 );
 
@@ -116,6 +129,7 @@ public class FileUtil {
                         LogEventCode.MULTIPART_FILE,
                         "FAIL",
                         LogEventReasonCode.MULTIPART_FILE_REQUIRED,
+                        LogEventReasonCode.MULTIPART_FILE_REQUIRED.getMessage() + " - File is null or empty",
                         null
                 );
 
@@ -133,6 +147,7 @@ public class FileUtil {
                         LogEventCode.MULTIPART_FILE,
                         "FAIL",
                         LogEventReasonCode.CONTENT_TYPE_NULL,
+                        LogEventReasonCode.CONTENT_TYPE_NULL.getMessage() + " - MultipartFile.contentType is null",
                         null
                 );
 
@@ -145,6 +160,7 @@ public class FileUtil {
                             LogEventCode.MULTIPART_FILE,
                             "FAIL",
                             LogEventReasonCode.PDF_REQUIRED,
+                            LogEventReasonCode.PDF_REQUIRED.getMessage() + " - File extension is not pdf",
                             null
                     );
 
@@ -162,6 +178,7 @@ public class FileUtil {
                             LogEventCode.MULTIPART_FILE,
                             "FAIL",
                             LogEventReasonCode.INVALID_IMAGE_TYPE,
+                            LogEventReasonCode.INVALID_IMAGE_TYPE.getMessage() + " - File extension is not image: jpeg, jpg,png required",
                             null
                     );
 
@@ -180,6 +197,7 @@ public class FileUtil {
                         LogEventCode.MULTIPART_FILE,
                         "FAIL",
                         LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST,
+                        LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST.getMessage() + " - " + filePurpose.name() + "is unsupported purpose: TERM, POST, PROFILE only supported",
                         null
                 );
 

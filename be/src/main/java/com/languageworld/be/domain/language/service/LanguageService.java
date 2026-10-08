@@ -30,6 +30,7 @@ public class LanguageService {
             CustomLogger.warn(LogEventCode.LANGUAGE,
                     "FAIL",
                     LogEventReasonCode.UNSUPPORTED_LANGUAGE,
+                    LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST.getMessage() + " - LanguageId: " + languageId,
                     null
             );
 
@@ -47,6 +48,7 @@ public class LanguageService {
             CustomLogger.warn(LogEventCode.LANGUAGE,
                     "FAIL",
                     LogEventReasonCode.LEVEL_NOT_FOUND,
+                    LogEventReasonCode.LEVEL_NOT_FOUND.getMessage() + " - LevelId: " + levelId,
                     null
             );
 

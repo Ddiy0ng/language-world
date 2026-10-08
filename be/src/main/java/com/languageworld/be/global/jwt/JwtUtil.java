@@ -1,5 +1,10 @@
 package com.languageworld.be.global.jwt;
 
+import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.enumGroup.LogEventCode;
+import com.languageworld.be.global.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.exception.CustomException;
+import com.languageworld.be.global.log.CustomLogger;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -54,9 +59,25 @@ public class JwtUtil {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (ExpiredJwtException expiredJwtException) {
-            throw new RuntimeException(); // CustomException 처리: 만료된 토큰 처리
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.EXPIRED_TOKEN,
+                    LogEventReasonCode.EXPIRED_TOKEN.getMessage(),
+                    null
+            );
+            throw new CustomException(CustomExceptionCode.EXPIRED_TOKEN); // CustomException 처리: 만료된 토큰 처리
         } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException(); // CustomException 처리: 유효하지 않은 토큰 처리
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.INVALID_TOKEN,
+                    LogEventReasonCode.INVALID_TOKEN.getMessage() + "JwtException | IllegalArgumentException while parsing jwt to get claims",
+                    null
+            );
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN); // CustomException 처리: 유효하지 않은 토큰 처리
         }
 
         return claims;

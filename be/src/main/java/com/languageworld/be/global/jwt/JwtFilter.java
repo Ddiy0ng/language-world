@@ -1,6 +1,11 @@
 package com.languageworld.be.global.jwt;
 
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
+import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.enumGroup.LogEventCode;
+import com.languageworld.be.global.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.exception.CustomException;
+import com.languageworld.be.global.log.CustomLogger;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,16 +38,35 @@ public class JwtFilter extends OncePerRequestFilter {
             return; // null인 경우 더 진행되지 않도록 return
         }
 
-        if (token.isBlank())
-            throw new RuntimeException(); //CustomException 처리: 토큰 공백
+        if (token.isBlank()) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.TOKEN_NULL,
+                    LogEventReasonCode.TOKEN_NULL.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN); //CustomException 처리: 토큰 공백
+        }
 
         // claim 추출
         Claims claims = jwtUtil.getClaims(token);
 
         // tokenType 검출
-        if("ACCESS_TOKEN".equals(jwtUtil.getTokenType(claims)))
-            throw new RuntimeException(); // CustomException 처리: 액세스 토큰 필요
+        if(!"ACCESS_TOKEN".equals(jwtUtil.getTokenType(claims))) {
 
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.ACCESS_TOKEN_REQUIRED,
+                    LogEventReasonCode.ACCESS_TOKEN_REQUIRED.getMessage() + " - Requested token type: " + jwtUtil.getTokenType(claims),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN); // CustomException 처리: 액세스 토큰 필요
+        }
         // 인증 사용자 객체 셍성
         CustomPrincipal customPrincipal = new CustomPrincipal(jwtUtil.getUsername(claims), jwtUtil.getUserRole(claims));
 

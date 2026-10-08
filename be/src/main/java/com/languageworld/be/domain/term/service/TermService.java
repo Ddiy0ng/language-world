@@ -1,6 +1,5 @@
 package com.languageworld.be.domain.term.service;
 
-import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.term.dto.TermCreateRequestDto;
 import com.languageworld.be.domain.term.entity.Term;
 import com.languageworld.be.domain.term.repository.TermRepository;
@@ -32,11 +31,12 @@ public class TermService {
         String version = termCreateRequestDto.purpose() + LocalDate.now().toString();
 
         //동일 약관 존재 확인(목적 + 버전)
-        boolean isTermExist = termRepository.existsByPurposeAndVersion(termCreateRequestDto.purpose(), version);
+        boolean isTermExist = termRepository.existsByVersion(version);
         if(isTermExist) {
             CustomLogger.warn(LogEventCode.TERM,
                     "FAIL",
                     LogEventReasonCode.TERM_ALREADY_EXIST,
+                    LogEventReasonCode.TERM_ALREADY_EXIST.getMessage() + " - Version: " + version,
                     null);
 
             throw new CustomException(CustomExceptionCode.TERM_ALREADY_EXIST);
@@ -56,6 +56,7 @@ public class TermService {
             CustomLogger.warn(LogEventCode.TERM,
                     "FAIL",
                     LogEventReasonCode.TERM_NOT_FOUND,
+                    LogEventReasonCode.TERM_NOT_FOUND.getMessage() + " - TermId: " + termId,
                     null
             );
 

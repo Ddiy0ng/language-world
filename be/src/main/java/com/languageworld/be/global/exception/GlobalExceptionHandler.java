@@ -1,5 +1,6 @@
 package com.languageworld.be.global.exception;
 
+import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import lombok.extern.slf4j.Slf4j;

@@ -51,6 +51,7 @@ public class AuthService {
                     LogEventCode.SIGNUP,
                     "FAIL",
                     LogEventReasonCode.EMAIL_ALREADY_EXIST,
+                    LogEventReasonCode.EMAIL_ALREADY_EXIST.getMessage() + " - Requested email: " + email,
                     null
             );
 
@@ -111,6 +112,7 @@ public class AuthService {
                     LogEventCode.LOGIN,
                     "FAIL",
                     LogEventReasonCode.EMAIL_NOT_FOUND,
+                    LogEventReasonCode.EMAIL_NOT_FOUND.getMessage() + " - Requested email: " +email,
                     null
             );
 
