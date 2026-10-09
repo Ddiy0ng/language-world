@@ -17,8 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationExceptionHandleFilter authenticationExceptionHandleFilter;
-    private final AuthorizationExceptionHandleFilter authorizationExceptionHandleFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final JwtExceptionHandleFilter jwtExceptionHandleFilter;
     private final JwtFilter jwtFilter;
 
@@ -51,8 +51,8 @@ public class SecurityConfig {
 
                 // 인증인가 예외처리
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(authenticationExceptionHandleFilter)
-                        .accessDeniedHandler(authorizationExceptionHandleFilter)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
 
                 // 엔드포인트 인가 관리
