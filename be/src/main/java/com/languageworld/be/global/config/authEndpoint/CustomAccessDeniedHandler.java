@@ -1,4 +1,4 @@
-package com.languageworld.be.global.config;
+package com.languageworld.be.global.config.authEndpoint;
 
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;

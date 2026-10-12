@@ -5,11 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
-@Schema(name = "서비스 자체 제공 회원가입 요청 Dto")
+@Schema(name = "ServiceSignupRequestDto")
 public record ServiceSignupRequestDto (
 
         @Schema(
-                name = "이메일",
+                name = "email",
                 example = "example@gmail.com"
         )
         @NotBlank
@@ -17,7 +17,7 @@ public record ServiceSignupRequestDto (
         String email,
 
         @Schema(
-                name = "비밀번호",
+                name = "password",
                 description = "8~20글자 내 영문, 숫자, 특수문자를 포함하여야 합니다.",
                 example = "password1234!"
         )
@@ -26,7 +26,7 @@ public record ServiceSignupRequestDto (
         String password,
 
         @Schema(
-                name = "이름",
+                name = "name",
                 example = "김철수"
         )
         @NotBlank
@@ -34,7 +34,7 @@ public record ServiceSignupRequestDto (
         String name,
 
         @Schema(
-                name = "생년월일",
+                name = "birth",
                 example = "2000-01-01"
         )
         @NotNull
@@ -42,49 +42,49 @@ public record ServiceSignupRequestDto (
         LocalDate birth,
 
         @Schema(
-                name = "국적",
+                name = "nation",
                 example = "EN"
         )
         @NotNull
         NationCode nation,
 
         @Schema(
-                name = "모국어 Id",
+                name = "motherTongueId",
                 example = "1"
         )
         @NotNull
         Long motherTongueId,
 
         @Schema(
-                name = "학습어 Id",
+                name = "learningLanguageId",
                 example = "2"
         )
         @NotNull
         Long learningLanguageId,
 
         @Schema(
-                name = "학습어 수준 Id",
+                name = "learningLanguageLevelId",
                 example = "4"
         )
         @NotNull
         Long learningLanguageLevelId,
 
         @Schema(
-                name = "서비스 이용약관 Id",
+                name = "serviceUseTermId",
                 example = "1"
         )
         @NotNull
         Long serviceUseTermId,
 
         @Schema(
-                name = "개인정보 이용약관 Id",
+                name = "personalInfoUseTermId",
                 example = "2"
         )
         @NotNull
         Long personalInfoUseTermId,
 
         @Schema(
-                name = "서비스 이용약관 동의 여부",
+                name = "isServiceUseTermAgreed",
                 example = "true"
         )
         @NotNull
@@ -92,7 +92,7 @@ public record ServiceSignupRequestDto (
         Boolean isServiceUseTermAgreed,
 
         @Schema(
-                name = "개인정보 이용약관 동의 여부",
+                name = "isPersonalInfoUseTermAgreed",
                 example = "true"
         )
         @NotNull

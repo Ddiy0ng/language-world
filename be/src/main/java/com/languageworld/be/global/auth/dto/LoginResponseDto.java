@@ -3,17 +3,20 @@ package com.languageworld.be.global.auth.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
-@Schema(name = "서비스 자체 제공 로그인 응답 Dto")
+@Schema(name = "LoginResponseDto")
 @Builder
 public record LoginResponseDto(
 
         @Schema(
-                name = "액세스 토큰"
+                name = "accessToken",
+                description = "자체 서비스에서 발급한 액세스 토큰"
         )
         String accessToken,
 
         @Schema(
-                name = "리프레시 토큰"
+                name = "refreshToken",
+                description = "자체 서비스에서 발급한 리프레시 토큰"
+
         )
         String refreshToken
 ) {

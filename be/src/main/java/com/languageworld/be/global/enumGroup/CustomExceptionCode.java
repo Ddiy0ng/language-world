@@ -22,8 +22,12 @@ public enum CustomExceptionCode {
     PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "AUTH_400", "비밀번호를 입력해주세요."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH_400", "영문, 숫자, 특수문자의 8~20자 이내의 비밀번호여야 합니다"),
     ACCOUNT_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "AUTH_400", "이미 가입된 계정입니다."),
+    ACCOUNT_NOT_EXIST(HttpStatus.BAD_REQUEST, "AUTH_400", "존재하지 않는 계정입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_401", "만료된 토큰입니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_401", "유효하지 않은 토큰입니다."),
+
+    // OAUTH2
+    UNSUPPORTED_SOCIAL_TYPE(HttpStatus.BAD_REQUEST, "AUTH400", "지원하지 않는 소셜 타입입니다."),
 
     // MULTIPART_FILE
     MULTIPART_FILE_REQUIRED(HttpStatus.BAD_REQUEST, "MULTIPART_FILE_400", "파일을 등록해주세요"),

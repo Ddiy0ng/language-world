@@ -23,10 +23,15 @@ spring:
       max-file-size: 10MB
       max-request-size: 11MB
 
+google:
+  oauth:
+    client-id: ${GOOGLE_OAUTH_CLIENT_ID}
+
 jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
 
 #파일 업로드 경로 설정
 file:
@@ -35,7 +40,11 @@ file:
     post: ${POST_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/post}
     term: ${TERM_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/term}
 
-
+logging:
+  level:
+    root: INFO
+    com.languageworld.be: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
   file:
     name: ${LOG_FILE_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/logs/application.log}
-
