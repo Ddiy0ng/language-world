@@ -22,19 +22,15 @@ public class SocialAccount {
     @Column(nullable = false)
     private String sub;
 
-    @Column(nullable = false)
-    private String email;
-
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public static SocialAccount of(SocialTypeCode socialTypeCode, String sub, String email, User user) {
+    public static SocialAccount of(SocialTypeCode socialTypeCode, String sub, User user) {
 
          SocialAccount socialAccount = SocialAccount.builder()
                  .signupType(socialTypeCode)
                  .sub(sub)
-                 .email(email)
                  .user(user)
                  .build();
 

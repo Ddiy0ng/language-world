@@ -159,7 +159,6 @@ public class AuthService {
         String idToken = socialSignupRequestDto.idToken();
         SocialAuthorizedUserDto socialAuthorizedUserDto = authUtil.verifyGoogleIdToken(idToken);
         String sub = socialAuthorizedUserDto.sub();
-        String email = socialAuthorizedUserDto.email();
         String profileImageUrl = socialAuthorizedUserDto.profileImageUrl();
 
         // spring 파트
@@ -189,7 +188,7 @@ public class AuthService {
 
         // 회원가입
         User user = User.of(socialSignupRequestDto, profileImageUrl, motherTongue, learningLanguage, learningLanguageLevel);
-        SocialAccount socialAccount = SocialAccount.of(type, sub, email, user);
+        SocialAccount socialAccount = SocialAccount.of(type, sub, user);
         AgreedTerm agreedServiceTerm = AgreedTerm.of(socialSignupRequestDto.isServiceUseTermAgreed(), user, serviceUseTerm);
         AgreedTerm agreedPersonalInfoUseTerm = AgreedTerm.of(socialSignupRequestDto.isPersonalInfoUseTermAgreed(), user, personalInfoUseTerm);
 

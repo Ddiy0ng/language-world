@@ -117,14 +117,11 @@ public class AuthUtil {
             // sub
             String sub = payload.getSubject();
 
-            // email
-            String email = payload.getEmail();
-
             // profile
             String profileImageUrl = payload.get("picture").toString();
 
             // SocialAuthorizedUserDto
-            SocialAuthorizedUserDto socialAuthorizedUserDto = SocialAuthorizedUserDto.of(SocialTypeCode.GOOGLE, sub, email, profileImageUrl);
+            SocialAuthorizedUserDto socialAuthorizedUserDto = SocialAuthorizedUserDto.of(SocialTypeCode.GOOGLE, sub, profileImageUrl);
 
             return socialAuthorizedUserDto;
 
