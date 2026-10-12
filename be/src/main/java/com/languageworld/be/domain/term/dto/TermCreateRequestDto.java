@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 public record TermCreateRequestDto(
 
         @Schema(
-                name = "약관 목적",
+                name = "purpose",
                 example = "SERVICE_USE")
         @NotNull
         TermPurposeCode purpose

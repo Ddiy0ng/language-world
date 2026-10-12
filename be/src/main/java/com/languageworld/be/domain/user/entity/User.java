@@ -3,6 +3,7 @@ package com.languageworld.be.domain.user.entity;
 import com.languageworld.be.domain.game.entity.GameResult;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
 import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
+import com.languageworld.be.global.auth.dto.SocialSignupRequestDto;
 import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;
@@ -115,5 +116,27 @@ public class User extends ChangeableEntity {
                 .build();
 
         return user;
+    }
+
+    public static User of(SocialSignupRequestDto socialSignupRequestDto,
+                          String profileImageUrl,
+                          Language motherTongue,
+                          Language learningLanguage,
+                          Level learningLanguageLevel) {
+
+        User user = User.builder()
+                .uuid(UUID.randomUUID())
+                .userRole(UserRoleCode.USER)
+                .name(socialSignupRequestDto.name())
+                .birth(socialSignupRequestDto.birth())
+                .nation(socialSignupRequestDto.nation())
+                .profileImageUrl(profileImageUrl)
+                .motherTongue(motherTongue)
+                .learningLanguage(learningLanguage)
+                .learningLanguageLevel(learningLanguageLevel)
+                .build();
+
+        return user;
+
     }
 }

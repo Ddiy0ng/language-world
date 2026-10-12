@@ -1,51 +1,91 @@
 package com.languageworld.be.global.auth.dto;
 
 import com.languageworld.be.domain.user.enumGroup.NationCode;
-import com.languageworld.be.global.auth.enumGroup.SignupTypeCode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 
 import java.time.LocalDate;
 
+@Schema(name = "SocialSignupRequestDto")
+@Builder
 public record SocialSignupRequestDto (
 
-        @NotNull
-        SignupTypeCode signupTypeCode,
-
         @NotBlank
-        String providerUserId,
+        String idToken,
 
+        @Schema(
+                name = "name",
+                example = "김철수"
+        )
         @NotBlank
         @Size(min = 1, max = 50)
         String name,
 
+        @Schema(
+                name = "birth",
+                example = "2000-01-01"
+        )
         @NotNull
         @Past
         LocalDate birth,
 
+        @Schema(
+                name = "nation",
+                example = "EN"
+        )
         @NotNull
         NationCode nation,
 
+        @Schema(
+                name = "motherTongueId",
+                example = "1"
+        )
         @NotNull
         Long motherTongueId,
 
+        @Schema(
+                name = "learningLanguageId",
+                example = "2"
+        )
         @NotNull
         Long learningLanguageId,
 
+        @Schema(
+                name = "learningLanguageLevelId",
+                example = "4"
+        )
         @NotNull
         Long learningLanguageLevelId,
 
+        @Schema(
+                name = "serviceUseTermId",
+                example = "1"
+        )
         @NotNull
         Long serviceUseTermId,
 
+        @Schema(
+                name = "personalInfoUseTermId",
+                example = "2"
+        )
         @NotNull
         Long personalInfoUseTermId,
 
+        @Schema(
+                name = "isServiceUseTermAgreed",
+                example = "true"
+        )
         @NotNull
         @AssertTrue
-        Boolean isPersonalInfoUseTermAgreed,
+        Boolean isServiceUseTermAgreed,
 
+        @Schema(
+                name = "isPersonalInfoUseTermAgreed",
+                example = "true"
+        )
         @NotNull
         @AssertTrue
-        Boolean isServiceUseTermAgreed
+        Boolean isPersonalInfoUseTermAgreed
 ){
 }

@@ -6,6 +6,8 @@ build/
 !**/src/test/**/build/
 .env
 
+src/main/resources/test.html
+
 ### STS ###
 .apt_generated
 .classpath

@@ -8,12 +8,13 @@ import com.languageworld.be.domain.term.entity.Term;
 import com.languageworld.be.domain.term.repository.AgreedTermRepository;
 import com.languageworld.be.domain.term.service.TermService;
 import com.languageworld.be.domain.user.entity.ServiceAccount;
+import com.languageworld.be.domain.user.entity.SocialAccount;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.repository.ServiceAccountRepository;
+import com.languageworld.be.domain.user.repository.SocialAccountRepository;
 import com.languageworld.be.domain.user.repository.UserRepository;
-import com.languageworld.be.global.auth.dto.LoginResponseDto;
-import com.languageworld.be.global.auth.dto.ServiceLoginRequestDto;
-import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
+import com.languageworld.be.global.auth.dto.*;
+import com.languageworld.be.global.auth.enumGroup.SocialTypeCode;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.jwt.JwtProvider;
@@ -33,6 +34,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final ServiceAccountRepository serviceAccountRepository;
+    private final SocialAccountRepository socialAccountRepository;
     private final AgreedTermRepository agreedTermRepository;
     private final LanguageService languageService;
     private final TermService termService;
@@ -98,21 +100,6 @@ public class AuthService {
         agreedTermRepository.save(agreedPersonalInfoUseTerm);
     }
 
-//    // 소셜 회원가입
-//    @Transactional
-//    public void signup(SocialSignupRequestDto socialSignupRequestDto) {
-//
-//        // providerId로 가입 여부 확인(중복 가입 방지)
-//
-//        // 참조 객체
-//        Language motherTongue = languageService.getLanguageById(serviceSignupRequestDto.motherTongueId());
-//        Language learningLanguage = languageService.getLanguageById(serviceSignupRequestDto.learningLanguageId());
-//        Level learningLanguageLevel = languageService.getLevelById(serviceSignupRequestDto.learningLanguageLevelId());
-//
-//        // 회원가입: user + account + term
-//
-//    }
-
     // 서비스 자체 로그인
     @Transactional
     public LoginResponseDto login(ServiceLoginRequestDto serviceLoginRequestDto) {
@@ -164,5 +151,116 @@ public class AuthService {
         return loginResponseDto;
     }
 
-    // 소셜 로그인
+    // 소셜 회원가입
+    @Transactional
+    public void signup(String signupTypeCode, SocialSignupRequestDto socialSignupRequestDto) {
+
+        // 소셜 파트
+        String idToken = socialSignupRequestDto.idToken();
+        SocialAuthorizedUserDto socialAuthorizedUserDto = authUtil.verifyGoogleIdToken(idToken);
+        String sub = socialAuthorizedUserDto.sub();
+        String email = socialAuthorizedUserDto.email();
+        String profileImageUrl = socialAuthorizedUserDto.profileImageUrl();
+
+        // spring 파트
+        //회원가입 여부 확인
+        SocialTypeCode type = SocialTypeCode.from(signupTypeCode);
+        userExistCheckForSignup(type, sub);
+        
+        // 참조 객체
+        Language motherTongue = languageService.getLanguageById(socialSignupRequestDto.motherTongueId());
+        Language learningLanguage = languageService.getLanguageById(socialSignupRequestDto.learningLanguageId());
+        Level learningLanguageLevel = languageService.getLevelById(socialSignupRequestDto.learningLanguageLevelId());
+        if(!learningLanguage.equals(learningLanguageLevel.getLanguage())) {
+
+            CustomLogger.warn(
+                    LogEventCode.SIGNUP,
+                    "FAIL",
+                    LogEventReasonCode.NOT_PROPER_LEVEL_FOR_LANGUAGE,
+                    LogEventReasonCode.NOT_PROPER_LEVEL_FOR_LANGUAGE.getMessage() + " - LearningLanguage: " + learningLanguage.getType() + ", Level: " + learningLanguageLevel.getLevel(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.NOT_PROPER_LEVEL_FOR_LANGUAGE);
+        }
+
+        Term serviceUseTerm = termService.getTermById(socialSignupRequestDto.serviceUseTermId());
+        Term personalInfoUseTerm = termService.getTermById(socialSignupRequestDto.personalInfoUseTermId());
+
+        // 회원가입
+        User user = User.of(socialSignupRequestDto, profileImageUrl, motherTongue, learningLanguage, learningLanguageLevel);
+        SocialAccount socialAccount = SocialAccount.of(type, sub, email, user);
+        AgreedTerm agreedServiceTerm = AgreedTerm.of(socialSignupRequestDto.isServiceUseTermAgreed(), user, serviceUseTerm);
+        AgreedTerm agreedPersonalInfoUseTerm = AgreedTerm.of(socialSignupRequestDto.isPersonalInfoUseTermAgreed(), user, personalInfoUseTerm);
+
+        // 저장
+        userRepository.save(user);
+        socialAccountRepository.save(socialAccount);
+        agreedTermRepository.save(agreedServiceTerm);
+        agreedTermRepository.save(agreedPersonalInfoUseTerm);
+
+    }
+
+    @Transactional
+    public LoginResponseDto login(String loginTypeCode, SocialLoginRequestDto socialLoginRequestDto) {
+
+        // 소셜 파트
+        String idToken = socialLoginRequestDto.idToken();
+        SocialAuthorizedUserDto socialAuthorizedUserDto = authUtil.verifyGoogleIdToken(idToken);
+
+        // spring 파트
+        // 회원 존재 여부 확인
+        SocialTypeCode type = SocialTypeCode.from(loginTypeCode);
+        String sub = socialAuthorizedUserDto.sub();
+
+        SocialAccount socialAccount = userExistCheckForLogin(type, sub);
+        User user = socialAccount.getUser();
+
+        String accessToken = jwtProvider.generateAccessToken(user);
+        String refreshToken = jwtProvider.generateRefreshToken(user);
+
+        LoginResponseDto loginResponseDto = LoginResponseDto.of(accessToken, refreshToken);
+
+        return loginResponseDto;
+    }
+
+
+    // 사용자 존재 여부 확인: signup type + sub
+    private void userExistCheckForSignup(SocialTypeCode socialTypeCode, String sub) {
+
+        Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findBySignupTypeAndSub(socialTypeCode, sub);
+        if(optionalSocialAccount.isPresent()) {
+
+            CustomLogger.warn(
+              LogEventCode.OAUTH2,
+                    "FAIL",
+                    LogEventReasonCode.SOCIAL_SUB_ALREADY_EXIST,
+                    LogEventReasonCode.SOCIAL_SUB_ALREADY_EXIST.getMessage() + " - type: " + socialTypeCode + ", sub: " + sub,
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.ACCOUNT_ALREADY_EXIST);
+        }
+    }
+
+    private SocialAccount userExistCheckForLogin(SocialTypeCode loginTypeCode, String sub) {
+
+        Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findBySignupTypeAndSub(loginTypeCode, sub);
+        if(optionalSocialAccount.isEmpty()) {
+
+            CustomLogger.warn(
+                    LogEventCode.OAUTH2,
+                    "FAIL",
+                    LogEventReasonCode.SOCIAL_SUB_NOT_EXIST,
+                    LogEventReasonCode.SOCIAL_SUB_NOT_EXIST.getMessage() + " - sub: " + sub,
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.ACCOUNT_NOT_EXIST);
+        }
+
+        SocialAccount socialAccount = optionalSocialAccount.get();
+
+        return socialAccount;
+    }
 }

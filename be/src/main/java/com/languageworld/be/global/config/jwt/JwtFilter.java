@@ -1,4 +1,4 @@
-package com.languageworld.be.global.config;
+package com.languageworld.be.global.config.jwt;
 
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
@@ -44,8 +44,8 @@ public class JwtFilter extends OncePerRequestFilter {
             CustomLogger.warn(
                     LogEventCode.JWT,
                     "FAIL",
-                    LogEventReasonCode.TOKEN_NULL,
-                    LogEventReasonCode.TOKEN_NULL.getMessage(),
+                    LogEventReasonCode.JWT_TOKEN_NULL,
+                    LogEventReasonCode.JWT_TOKEN_NULL.getMessage(),
                     null
             );
 

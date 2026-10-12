@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum LogEventReasonCode {
 
+    // SOCIAL
+    INVALID_GOOGLE_TOKEN("유효하지 않은 구글 토큰입니다."),
+
     // AUTH_FILTER
     UNAUTHORIZED("인증되지 않은 사용자입니다."),
     ACCESS_REQUIRED("권한이 필요합니다."),
@@ -19,11 +22,17 @@ public enum LogEventReasonCode {
     PASSWORD_MISMATCH("비밀번호가 일치하지 않습니다."),
     PASSWORD_REQUIRED("비밀번호를 입력해주세요."),
     INVALID_PASSWORD("영문, 숫자, 특수문자의 8~20자 이내의 비밀번호여야 합니다"),
-    PROVIDER_ID_ALREADY_EXIST("providerId가 존재합니다."),
     EXPIRED_TOKEN("만료된 토큰입니다."),
     INVALID_TOKEN("유효하지 않은 토큰입니다."),
-    TOKEN_NULL("토큰이 null입니다."),
+    JWT_TOKEN_NULL("토큰이 null입니다."),
     ACCESS_TOKEN_REQUIRED("액세스 토큰이 필요합니다."),
+
+    // SOCIAL
+    GOOGLE_ID_TOKEN_NULL("GoogleIdToken이 null입니다."),
+    EMAIL_NOT_VERIFIED_WITH_GOOGLE("구글 인증을 받지 않은 이메일입니다."),
+    SOCIAL_SUB_ALREADY_EXIST("이미 소셜 회원가입이 완료된 사용자입니다."),
+    SOCIAL_SUB_NOT_EXIST("존재하지 않는 사용자입니다."),
+    UNSUPPORTED_SOCIAL_TYPE("지원하지 않는 소셜 타입입니다."),
 
     // MULTIPART_FILE
     MULTIPART_FILE_REQUIRED("파일을 등록해주세요"),

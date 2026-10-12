@@ -1,7 +1,6 @@
-package com.languageworld.be.global.config;
+package com.languageworld.be.global.config.jwt;
 
 import com.languageworld.be.global.exception.CustomException;
-import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.response.ApiResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

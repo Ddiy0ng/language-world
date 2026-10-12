@@ -1,6 +1,6 @@
 package com.languageworld.be.domain.user.entity;
 
-import com.languageworld.be.global.auth.enumGroup.SignupTypeCode;
+import com.languageworld.be.global.auth.enumGroup.SocialTypeCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,12 +17,27 @@ public class SocialAccount {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private SignupTypeCode signupType;
+    private SocialTypeCode signupType;
 
-    @Column(name = "provider_user_id", nullable = false)
-    private String providerUserId;
+    @Column(nullable = false)
+    private String sub;
+
+    @Column(nullable = false)
+    private String email;
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public static SocialAccount of(SocialTypeCode socialTypeCode, String sub, String email, User user) {
+
+         SocialAccount socialAccount = SocialAccount.builder()
+                 .signupType(socialTypeCode)
+                 .sub(sub)
+                 .email(email)
+                 .user(user)
+                 .build();
+
+         return socialAccount;
+    }
 }

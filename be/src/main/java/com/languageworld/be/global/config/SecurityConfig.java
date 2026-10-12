@@ -1,5 +1,9 @@
 package com.languageworld.be.global.config;
 
+import com.languageworld.be.global.config.authEndpoint.CustomAccessDeniedHandler;
+import com.languageworld.be.global.config.authEndpoint.CustomAuthenticationEntryPoint;
+import com.languageworld.be.global.config.jwt.JwtExceptionHandleFilter;
+import com.languageworld.be.global.config.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,10 +31,9 @@ public class SecurityConfig {
             "/auth/signup/**",
             "/auth/login/**",
             "/swagger-ui/**",
-            "/v3/api-docs"
-    };
-    private final String[] TEST_URL = {
-
+            "/v3/api-docs",
+            "/static/test.html",
+            "/**"
     };
 
     //SecurityFilterChain Bean
@@ -58,7 +61,6 @@ public class SecurityConfig {
                 // 엔드포인트 인가 관리
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
-                        .requestMatchers(TEST_URL).permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
