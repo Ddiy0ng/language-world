@@ -1,18 +1,16 @@
-package com.languageworld.be.global.auth.dto;
+package com.languageworld.be.global.auth.dto.social;
 
 import com.languageworld.be.domain.user.enumGroup.NationCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
 
 import java.time.LocalDate;
 
-@Schema(name = "SocialSignupRequestDto")
-@Builder
-public record SocialSignupRequestDto (
+@Schema(name = "GoogleSignupRequestDto")
+public record SocialSignupRequestDto(
 
         @NotBlank
-        String idToken,
+        String token,
 
         @Schema(
                 name = "name",
@@ -87,5 +85,5 @@ public record SocialSignupRequestDto (
         @NotNull
         @AssertTrue
         Boolean isPersonalInfoUseTermAgreed
-){
+) {
 }

@@ -13,7 +13,8 @@ import java.util.List;
 public class GoogleAuthConfig {
 
     @Bean
-    public GoogleIdTokenVerifier googleIdTokenVerifier(@Value("${google.oauth.client-id}") String googleClientId) {
+    public GoogleIdTokenVerifier googleIdTokenVerifier(
+            @Value("${google.oauth.client-id}") String googleClientId) {
 
         GoogleIdTokenVerifier googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(
                         new NetHttpTransport(),

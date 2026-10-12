@@ -1,15 +1,14 @@
 package com.languageworld.be.global.auth.controller;
 
 import com.languageworld.be.global.auth.dto.*;
+import com.languageworld.be.global.auth.dto.social.SocialSignupRequestDto;
+import com.languageworld.be.global.auth.dto.social.SocialLoginRequestDto;
 import com.languageworld.be.global.auth.service.AuthService;
 import com.languageworld.be.global.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -59,25 +58,25 @@ public class AuthController {
 
     @Operation(
             summary = "소셜 회원가입",
-            description = "소셜 로그인 제공자가 발급한 인증 토큰을 검증하고 자체 서비스에 회원가입을 진행하는 api입니다.."
+            description = "소셜 측에서 발급한 토큰을 검증하고 자체 서비스에 회원가입을 진행하는 api입니다.."
     )
-    @PostMapping(value = "/signup/{signupTypeCode}",
+    @PostMapping(value = "/signup/{socialSignupType}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<ApiResponse<Void>> signup(@PathVariable String signupTypeCode, @Valid @RequestBody SocialSignupRequestDto socialSignupRequestDto) {
+    public ResponseEntity<ApiResponse<Void>> signup(@PathVariable String socialSignupType, @Valid @RequestBody SocialSignupRequestDto socialSignupRequestDto) {
 
-        authService.signup(signupTypeCode, socialSignupRequestDto);
+        authService.signup(socialSignupType, socialSignupRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.SIGNUP_SUCCESS);
     }
 
     @Operation(
-            summary = "소셜 로그인",
-            description = "소셜 로그인 제공자가 발급한 인증 토큰을 검증하고 자체 서비스에 로그인을 진행하는 api입니다." +
+            summary = "Google 로그인",
+            description = "Google을 이용해 서비스에 로그인을 진행하는 api입니다." +
                     "로그인 시 자체 서비스의 AccessToken과 RefreshToken이 반환됩니다."
     )
-    @PostMapping(value = "/login/{loginTypeCode}",
+    @PostMapping(value = "/login/google",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
