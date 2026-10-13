@@ -14,6 +14,8 @@ import com.languageworld.be.domain.user.repository.ServiceAccountRepository;
 import com.languageworld.be.domain.user.repository.SocialAccountRepository;
 import com.languageworld.be.domain.user.repository.UserRepository;
 import com.languageworld.be.global.auth.dto.*;
+import com.languageworld.be.global.auth.dto.social.*;
+import com.languageworld.be.global.auth.entity.SocialAuthorizedUser;
 import com.languageworld.be.global.auth.enumGroup.SocialTypeCode;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
@@ -39,6 +41,8 @@ public class AuthService {
     private final LanguageService languageService;
     private final TermService termService;
     private final AuthUtil authUtil;
+    private final GoogleUtil googleUtil;
+    private final KakaoUtil kakaoUtil;
     private final JwtProvider jwtProvider;
 
     // 서비스 자체 회원가입
@@ -153,20 +157,29 @@ public class AuthService {
 
     // 소셜 회원가입
     @Transactional
-    public void signup(String signupTypeCode, SocialSignupRequestDto socialSignupRequestDto) {
+    public void signup(String socialSignupType, SocialSignupRequestDto socialSignupRequestDto) {
+
+
+        SocialTypeCode type = SocialTypeCode.from(socialSignupType);
+        String token = socialSignupRequestDto.token();
+        SocialAuthorizedUser socialAuthorizedUser;
+
+        switch(type) {
+            case GOOGLE -> socialAuthorizedUser = googleUtil.verifyGoogleIdToken(token);
+            case KAKAO -> socialAuthorizedUser = kakaoUtil.getSocialAuthorizedUser(token);
+
+            // TODO: Custom log, customException 처리
+            default -> throw new RuntimeException();
+        }
 
         // 소셜 파트
-        String idToken = socialSignupRequestDto.idToken();
-        SocialAuthorizedUserDto socialAuthorizedUserDto = authUtil.verifyGoogleIdToken(idToken);
-        String sub = socialAuthorizedUserDto.sub();
-        String email = socialAuthorizedUserDto.email();
-        String profileImageUrl = socialAuthorizedUserDto.profileImageUrl();
+        String sub = socialAuthorizedUser.sub();
+        String profileImageUrl = socialAuthorizedUser.profileImageUrl();
 
         // spring 파트
-        //회원가입 여부 확인
-        SocialTypeCode type = SocialTypeCode.from(signupTypeCode);
+        //회원가입 여부 확인;
         userExistCheckForSignup(type, sub);
-        
+
         // 참조 객체
         Language motherTongue = languageService.getLanguageById(socialSignupRequestDto.motherTongueId());
         Language learningLanguage = languageService.getLanguageById(socialSignupRequestDto.learningLanguageId());
@@ -189,7 +202,7 @@ public class AuthService {
 
         // 회원가입
         User user = User.of(socialSignupRequestDto, profileImageUrl, motherTongue, learningLanguage, learningLanguageLevel);
-        SocialAccount socialAccount = SocialAccount.of(type, sub, email, user);
+        SocialAccount socialAccount = SocialAccount.of(type, sub, user);
         AgreedTerm agreedServiceTerm = AgreedTerm.of(socialSignupRequestDto.isServiceUseTermAgreed(), user, serviceUseTerm);
         AgreedTerm agreedPersonalInfoUseTerm = AgreedTerm.of(socialSignupRequestDto.isPersonalInfoUseTermAgreed(), user, personalInfoUseTerm);
 
@@ -201,17 +214,18 @@ public class AuthService {
 
     }
 
+    // google 로그인
     @Transactional
     public LoginResponseDto login(String loginTypeCode, SocialLoginRequestDto socialLoginRequestDto) {
 
         // 소셜 파트
         String idToken = socialLoginRequestDto.idToken();
-        SocialAuthorizedUserDto socialAuthorizedUserDto = authUtil.verifyGoogleIdToken(idToken);
+        SocialAuthorizedUser socialAuthorizedUser = googleUtil.verifyGoogleIdToken(idToken);
 
         // spring 파트
         // 회원 존재 여부 확인
         SocialTypeCode type = SocialTypeCode.from(loginTypeCode);
-        String sub = socialAuthorizedUserDto.sub();
+        String sub = socialAuthorizedUser.sub();
 
         SocialAccount socialAccount = userExistCheckForLogin(type, sub);
         User user = socialAccount.getUser();
@@ -223,7 +237,6 @@ public class AuthService {
 
         return loginResponseDto;
     }
-
 
     // 사용자 존재 여부 확인: signup type + sub
     private void userExistCheckForSignup(SocialTypeCode socialTypeCode, String sub) {
