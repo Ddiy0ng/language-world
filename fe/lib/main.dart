@@ -10,20 +10,40 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 // 환경 설정
 // ======================================================
 
-// Google Cloud Console의 "Web application" OAuth Client ID
-// 예: 123456789-xxxxx.apps.googleusercontent.com
+class SecureConfig {
+  static const String googleWebClientId =
+  String.fromEnvironment(
+    'GOOGLE_WEB_CLIENT_ID',
+  );
+
+  static const String kakaoNativeAppKey =
+  String.fromEnvironment(
+    'KAKAO_NATIVE_APP_KEY',
+  );
+
+  static const String springBaseUrl =
+  String.fromEnvironment(
+    'SPRING_BASE_URL',
+  );
+}
+
+
+// Google Cloud Console의
+// "Web application" OAuth Client ID
 const String googleWebClientId =
-    '[GOOGLE_WEB_CLIENT_KEY]';
+    SecureConfig.googleWebClientId;
 
 
-// Kakao Developers의 "Native App Key"
+// Kakao Developers의
+// "Native App Key"
 const String kakaoNativeAppKey =
-    '[KAKAO_NATIVE_APP_KEY]]';
+    SecureConfig.kakaoNativeAppKey;
 
 
-// Android Emulator에서 Windows PC의 localhost에 접근하는 주소
+// Android Emulator에서
+// Windows PC의 Spring 서버에 접근하는 주소
 const String springBaseUrl =
-    'http://10.0.2.2:8080';
+    SecureConfig.springBaseUrl;
 
 
 // ======================================================
@@ -46,15 +66,56 @@ void logStep(
 // ======================================================
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+
+  // ------------------------------------------------------
+  // 환경변수 확인
+  // 실제 값은 출력하지 않음
+  // ------------------------------------------------------
+
+  debugPrint(
+    '[ENV] KAKAO_NATIVE_APP_KEY exists = '
+        '${kakaoNativeAppKey.isNotEmpty}',
+  );
+
+  debugPrint(
+    '[ENV] GOOGLE_WEB_CLIENT_ID exists = '
+        '${googleWebClientId.isNotEmpty}',
+  );
+
+  debugPrint(
+    '[ENV] SPRING_BASE_URL exists = '
+        '${springBaseUrl.isNotEmpty}',
+  );
+
+
+  // 환경변수가 비어 있으면
+  // 앱 시작 단계에서 즉시 오류 발생
+  if (kakaoNativeAppKey.isEmpty) {
+    throw StateError(
+      'KAKAO_NATIVE_APP_KEY가 설정되지 않았습니다.',
+    );
+  }
+
+  if (googleWebClientId.isEmpty) {
+    throw StateError(
+      'GOOGLE_WEB_CLIENT_ID가 설정되지 않았습니다.',
+    );
+  }
+
+  if (springBaseUrl.isEmpty) {
+    throw StateError(
+      'SPRING_BASE_URL이 설정되지 않았습니다.',
+    );
+  }
+
 
   logStep(
     'APP',
     '1',
     'main() 시작',
   );
-
-
-  WidgetsFlutterBinding.ensureInitialized();
 
 
   // ------------------------------------------------------
@@ -67,11 +128,9 @@ Future<void> main() async {
     'KakaoSdk.init() 호출 직전',
   );
 
-
   await KakaoSdk.init(
     nativeAppKey: kakaoNativeAppKey,
   );
-
 
   logStep(
     'APP',
@@ -90,11 +149,9 @@ Future<void> main() async {
     'GoogleSignIn.initialize() 호출 직전',
   );
 
-
   await GoogleSignIn.instance.initialize(
     serverClientId: googleWebClientId,
   );
-
 
   logStep(
     'APP',
@@ -103,10 +160,13 @@ Future<void> main() async {
   );
 
 
+  // ------------------------------------------------------
+  // Flutter 앱 시작
+  // ------------------------------------------------------
+
   runApp(
     const MyApp(),
   );
-
 
   logStep(
     'APP',
@@ -121,17 +181,14 @@ Future<void> main() async {
 // ======================================================
 
 class MyApp extends StatelessWidget {
-
   const MyApp({
     super.key,
   });
-
 
   @override
   Widget build(
       BuildContext context,
       ) {
-
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SocialSignupPage(),
@@ -144,13 +201,10 @@ class MyApp extends StatelessWidget {
 // 소셜 회원가입 테스트 화면
 // ======================================================
 
-class SocialSignupPage
-    extends StatefulWidget {
-
+class SocialSignupPage extends StatefulWidget {
   const SocialSignupPage({
     super.key,
   });
-
 
   @override
   State<SocialSignupPage> createState() =>
@@ -164,7 +218,6 @@ class _SocialSignupPageState
   String result =
       '아직 회원가입하지 않았습니다.';
 
-
   bool loading = false;
 
 
@@ -173,20 +226,16 @@ class _SocialSignupPageState
   // ====================================================
 
   Future<void> googleSignup() async {
-
     logStep(
       'GOOGLE',
       '1',
       'googleSignup() 시작',
     );
 
-
     try {
-
       setState(() {
         loading = true;
-        result =
-        'Google 로그인 중...';
+        result = 'Google 로그인 중...';
       });
 
 
@@ -200,12 +249,10 @@ class _SocialSignupPageState
         'GoogleSignIn.authenticate() 호출 직전',
       );
 
-
       final GoogleSignInAccount account =
       await GoogleSignIn
           .instance
           .authenticate();
-
 
       logStep(
         'GOOGLE',
@@ -224,12 +271,10 @@ class _SocialSignupPageState
         'ID Token 조회 직전',
       );
 
-
       final String? idToken =
           account
               .authentication
               .idToken;
-
 
       logStep(
         'GOOGLE',
@@ -237,14 +282,11 @@ class _SocialSignupPageState
         'ID Token null 여부 = ${idToken == null}',
       );
 
-
       if (idToken == null) {
-
         throw Exception(
           'Google ID Token을 받지 못했습니다.',
         );
       }
-
 
       logStep(
         'GOOGLE',
@@ -253,8 +295,7 @@ class _SocialSignupPageState
             'length=${idToken.length}',
       );
 
-
-      // 토큰 실제 값은 로그로 출력하지 않음
+      // 실제 토큰 문자열은 로그로 출력하지 않음
 
 
       // ------------------------------------------------
@@ -267,76 +308,65 @@ class _SocialSignupPageState
         'socialSignup(google) 호출 직전',
       );
 
-
       await socialSignup(
         socialType: 'google',
         token: idToken,
       );
-
 
       logStep(
         'GOOGLE',
         '8',
         'socialSignup(google) 정상 반환',
       );
-
-
     } catch (
     e,
     stackTrace,
     ) {
-
     debugPrint(
     '================ GOOGLE ERROR ================',
     );
 
     debugPrint(
-    '[GOOGLE][ERROR] type = ${e.runtimeType}',
+    '[GOOGLE][ERROR] '
+    'type = ${e.runtimeType}',
     );
 
     debugPrint(
-    '[GOOGLE][ERROR] error = $e',
+    '[GOOGLE][ERROR] '
+    'error = $e',
     );
 
     debugPrint(
-    '[GOOGLE][ERROR] stackTrace = $stackTrace',
+    '[GOOGLE][ERROR] '
+    'stackTrace = $stackTrace',
     );
 
     debugPrint(
     '==============================================',
     );
 
-
     if (!mounted) {
     return;
     }
 
-
     setState(() {
-
     result =
     'Google 회원가입 실패\n\n'
     '${e.runtimeType}\n'
     '$e';
     });
-
-
     } finally {
-
     logStep(
     'GOOGLE',
     '9',
     'finally 진입',
     );
 
-
     if (mounted) {
-
     setState(() {
     loading = false;
     });
     }
-
 
     logStep(
     'GOOGLE',
@@ -352,20 +382,16 @@ class _SocialSignupPageState
   // ====================================================
 
   Future<void> kakaoSignup() async {
-
     logStep(
       'KAKAO',
       '1',
       'kakaoSignup() 시작',
     );
 
-
     try {
-
       setState(() {
         loading = true;
-        result =
-        'Kakao 로그인 중...';
+        result = 'Kakao 로그인 중...';
       });
 
 
@@ -379,10 +405,8 @@ class _SocialSignupPageState
         'isKakaoTalkInstalled() 호출 직전',
       );
 
-
       final bool installed =
       await isKakaoTalkInstalled();
-
 
       logStep(
         'KAKAO',
@@ -399,40 +423,32 @@ class _SocialSignupPageState
       // ------------------------------------------------
 
       if (installed) {
-
         logStep(
           'KAKAO',
           '4-A',
           'loginWithKakaoTalk() 호출 직전',
         );
 
-
         try {
-
           oauthToken =
           await UserApi
               .instance
               .loginWithKakaoTalk();
-
 
           logStep(
             'KAKAO',
             '5-A',
             'loginWithKakaoTalk() 반환 성공',
           );
-
-
         } catch (
     e,
     stackTrace,
     ) {
-
     logStep(
     'KAKAO',
     'ERROR-A',
     'KakaoTalk 로그인 실패',
     );
-
 
     debugPrint(
     '[KAKAO][ERROR-A] '
@@ -451,7 +467,8 @@ class _SocialSignupPageState
 
 
     // --------------------------------------------
-    // KakaoTalk 실패 → KakaoAccount fallback
+    // KakaoTalk 실패
+    // → KakaoAccount fallback
     // --------------------------------------------
 
     logStep(
@@ -461,12 +478,10 @@ class _SocialSignupPageState
     'fallback 호출 직전',
     );
 
-
     oauthToken =
     await UserApi
         .instance
         .loginWithKakaoAccount();
-
 
     logStep(
     'KAKAO',
@@ -477,13 +492,11 @@ class _SocialSignupPageState
     }
     }
 
-
     // ------------------------------------------------
     // KakaoTalk 미설치
     // ------------------------------------------------
 
     else {
-
     logStep(
     'KAKAO',
     '4-C',
@@ -491,12 +504,10 @@ class _SocialSignupPageState
     'loginWithKakaoAccount() 호출 직전',
     );
 
-
     oauthToken =
     await UserApi
         .instance
         .loginWithKakaoAccount();
-
 
     logStep(
     'KAKAO',
@@ -516,10 +527,8 @@ class _SocialSignupPageState
     'OAuthToken 객체 획득 완료',
     );
 
-
     final String accessToken =
     oauthToken.accessToken;
-
 
     logStep(
     'KAKAO',
@@ -529,8 +538,7 @@ class _SocialSignupPageState
     'length=${accessToken.length}',
     );
 
-
-    // Access Token 실제 문자열은 출력하지 않음
+    // 실제 Access Token은 출력하지 않음
 
 
     // ------------------------------------------------
@@ -543,76 +551,65 @@ class _SocialSignupPageState
     'socialSignup(kakao) 호출 직전',
     );
 
-
     await socialSignup(
     socialType: 'kakao',
     token: accessToken,
     );
-
 
     logStep(
     'KAKAO',
     '9',
     'socialSignup(kakao) 정상 반환',
     );
-
-
     } catch (
     e,
     stackTrace,
     ) {
-
     debugPrint(
     '================ KAKAO ERROR ================',
     );
 
     debugPrint(
-    '[KAKAO][ERROR] type = ${e.runtimeType}',
+    '[KAKAO][ERROR] '
+    'type = ${e.runtimeType}',
     );
 
     debugPrint(
-    '[KAKAO][ERROR] error = $e',
+    '[KAKAO][ERROR] '
+    'error = $e',
     );
 
     debugPrint(
-    '[KAKAO][ERROR] stackTrace = $stackTrace',
+    '[KAKAO][ERROR] '
+    'stackTrace = $stackTrace',
     );
 
     debugPrint(
     '=============================================',
     );
 
-
     if (!mounted) {
     return;
     }
 
-
     setState(() {
-
     result =
     'Kakao 회원가입 실패\n\n'
     '${e.runtimeType}\n'
     '$e';
     });
-
-
     } finally {
-
     logStep(
     'KAKAO',
     '10',
     'finally 진입',
     );
 
-
     if (mounted) {
-
     setState(() {
     loading = false;
     });
     }
-
 
     logStep(
     'KAKAO',
@@ -631,7 +628,6 @@ class _SocialSignupPageState
     required String socialType,
     required String token,
   }) async {
-
     logStep(
       'SPRING',
       '1',
@@ -639,13 +635,9 @@ class _SocialSignupPageState
           '- socialType=$socialType',
     );
 
-
     try {
-
       if (mounted) {
-
         setState(() {
-
           result =
           '$socialType 인증 성공\n'
               'Spring 회원가입 요청 중...';
@@ -662,7 +654,6 @@ class _SocialSignupPageState
         '$springBaseUrl/auth/signup/$socialType',
       );
 
-
       logStep(
         'SPRING',
         '2',
@@ -675,7 +666,6 @@ class _SocialSignupPageState
       // ------------------------------------------------
 
       final Map<String, dynamic> body = {
-
         // Google:
         // Google ID Token
         //
@@ -683,38 +673,22 @@ class _SocialSignupPageState
         // Kakao Access Token
         'token': token,
 
-
         'name': '소셜회원',
-
 
         'birth': '2000-01-01',
 
-
-        // 네 Spring NationCode에
-        // 실제 존재하는 값으로 변경
+        // Spring NationCode에 실제 존재하는 값
         'nation': 'KR',
 
-
-        // 아래 값은
-        // 실제 DB ID로 변경
+        // 실제 DB의 ID와 맞춰야 함
         'motherTongueId': 1,
-
-
         'learningLanguageId': 2,
-
-
         'learningLanguageLevelId': 1,
 
-
         'serviceUseTermId': 1,
-
-
         'personalInfoUseTermId': 2,
 
-
         'isServiceUseTermAgreed': true,
-
-
         'isPersonalInfoUseTermAgreed': true,
       };
 
@@ -726,14 +700,14 @@ class _SocialSignupPageState
       );
 
 
-      // 토큰을 제외한 테스트 데이터만 출력
+      // 토큰을 제외한 데이터만 출력
+
       debugPrint(
         '[SPRING][3] '
             'name=${body['name']}, '
             'birth=${body['birth']}, '
             'nation=${body['nation']}',
       );
-
 
       debugPrint(
         '[SPRING][3] '
@@ -744,7 +718,6 @@ class _SocialSignupPageState
             'learningLanguageLevelId='
             '${body['learningLanguageLevelId']}',
       );
-
 
       debugPrint(
         '[SPRING][3] '
@@ -768,34 +741,28 @@ class _SocialSignupPageState
 
       final http.Response response =
       await http.post(
-
         uri,
-
         headers: {
           'Content-Type':
           'application/json',
         },
-
-        body:
-        jsonEncode(body),
+        body: jsonEncode(body),
       );
 
 
-      // 여기까지 왔다는 것은
-      // Spring에서 HTTP 응답을 받았다는 뜻
+      // Spring으로부터 HTTP 응답을 받음
+
       logStep(
         'SPRING',
         '5',
         'http.post() 응답 수신',
       );
 
-
       debugPrint(
         '[SPRING][6] '
             'HTTP STATUS = '
             '${response.statusCode}',
       );
-
 
       debugPrint(
         '[SPRING][7] '
@@ -812,34 +779,28 @@ class _SocialSignupPageState
       response.statusCode >= 200 &&
           response.statusCode < 300
       ) {
-
         logStep(
           'SPRING',
           '8',
           'Spring 회원가입 HTTP 성공',
         );
 
-
         if (!mounted) {
           return;
         }
 
-
         setState(() {
-
           result =
           '$socialType 회원가입 성공\n\n'
               'HTTP ${response.statusCode}\n\n'
               '${response.body}';
         });
 
-
         logStep(
           'SPRING',
           '9',
           'socialSignup() 정상 종료',
         );
-
 
         return;
       }
@@ -855,19 +816,15 @@ class _SocialSignupPageState
         'Spring이 실패 HTTP 응답 반환',
       );
 
-
       throw Exception(
         'Spring 요청 실패\n'
             'HTTP ${response.statusCode}\n'
             '${response.body}',
       );
-
-
     } catch (
     e,
     stackTrace,
     ) {
-
     debugPrint(
     '================ SPRING ERROR ================',
     );
@@ -891,9 +848,8 @@ class _SocialSignupPageState
     '==============================================',
     );
 
-
-    // 상위 googleSignup/kakaoSignup에서도
-    // provider별 에러를 처리하도록 다시 던짐
+    // Google/Kakao 쪽에서도 처리하도록
+    // 다시 예외 전달
     rethrow;
     }
   }
@@ -907,46 +863,36 @@ class _SocialSignupPageState
   Widget build(
       BuildContext context,
       ) {
-
     return Scaffold(
-
       appBar: AppBar(
-
         title: const Text(
           'Language World Social Signup',
         ),
       ),
 
-
       body: SingleChildScrollView(
-
         padding:
         const EdgeInsets.all(24),
 
         child: Column(
-
           crossAxisAlignment:
           CrossAxisAlignment.stretch,
 
           children: [
-
             // ==========================================
             // Google 버튼
             // ==========================================
 
             ElevatedButton(
-
               onPressed:
               loading
                   ? null
                   : googleSignup,
-
               child:
               const Text(
                 'Google 회원가입',
               ),
             ),
-
 
             const SizedBox(
               height: 16,
@@ -958,18 +904,15 @@ class _SocialSignupPageState
             // ==========================================
 
             ElevatedButton(
-
               onPressed:
               loading
                   ? null
                   : kakaoSignup,
-
               child:
               const Text(
                 'Kakao 회원가입',
               ),
             ),
-
 
             const SizedBox(
               height: 32,
@@ -977,9 +920,7 @@ class _SocialSignupPageState
 
 
             const Text(
-
               '현재 상태',
-
               style: TextStyle(
                 fontSize: 18,
                 fontWeight:
@@ -987,16 +928,13 @@ class _SocialSignupPageState
               ),
             ),
 
-
             const SizedBox(
               height: 12,
             ),
 
-
             SelectableText(
               result,
             ),
-
 
             const SizedBox(
               height: 32,
