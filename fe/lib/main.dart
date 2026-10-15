@@ -12,42 +12,27 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 class SecureConfig {
   static const String googleWebClientId =
-  String.fromEnvironment(
-    'GOOGLE_WEB_CLIENT_ID',
-  );
+  String.fromEnvironment('GOOGLE_WEB_CLIENT_ID');
 
   static const String kakaoNativeAppKey =
-  String.fromEnvironment(
-    'KAKAO_NATIVE_APP_KEY',
-  );
+  String.fromEnvironment('KAKAO_NATIVE_APP_KEY');
 
   static const String springBaseUrl =
-  String.fromEnvironment(
-    'SPRING_BASE_URL',
-  );
+  String.fromEnvironment('SPRING_BASE_URL');
 }
 
-
-// Google Cloud Console의
-// "Web application" OAuth Client ID
 const String googleWebClientId =
     SecureConfig.googleWebClientId;
 
-
-// Kakao Developers의
-// "Native App Key"
 const String kakaoNativeAppKey =
     SecureConfig.kakaoNativeAppKey;
 
-
-// Android Emulator에서
-// Windows PC의 Spring 서버에 접근하는 주소
 const String springBaseUrl =
     SecureConfig.springBaseUrl;
 
 
 // ======================================================
-// 공통 로그 함수
+// 로그
 // ======================================================
 
 void logStep(
@@ -55,24 +40,16 @@ void logStep(
     String step,
     String message,
     ) {
-  debugPrint(
-    '[$scope][$step] $message',
-  );
+  debugPrint('[$scope][$step] $message');
 }
 
 
 // ======================================================
-// 앱 시작
+// main
 // ======================================================
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-
-  // ------------------------------------------------------
-  // 환경변수 확인
-  // 실제 값은 출력하지 않음
-  // ------------------------------------------------------
 
   debugPrint(
     '[ENV] KAKAO_NATIVE_APP_KEY exists = '
@@ -89,9 +66,6 @@ Future<void> main() async {
         '${springBaseUrl.isNotEmpty}',
   );
 
-
-  // 환경변수가 비어 있으면
-  // 앱 시작 단계에서 즉시 오류 발생
   if (kakaoNativeAppKey.isEmpty) {
     throw StateError(
       'KAKAO_NATIVE_APP_KEY가 설정되지 않았습니다.',
@@ -110,17 +84,11 @@ Future<void> main() async {
     );
   }
 
-
   logStep(
     'APP',
     '1',
     'main() 시작',
   );
-
-
-  // ------------------------------------------------------
-  // Kakao SDK 초기화
-  // ------------------------------------------------------
 
   logStep(
     'APP',
@@ -138,11 +106,6 @@ Future<void> main() async {
     'KakaoSdk.init() 완료',
   );
 
-
-  // ------------------------------------------------------
-  // Google Sign-In 초기화
-  // ------------------------------------------------------
-
   logStep(
     'APP',
     '4',
@@ -159,11 +122,6 @@ Future<void> main() async {
     'GoogleSignIn.initialize() 완료',
   );
 
-
-  // ------------------------------------------------------
-  // Flutter 앱 시작
-  // ------------------------------------------------------
-
   runApp(
     const MyApp(),
   );
@@ -177,7 +135,7 @@ Future<void> main() async {
 
 
 // ======================================================
-// Root Widget
+// App
 // ======================================================
 
 class MyApp extends StatelessWidget {
@@ -186,296 +144,342 @@ class MyApp extends StatelessWidget {
   });
 
   @override
-  Widget build(
-      BuildContext context,
-      ) {
-    return const MaterialApp(
+  Widget build(BuildContext context) {
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SocialSignupPage(),
+      title: 'Language World Auth Test',
+      theme: ThemeData(
+        useMaterial3: true,
+      ),
+      home: const AuthTestPage(),
     );
   }
 }
 
 
 // ======================================================
-// 소셜 회원가입 테스트 화면
+// 인증 테스트 화면
 // ======================================================
 
-class SocialSignupPage extends StatefulWidget {
-  const SocialSignupPage({
+class AuthTestPage extends StatefulWidget {
+  const AuthTestPage({
     super.key,
   });
 
   @override
-  State<SocialSignupPage> createState() =>
-      _SocialSignupPageState();
+  State<AuthTestPage> createState() =>
+      _AuthTestPageState();
 }
 
 
-class _SocialSignupPageState
-    extends State<SocialSignupPage> {
+class _AuthTestPageState
+    extends State<AuthTestPage> {
 
-  String result =
-      '아직 회원가입하지 않았습니다.';
+  // ====================================================
+  // 회원가입 Form
+  // ====================================================
 
-  bool loading = false;
+  final GlobalKey<FormState> _signupFormKey =
+  GlobalKey<FormState>();
+
+  final TextEditingController _nameController =
+  TextEditingController();
+
+  final TextEditingController _birthController =
+  TextEditingController();
+
+  final TextEditingController _nationController =
+  TextEditingController(
+    text: 'KR',
+  );
+
+  final TextEditingController _motherTongueIdController =
+  TextEditingController(
+    text: '1',
+  );
+
+  final TextEditingController
+  _learningLanguageIdController =
+  TextEditingController(
+    text: '2',
+  );
+
+  final TextEditingController
+  _learningLanguageLevelIdController =
+  TextEditingController(
+    text: '1',
+  );
+
+  final TextEditingController _serviceUseTermIdController =
+  TextEditingController(
+    text: '1',
+  );
+
+  final TextEditingController
+  _personalInfoUseTermIdController =
+  TextEditingController(
+    text: '2',
+  );
+
+  bool _serviceTermAgreed = false;
+  bool _personalInfoTermAgreed = false;
+
+  bool _loading = false;
+
+  String _result =
+      '아직 요청하지 않았습니다.';
 
 
   // ====================================================
-  // Google 회원가입
+  // dispose
   // ====================================================
 
-  Future<void> googleSignup() async {
-    logStep(
-      'GOOGLE',
-      '1',
-      'googleSignup() 시작',
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _birthController.dispose();
+    _nationController.dispose();
+    _motherTongueIdController.dispose();
+    _learningLanguageIdController.dispose();
+    _learningLanguageLevelIdController.dispose();
+    _serviceUseTermIdController.dispose();
+    _personalInfoUseTermIdController.dispose();
+
+    super.dispose();
+  }
+
+
+  // ====================================================
+  // 생년월일 선택
+  // ====================================================
+
+  Future<void> _selectBirth() async {
+    final DateTime? date =
+    await showDatePicker(
+      context: context,
+      initialDate: DateTime(
+        2000,
+        1,
+        1,
+      ),
+      firstDate: DateTime(
+        1900,
+        1,
+        1,
+      ),
+      lastDate: DateTime.now(),
     );
 
-    try {
-      setState(() {
-        loading = true;
-        result = 'Google 로그인 중...';
-      });
+    if (date == null) {
+      return;
+    }
+
+    final String year =
+    date.year.toString().padLeft(4, '0');
+
+    final String month =
+    date.month.toString().padLeft(2, '0');
+
+    final String day =
+    date.day.toString().padLeft(2, '0');
+
+    _birthController.text =
+    '$year-$month-$day';
+  }
 
 
-      // ------------------------------------------------
-      // Google 로그인 시작
-      // ------------------------------------------------
+  // ====================================================
+  // Form validator
+  // ====================================================
 
-      logStep(
-        'GOOGLE',
-        '2',
-        'GoogleSignIn.authenticate() 호출 직전',
-      );
+  String? _requiredValidator(
+      String? value,
+      ) {
+    if (value == null ||
+        value.trim().isEmpty) {
+      return '필수 입력값입니다.';
+    }
 
-      final GoogleSignInAccount account =
-      await GoogleSignIn
-          .instance
-          .authenticate();
-
-      logStep(
-        'GOOGLE',
-        '3',
-        'GoogleSignIn.authenticate() 반환 성공',
-      );
+    return null;
+  }
 
 
-      // ------------------------------------------------
-      // ID Token 획득
-      // ------------------------------------------------
+  String? _idValidator(
+      String? value,
+      ) {
+    if (value == null ||
+        value.trim().isEmpty) {
+      return '필수 입력값입니다.';
+    }
 
-      logStep(
-        'GOOGLE',
-        '4',
-        'ID Token 조회 직전',
-      );
+    final int? number =
+    int.tryParse(
+      value.trim(),
+    );
 
-      final String? idToken =
-          account
-              .authentication
-              .idToken;
+    if (number == null ||
+        number <= 0) {
+      return '1 이상의 숫자를 입력하세요.';
+    }
 
-      logStep(
-        'GOOGLE',
-        '5',
-        'ID Token null 여부 = ${idToken == null}',
-      );
+    return null;
+  }
 
-      if (idToken == null) {
+
+  // ====================================================
+  // Provider Token 획득
+  // ====================================================
+
+  Future<String> _getSocialToken(
+      String socialType,
+      ) async {
+    switch (socialType) {
+      case 'google':
+        return _getGoogleIdToken();
+
+      case 'kakao':
+        return _getKakaoAccessToken();
+
+      default:
         throw Exception(
-          'Google ID Token을 받지 못했습니다.',
+          '지원하지 않는 socialType입니다: '
+              '$socialType',
         );
-      }
-
-      logStep(
-        'GOOGLE',
-        '6',
-        'Google ID Token 획득 성공, '
-            'length=${idToken.length}',
-      );
-
-      // 실제 토큰 문자열은 로그로 출력하지 않음
-
-
-      // ------------------------------------------------
-      // Spring 요청
-      // ------------------------------------------------
-
-      logStep(
-        'GOOGLE',
-        '7',
-        'socialSignup(google) 호출 직전',
-      );
-
-      await socialSignup(
-        socialType: 'google',
-        token: idToken,
-      );
-
-      logStep(
-        'GOOGLE',
-        '8',
-        'socialSignup(google) 정상 반환',
-      );
-    } catch (
-    e,
-    stackTrace,
-    ) {
-    debugPrint(
-    '================ GOOGLE ERROR ================',
-    );
-
-    debugPrint(
-    '[GOOGLE][ERROR] '
-    'type = ${e.runtimeType}',
-    );
-
-    debugPrint(
-    '[GOOGLE][ERROR] '
-    'error = $e',
-    );
-
-    debugPrint(
-    '[GOOGLE][ERROR] '
-    'stackTrace = $stackTrace',
-    );
-
-    debugPrint(
-    '==============================================',
-    );
-
-    if (!mounted) {
-    return;
-    }
-
-    setState(() {
-    result =
-    'Google 회원가입 실패\n\n'
-    '${e.runtimeType}\n'
-    '$e';
-    });
-    } finally {
-    logStep(
-    'GOOGLE',
-    '9',
-    'finally 진입',
-    );
-
-    if (mounted) {
-    setState(() {
-    loading = false;
-    });
-    }
-
-    logStep(
-    'GOOGLE',
-    '10',
-    'googleSignup() 종료',
-    );
     }
   }
 
 
   // ====================================================
-  // Kakao 회원가입
+  // Google Token
   // ====================================================
 
-  Future<void> kakaoSignup() async {
+  Future<String> _getGoogleIdToken() async {
+    logStep(
+      'GOOGLE',
+      '1',
+      'Google 인증 시작',
+    );
+
+    logStep(
+      'GOOGLE',
+      '2',
+      'authenticate() 호출 직전',
+    );
+
+    final GoogleSignInAccount account =
+    await GoogleSignIn
+        .instance
+        .authenticate();
+
+    logStep(
+      'GOOGLE',
+      '3',
+      'authenticate() 반환 성공',
+    );
+
+    final String? idToken =
+        account
+            .authentication
+            .idToken;
+
+    if (idToken == null ||
+        idToken.isEmpty) {
+      throw Exception(
+        'Google ID Token을 '
+            '받지 못했습니다.',
+      );
+    }
+
+    logStep(
+      'GOOGLE',
+      '4',
+      'ID Token 획득 성공 '
+          'length=${idToken.length}',
+    );
+
+    // 실제 token 문자열 출력 금지
+
+    return idToken;
+  }
+
+
+  // ====================================================
+  // Kakao Token
+  // ====================================================
+
+  Future<String>
+  _getKakaoAccessToken() async {
+
     logStep(
       'KAKAO',
       '1',
-      'kakaoSignup() 시작',
+      'Kakao 인증 시작',
     );
 
-    try {
-      setState(() {
-        loading = true;
-        result = 'Kakao 로그인 중...';
-      });
+    final bool installed =
+    await isKakaoTalkInstalled();
 
+    logStep(
+      'KAKAO',
+      '2',
+      'KakaoTalk 설치 여부 = '
+          '$installed',
+    );
 
-      // ------------------------------------------------
-      // KakaoTalk 설치 여부 확인
-      // ------------------------------------------------
+    OAuthToken oauthToken;
 
-      logStep(
-        'KAKAO',
-        '2',
-        'isKakaoTalkInstalled() 호출 직전',
-      );
+    if (installed) {
+      try {
+        logStep(
+          'KAKAO',
+          '3-A',
+          'loginWithKakaoTalk() 호출',
+        );
 
-      final bool installed =
-      await isKakaoTalkInstalled();
+        oauthToken =
+        await UserApi
+            .instance
+            .loginWithKakaoTalk();
 
-      logStep(
-        'KAKAO',
-        '3',
-        'KakaoTalk 설치 여부 = $installed',
-      );
-
-
-      OAuthToken oauthToken;
-
-
-      // ------------------------------------------------
-      // KakaoTalk 설치된 경우
-      // ------------------------------------------------
-
-      if (installed) {
         logStep(
           'KAKAO',
           '4-A',
-          'loginWithKakaoTalk() 호출 직전',
+          'KakaoTalk 로그인 성공',
         );
-
-        try {
-          oauthToken =
-          await UserApi
-              .instance
-              .loginWithKakaoTalk();
-
-          logStep(
-            'KAKAO',
-            '5-A',
-            'loginWithKakaoTalk() 반환 성공',
-          );
-        } catch (
+      } catch (
     e,
     stackTrace,
     ) {
+    debugPrint(
+    '[KAKAO][TALK ERROR] $e',
+    );
+
+    debugPrint(
+    '$stackTrace',
+    );
+
     logStep(
     'KAKAO',
-    'ERROR-A',
-    'KakaoTalk 로그인 실패',
+    '3-B',
+    'KakaoAccount fallback',
     );
 
-    debugPrint(
-    '[KAKAO][ERROR-A] '
-    'type = ${e.runtimeType}',
-    );
-
-    debugPrint(
-    '[KAKAO][ERROR-A] '
-    'error = $e',
-    );
-
-    debugPrint(
-    '[KAKAO][ERROR-A] '
-    'stackTrace = $stackTrace',
-    );
-
-
-    // --------------------------------------------
-    // KakaoTalk 실패
-    // → KakaoAccount fallback
-    // --------------------------------------------
+    oauthToken =
+    await UserApi
+        .instance
+        .loginWithKakaoAccount();
 
     logStep(
     'KAKAO',
     '4-B',
-    'loginWithKakaoAccount() '
-    'fallback 호출 직전',
+    'KakaoAccount 로그인 성공',
+    );
+    }
+    } else {
+    logStep(
+    'KAKAO',
+    '3-C',
+    'loginWithKakaoAccount() 호출',
     );
 
     oauthToken =
@@ -483,261 +487,211 @@ class _SocialSignupPageState
         .instance
         .loginWithKakaoAccount();
 
-    logStep(
-    'KAKAO',
-    '5-B',
-    'loginWithKakaoAccount() '
-    'fallback 반환 성공',
-    );
-    }
-    }
-
-    // ------------------------------------------------
-    // KakaoTalk 미설치
-    // ------------------------------------------------
-
-    else {
     logStep(
     'KAKAO',
     '4-C',
-    'KakaoTalk 미설치 → '
-    'loginWithKakaoAccount() 호출 직전',
-    );
-
-    oauthToken =
-    await UserApi
-        .instance
-        .loginWithKakaoAccount();
-
-    logStep(
-    'KAKAO',
-    '5-C',
-    'loginWithKakaoAccount() 반환 성공',
+    'KakaoAccount 로그인 성공',
     );
     }
-
-
-    // ------------------------------------------------
-    // OAuthToken 획득 완료
-    // ------------------------------------------------
-
-    logStep(
-    'KAKAO',
-    '6',
-    'OAuthToken 객체 획득 완료',
-    );
 
     final String accessToken =
     oauthToken.accessToken;
 
+    if (accessToken.isEmpty) {
+    throw Exception(
+    'Kakao Access Token을 '
+    '받지 못했습니다.',
+    );
+    }
+
     logStep(
     'KAKAO',
-    '7',
-    'Access Token 존재 = '
-    '${accessToken.isNotEmpty}, '
+    '5',
+    'Access Token 획득 성공 '
     'length=${accessToken.length}',
     );
 
-    // 실제 Access Token은 출력하지 않음
+    // 실제 token 문자열 출력 금지
 
-
-    // ------------------------------------------------
-    // Spring 요청
-    // ------------------------------------------------
-
-    logStep(
-    'KAKAO',
-    '8',
-    'socialSignup(kakao) 호출 직전',
-    );
-
-    await socialSignup(
-    socialType: 'kakao',
-    token: accessToken,
-    );
-
-    logStep(
-    'KAKAO',
-    '9',
-    'socialSignup(kakao) 정상 반환',
-    );
-    } catch (
-    e,
-    stackTrace,
-    ) {
-    debugPrint(
-    '================ KAKAO ERROR ================',
-    );
-
-    debugPrint(
-    '[KAKAO][ERROR] '
-    'type = ${e.runtimeType}',
-    );
-
-    debugPrint(
-    '[KAKAO][ERROR] '
-    'error = $e',
-    );
-
-    debugPrint(
-    '[KAKAO][ERROR] '
-    'stackTrace = $stackTrace',
-    );
-
-    debugPrint(
-    '=============================================',
-    );
-
-    if (!mounted) {
-    return;
-    }
-
-    setState(() {
-    result =
-    'Kakao 회원가입 실패\n\n'
-    '${e.runtimeType}\n'
-    '$e';
-    });
-    } finally {
-    logStep(
-    'KAKAO',
-    '10',
-    'finally 진입',
-    );
-
-    if (mounted) {
-    setState(() {
-    loading = false;
-    });
-    }
-
-    logStep(
-    'KAKAO',
-    '11',
-    'kakaoSignup() 종료',
-    );
-    }
+    return accessToken;
   }
 
 
   // ====================================================
-  // Google / Kakao 공통 Spring 회원가입 요청
+  // 회원가입
   // ====================================================
 
-  Future<void> socialSignup({
-    required String socialType,
-    required String token,
-  }) async {
-    logStep(
-      'SPRING',
-      '1',
-      'socialSignup() 시작 '
-          '- socialType=$socialType',
-    );
+  Future<void> _socialSignup(
+      String socialType,
+      ) async {
+
+    if (_loading) {
+      return;
+    }
+
+
+    // --------------------------------------------------
+    // 입력값 검증
+    // --------------------------------------------------
+
+    final bool valid =
+        _signupFormKey
+            .currentState
+            ?.validate() ??
+            false;
+
+    if (!valid) {
+      return;
+    }
+
+
+    if (!_serviceTermAgreed) {
+      _showMessage(
+        '서비스 이용약관에 '
+            '동의해야 합니다.',
+      );
+
+      return;
+    }
+
+
+    if (!_personalInfoTermAgreed) {
+      _showMessage(
+        '개인정보 이용약관에 '
+            '동의해야 합니다.',
+      );
+
+      return;
+    }
+
+
+    setState(() {
+      _loading = true;
+      _result =
+      '$socialType 회원가입 인증 중...';
+    });
+
 
     try {
-      if (mounted) {
-        setState(() {
-          result =
-          '$socialType 인증 성공\n'
-              'Spring 회원가입 요청 중...';
-        });
-      }
-
-
-      // ------------------------------------------------
-      // URL 생성
-      // ------------------------------------------------
-
-      final Uri uri =
-      Uri.parse(
-        '$springBaseUrl/auth/signup/$socialType',
-      );
-
       logStep(
-        'SPRING',
-        '2',
-        '요청 URL = $uri',
+        'SIGNUP',
+        '1',
+        '$socialType 회원가입 시작',
       );
 
 
       // ------------------------------------------------
-      // Request Body 생성
+      // Google / Kakao 인증
+      // ------------------------------------------------
+
+      final String token =
+      await _getSocialToken(
+        socialType,
+      );
+
+
+      // ------------------------------------------------
+      // 입력값 → JSON
       // ------------------------------------------------
 
       final Map<String, dynamic> body = {
-        // Google:
-        // Google ID Token
-        //
-        // Kakao:
-        // Kakao Access Token
         'token': token,
 
-        'name': '소셜회원',
+        'name':
+        _nameController
+            .text
+            .trim(),
 
-        'birth': '2000-01-01',
+        'birth':
+        _birthController
+            .text
+            .trim(),
 
-        // Spring NationCode에 실제 존재하는 값
-        'nation': 'KR',
+        'nation':
+        _nationController
+            .text
+            .trim()
+            .toUpperCase(),
 
-        // 실제 DB의 ID와 맞춰야 함
-        'motherTongueId': 1,
-        'learningLanguageId': 2,
-        'learningLanguageLevelId': 1,
+        'motherTongueId':
+        int.parse(
+          _motherTongueIdController
+              .text
+              .trim(),
+        ),
 
-        'serviceUseTermId': 1,
-        'personalInfoUseTermId': 2,
+        'learningLanguageId':
+        int.parse(
+          _learningLanguageIdController
+              .text
+              .trim(),
+        ),
 
-        'isServiceUseTermAgreed': true,
-        'isPersonalInfoUseTermAgreed': true,
+        'learningLanguageLevelId':
+        int.parse(
+          _learningLanguageLevelIdController
+              .text
+              .trim(),
+        ),
+
+        'serviceUseTermId':
+        int.parse(
+          _serviceUseTermIdController
+              .text
+              .trim(),
+        ),
+
+        'personalInfoUseTermId':
+        int.parse(
+          _personalInfoUseTermIdController
+              .text
+              .trim(),
+        ),
+
+        'isServiceUseTermAgreed':
+        _serviceTermAgreed,
+
+        'isPersonalInfoUseTermAgreed':
+        _personalInfoTermAgreed,
       };
 
 
+      final Uri uri =
+      Uri.parse(
+        '$springBaseUrl/auth/signup/'
+            '$socialType',
+      );
+
       logStep(
-        'SPRING',
+        'SIGNUP',
+        '2',
+        'POST $uri',
+      );
+
+      logStep(
+        'SIGNUP',
         '3',
-        'Request Body 생성 완료',
+        '회원가입 Body 생성 완료',
       );
 
 
-      // 토큰을 제외한 데이터만 출력
+      // token 제외 데이터만 로그
 
       debugPrint(
-        '[SPRING][3] '
-            'name=${body['name']}, '
-            'birth=${body['birth']}, '
+        '[SIGNUP] '
+            'name=${body['name']}',
+      );
+
+      debugPrint(
+        '[SIGNUP] '
+            'birth=${body['birth']}',
+      );
+
+      debugPrint(
+        '[SIGNUP] '
             'nation=${body['nation']}',
       );
 
-      debugPrint(
-        '[SPRING][3] '
-            'motherTongueId='
-            '${body['motherTongueId']}, '
-            'learningLanguageId='
-            '${body['learningLanguageId']}, '
-            'learningLanguageLevelId='
-            '${body['learningLanguageLevelId']}',
-      );
-
-      debugPrint(
-        '[SPRING][3] '
-            'serviceUseTermId='
-            '${body['serviceUseTermId']}, '
-            'personalInfoUseTermId='
-            '${body['personalInfoUseTermId']}',
-      );
-
-
-      logStep(
-        'SPRING',
-        '4',
-        'http.post() 호출 직전',
-      );
-
-
-      // ------------------------------------------------
-      // Flutter → Spring 실제 HTTP 요청
-      // ------------------------------------------------
 
       final http.Response response =
       await http.post(
@@ -750,74 +704,32 @@ class _SocialSignupPageState
       );
 
 
-      // Spring으로부터 HTTP 응답을 받음
-
       logStep(
-        'SPRING',
-        '5',
-        'http.post() 응답 수신',
-      );
-
-      debugPrint(
-        '[SPRING][6] '
-            'HTTP STATUS = '
-            '${response.statusCode}',
-      );
-
-      debugPrint(
-        '[SPRING][7] '
-            'RESPONSE BODY = '
-            '${response.body}',
+        'SIGNUP',
+        '4',
+        'HTTP ${response.statusCode}',
       );
 
 
-      // ------------------------------------------------
-      // 성공 응답
-      // ------------------------------------------------
-
-      if (
-      response.statusCode >= 200 &&
-          response.statusCode < 300
-      ) {
-        logStep(
-          'SPRING',
-          '8',
-          'Spring 회원가입 HTTP 성공',
-        );
+      if (response.statusCode >= 200 &&
+          response.statusCode < 300) {
 
         if (!mounted) {
           return;
         }
 
         setState(() {
-          result =
-          '$socialType 회원가입 성공\n\n'
-              'HTTP ${response.statusCode}\n\n'
-              '${response.body}';
+          _result =
+          '$socialType 회원가입 성공\n'
+              'HTTP ${response.statusCode}';
         });
-
-        logStep(
-          'SPRING',
-          '9',
-          'socialSignup() 정상 종료',
-        );
 
         return;
       }
 
 
-      // ------------------------------------------------
-      // 4xx / 5xx
-      // ------------------------------------------------
-
-      logStep(
-        'SPRING',
-        'ERROR',
-        'Spring이 실패 HTTP 응답 반환',
-      );
-
       throw Exception(
-        'Spring 요청 실패\n'
+        '회원가입 실패\n'
             'HTTP ${response.statusCode}\n'
             '${response.body}',
       );
@@ -826,71 +738,347 @@ class _SocialSignupPageState
     stackTrace,
     ) {
     debugPrint(
-    '================ SPRING ERROR ================',
+    '============= SIGNUP ERROR =============',
     );
 
     debugPrint(
-    '[SPRING][ERROR] '
-    'type = ${e.runtimeType}',
+    '[SIGNUP][ERROR] '
+    '${e.runtimeType}',
     );
 
     debugPrint(
-    '[SPRING][ERROR] '
-    'error = $e',
+    '[SIGNUP][ERROR] $e',
     );
 
     debugPrint(
-    '[SPRING][ERROR] '
-    'stackTrace = $stackTrace',
+    '[SIGNUP][STACK] '
+    '$stackTrace',
     );
 
     debugPrint(
-    '==============================================',
+    '========================================',
     );
 
-    // Google/Kakao 쪽에서도 처리하도록
-    // 다시 예외 전달
-    rethrow;
+    if (!mounted) {
+    return;
+    }
+
+    setState(() {
+    _result =
+    '$socialType 회원가입 실패\n\n'
+    '$e';
+    });
+    } finally {
+    if (mounted) {
+    setState(() {
+    _loading = false;
+    });
+    }
     }
   }
 
 
   // ====================================================
-  // UI
+  // 로그인
   // ====================================================
 
-  @override
-  Widget build(
-      BuildContext context,
+  Future<void> _socialLogin(
+      String socialType,
+      ) async {
+
+    if (_loading) {
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+      _result =
+      '$socialType 로그인 인증 중...';
+    });
+
+    try {
+      logStep(
+        'LOGIN',
+        '1',
+        '$socialType 로그인 시작',
+      );
+
+
+      // ------------------------------------------------
+      // Provider 인증
+      // ------------------------------------------------
+
+      final String token =
+      await _getSocialToken(
+        socialType,
+      );
+
+
+      // ------------------------------------------------
+      // Spring 로그인 요청
+      // ------------------------------------------------
+
+      final Uri uri =
+      Uri.parse(
+        '$springBaseUrl/auth/login/'
+            '$socialType',
+      );
+
+
+      final Map<String, dynamic> body = {
+        'token': token,
+      };
+
+
+      logStep(
+        'LOGIN',
+        '2',
+        'POST $uri',
+      );
+
+
+      final http.Response response =
+      await http.post(
+        uri,
+        headers: {
+          'Content-Type':
+          'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+
+      logStep(
+        'LOGIN',
+        '3',
+        'HTTP ${response.statusCode}',
+      );
+
+
+      if (response.statusCode >= 200 &&
+          response.statusCode < 300) {
+
+        // 로그인 성공 응답에는
+        // accessToken / refreshToken 등
+        // JWT가 포함될 수 있으므로
+        // response.body를 debugPrint 하지 않음.
+
+        if (!mounted) {
+          return;
+        }
+
+        setState(() {
+          _result =
+          '$socialType 로그인 성공\n'
+              'HTTP ${response.statusCode}\n\n'
+              'Spring JWT 응답 수신 완료';
+        });
+
+        return;
+      }
+
+
+      throw Exception(
+        '로그인 실패\n'
+            'HTTP ${response.statusCode}\n'
+            '${response.body}',
+      );
+    } catch (
+    e,
+    stackTrace,
+    ) {
+    debugPrint(
+    '============= LOGIN ERROR =============',
+    );
+
+    debugPrint(
+    '[LOGIN][ERROR] '
+    '${e.runtimeType}',
+    );
+
+    debugPrint(
+    '[LOGIN][ERROR] $e',
+    );
+
+    debugPrint(
+    '[LOGIN][STACK] '
+    '$stackTrace',
+    );
+
+    debugPrint(
+    '=======================================',
+    );
+
+    if (!mounted) {
+    return;
+    }
+
+    setState(() {
+    _result =
+    '$socialType 로그인 실패\n\n'
+    '$e';
+    });
+    } finally {
+    if (mounted) {
+    setState(() {
+    _loading = false;
+    });
+    }
+    }
+  }
+
+
+  // ====================================================
+  // SnackBar
+  // ====================================================
+
+  void _showMessage(
+      String message,
       ) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Language World Social Signup',
+    ScaffoldMessenger
+        .of(context)
+        .showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
         ),
       ),
+    );
+  }
 
-      body: SingleChildScrollView(
-        padding:
-        const EdgeInsets.all(24),
 
+  // ====================================================
+  // 공통 TextField
+  // ====================================================
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    String? hint,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+    bool readOnly = false,
+    VoidCallback? onTap,
+  }) {
+    return Padding(
+      padding:
+      const EdgeInsets.only(
+        bottom: 16,
+      ),
+      child: TextFormField(
+        controller: controller,
+        keyboardType:
+        keyboardType,
+        validator:
+        validator,
+        readOnly:
+        readOnly,
+        onTap:
+        onTap,
+        decoration:
+        InputDecoration(
+          labelText: label,
+          hintText: hint,
+          border:
+          const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+
+  // ====================================================
+  // 회원가입 화면
+  // ====================================================
+
+  Widget _buildSignupPage() {
+    return SingleChildScrollView(
+      padding:
+      const EdgeInsets.all(
+        24,
+      ),
+      child: Form(
+        key:
+        _signupFormKey,
         child: Column(
           crossAxisAlignment:
           CrossAxisAlignment.stretch,
-
           children: [
-            // ==========================================
-            // Google 버튼
-            // ==========================================
 
-            ElevatedButton(
-              onPressed:
-              loading
-                  ? null
-                  : googleSignup,
-              child:
-              const Text(
-                'Google 회원가입',
+            const Text(
+              '회원가입 정보',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight:
+                FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(
+              height: 24,
+            ),
+
+
+            // ------------------------------------------
+            // 이름
+            // ------------------------------------------
+
+            _buildTextField(
+              label: '이름',
+              controller:
+              _nameController,
+              hint: '홍길동',
+              validator:
+              _requiredValidator,
+            ),
+
+
+            // ------------------------------------------
+            // 생년월일
+            // ------------------------------------------
+
+            _buildTextField(
+              label:
+              '생년월일',
+              controller:
+              _birthController,
+              hint:
+              '2000-01-01',
+              validator:
+              _requiredValidator,
+              readOnly:
+              true,
+              onTap:
+              _selectBirth,
+            ),
+
+
+            // ------------------------------------------
+            // 국가
+            // ------------------------------------------
+
+            _buildTextField(
+              label:
+              '국가 코드',
+              controller:
+              _nationController,
+              hint:
+              'KR',
+              validator:
+              _requiredValidator,
+            ),
+
+
+            const Divider(
+              height: 32,
+            ),
+
+            const Text(
+              '언어 설정',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight:
+                FontWeight.bold,
               ),
             ),
 
@@ -899,30 +1087,318 @@ class _SocialSignupPageState
             ),
 
 
-            // ==========================================
-            // Kakao 버튼
-            // ==========================================
+            _buildTextField(
+              label:
+              '모국어 ID',
+              controller:
+              _motherTongueIdController,
+              keyboardType:
+              TextInputType.number,
+              validator:
+              _idValidator,
+            ),
 
-            ElevatedButton(
-              onPressed:
-              loading
-                  ? null
-                  : kakaoSignup,
-              child:
-              const Text(
-                'Kakao 회원가입',
+
+            _buildTextField(
+              label:
+              '학습 언어 ID',
+              controller:
+              _learningLanguageIdController,
+              keyboardType:
+              TextInputType.number,
+              validator:
+              _idValidator,
+            ),
+
+
+            _buildTextField(
+              label:
+              '학습 언어 Level ID',
+              controller:
+              _learningLanguageLevelIdController,
+              keyboardType:
+              TextInputType.number,
+              validator:
+              _idValidator,
+            ),
+
+
+            const Divider(
+              height: 32,
+            ),
+
+            const Text(
+              '약관',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight:
+                FontWeight.bold,
               ),
             ),
+
+            const SizedBox(
+              height: 16,
+            ),
+
+
+            _buildTextField(
+              label:
+              '서비스 이용약관 ID',
+              controller:
+              _serviceUseTermIdController,
+              keyboardType:
+              TextInputType.number,
+              validator:
+              _idValidator,
+            ),
+
+
+            _buildTextField(
+              label:
+              '개인정보 이용약관 ID',
+              controller:
+              _personalInfoUseTermIdController,
+              keyboardType:
+              TextInputType.number,
+              validator:
+              _idValidator,
+            ),
+
+
+            CheckboxListTile(
+              value:
+              _serviceTermAgreed,
+              title:
+              const Text(
+                '서비스 이용약관 동의',
+              ),
+              controlAffinity:
+              ListTileControlAffinity.leading,
+              contentPadding:
+              EdgeInsets.zero,
+              onChanged:
+              _loading
+                  ? null
+                  : (bool? value) {
+                setState(() {
+                  _serviceTermAgreed =
+                      value ?? false;
+                });
+              },
+            ),
+
+
+            CheckboxListTile(
+              value:
+              _personalInfoTermAgreed,
+              title:
+              const Text(
+                '개인정보 이용 동의',
+              ),
+              controlAffinity:
+              ListTileControlAffinity.leading,
+              contentPadding:
+              EdgeInsets.zero,
+              onChanged:
+              _loading
+                  ? null
+                  : (bool? value) {
+                setState(() {
+                  _personalInfoTermAgreed =
+                      value ?? false;
+                });
+              },
+            ),
+
+
+            const SizedBox(
+              height: 24,
+            ),
+
+
+            // ------------------------------------------
+            // Google 회원가입
+            // ------------------------------------------
+
+            FilledButton(
+              onPressed:
+              _loading
+                  ? null
+                  : () {
+                _socialSignup(
+                  'google',
+                );
+              },
+              child:
+              const Text(
+                'Google로 회원가입',
+              ),
+            ),
+
+
+            const SizedBox(
+              height: 12,
+            ),
+
+
+            // ------------------------------------------
+            // Kakao 회원가입
+            // ------------------------------------------
+
+            FilledButton.tonal(
+              onPressed:
+              _loading
+                  ? null
+                  : () {
+                _socialSignup(
+                  'kakao',
+                );
+              },
+              child:
+              const Text(
+                'Kakao로 회원가입',
+              ),
+            ),
+
 
             const SizedBox(
               height: 32,
             ),
 
+            _buildResult(),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  // ====================================================
+  // 로그인 화면
+  // ====================================================
+
+  Widget _buildLoginPage() {
+    return SingleChildScrollView(
+      padding:
+      const EdgeInsets.all(
+        24,
+      ),
+      child: Column(
+        crossAxisAlignment:
+        CrossAxisAlignment.stretch,
+        children: [
+
+          const Text(
+            '소셜 로그인',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight:
+              FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(
+            height: 12,
+          ),
+
+          const Text(
+            '이미 회원가입한 계정으로 '
+                'Google 또는 Kakao 인증을 진행합니다.',
+          ),
+
+          const SizedBox(
+            height: 32,
+          ),
+
+
+          // --------------------------------------------
+          // Google 로그인
+          // --------------------------------------------
+
+          FilledButton(
+            onPressed:
+            _loading
+                ? null
+                : () {
+              _socialLogin(
+                'google',
+              );
+            },
+            child:
+            const Text(
+              'Google 로그인',
+            ),
+          ),
+
+
+          const SizedBox(
+            height: 16,
+          ),
+
+
+          // --------------------------------------------
+          // Kakao 로그인
+          // --------------------------------------------
+
+          FilledButton.tonal(
+            onPressed:
+            _loading
+                ? null
+                : () {
+              _socialLogin(
+                'kakao',
+              );
+            },
+            child:
+            const Text(
+              'Kakao 로그인',
+            ),
+          ),
+
+
+          const SizedBox(
+            height: 32,
+          ),
+
+
+          if (_loading)
+            const Center(
+              child:
+              CircularProgressIndicator(),
+            ),
+
+
+          const SizedBox(
+            height: 24,
+          ),
+
+          _buildResult(),
+        ],
+      ),
+    );
+  }
+
+
+  // ====================================================
+  // 결과 영역
+  // ====================================================
+
+  Widget _buildResult() {
+    return Card(
+      child: Padding(
+        padding:
+        const EdgeInsets.all(
+          16,
+        ),
+        child: Column(
+          crossAxisAlignment:
+          CrossAxisAlignment.start,
+          children: [
 
             const Text(
               '현재 상태',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 17,
                 fontWeight:
                 FontWeight.bold,
               ),
@@ -933,12 +1409,50 @@ class _SocialSignupPageState
             ),
 
             SelectableText(
-              result,
+              _result,
             ),
+          ],
+        ),
+      ),
+    );
+  }
 
-            const SizedBox(
-              height: 32,
-            ),
+
+  // ====================================================
+  // build
+  // ====================================================
+
+  @override
+  Widget build(
+      BuildContext context,
+      ) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title:
+          const Text(
+            'Language World Auth Test',
+          ),
+          bottom:
+          const TabBar(
+            tabs: [
+              Tab(
+                text:
+                '회원가입',
+              ),
+              Tab(
+                text:
+                '로그인',
+              ),
+            ],
+          ),
+        ),
+
+        body: TabBarView(
+          children: [
+            _buildSignupPage(),
+            _buildLoginPage(),
           ],
         ),
       ),
