@@ -72,17 +72,17 @@ public class AuthController {
     }
 
     @Operation(
-            summary = "Google 로그인",
-            description = "Google을 이용해 서비스에 로그인을 진행하는 api입니다." +
+            summary = "소셜 로그인",
+            description = "소셜을 이용해 서비스에 로그인을 진행하는 api입니다." +
                     "로그인 시 자체 서비스의 AccessToken과 RefreshToken이 반환됩니다."
     )
-    @PostMapping(value = "/login/google",
+    @PostMapping(value = "/login/{socialLoginType}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<ApiResponse<LoginResponseDto>> login(@PathVariable String loginTypeCode, @Valid @RequestBody SocialLoginRequestDto socialLoginRequestDto) {
+    public ResponseEntity<ApiResponse<LoginResponseDto>> login(@PathVariable String socialLoginType, @Valid @RequestBody SocialLoginRequestDto socialLoginRequestDto) {
 
-        LoginResponseDto loginResponseDto = authService.login(loginTypeCode, socialLoginRequestDto);
+        LoginResponseDto loginResponseDto = authService.login(socialLoginType, socialLoginRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.LOGIN_SUCCESS, loginResponseDto);
     }

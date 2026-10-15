@@ -214,19 +214,25 @@ public class AuthService {
 
     }
 
-    // google 로그인
+    // 소셜 로그인
     @Transactional
-    public LoginResponseDto login(String loginTypeCode, SocialLoginRequestDto socialLoginRequestDto) {
+    public LoginResponseDto login(String socialLoginType, SocialLoginRequestDto socialLoginRequestDto) {
 
-        // 소셜 파트
-        String idToken = socialLoginRequestDto.idToken();
-        SocialAuthorizedUser socialAuthorizedUser = googleUtil.verifyGoogleIdToken(idToken);
+        SocialTypeCode type = SocialTypeCode.from(socialLoginType);
+        String token = socialLoginRequestDto.token();
+        SocialAuthorizedUser socialAuthorizedUser;
+
+        switch(type) {
+            case GOOGLE -> socialAuthorizedUser = googleUtil.verifyGoogleIdToken(token);
+            case KAKAO -> socialAuthorizedUser = kakaoUtil.getSocialAuthorizedUser(token);
+
+            // TODO: Custom log, customException 처리
+            default -> throw new RuntimeException();
+        }
 
         // spring 파트
         // 회원 존재 여부 확인
-        SocialTypeCode type = SocialTypeCode.from(loginTypeCode);
         String sub = socialAuthorizedUser.sub();
-
         SocialAccount socialAccount = userExistCheckForLogin(type, sub);
         User user = socialAccount.getUser();
 

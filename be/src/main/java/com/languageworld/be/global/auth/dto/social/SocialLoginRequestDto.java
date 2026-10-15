@@ -7,9 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 public record SocialLoginRequestDto (
 
         @Schema(
-                name = "idToken"
+                name = "token"
         )
         @NotBlank
-        String idToken
+        String token
 )
 { }
