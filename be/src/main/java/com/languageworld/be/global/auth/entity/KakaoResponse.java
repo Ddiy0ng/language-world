@@ -21,7 +21,7 @@ public record KakaoResponse(
         @JsonIgnoreProperties(ignoreUnknown = true)
         public record Profile(
 
-                @JsonProperty("kakao_account")
+                @JsonProperty("profile_image_url")
                 String profileImageUrl
         ) {
         }
