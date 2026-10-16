@@ -75,7 +75,7 @@ public enum CustomExceptionCode {
             "SOCIAL_401",
             "유효하지 않은 소셜 인증 토큰입니다."),
     INVALID_KAKAO_RESPONSE(
-            HttpStatus.UNAUTHORIZED,
+            HttpStatus.BAD_GATEWAY,
             "SOCIAL_502",
             "카카오 인증 서버의 응답이 유효하지 않습니다."),
     SOCIAL_API_REQUEST_FAILED(HttpStatus.BAD_GATEWAY,
@@ -99,6 +99,9 @@ public enum CustomExceptionCode {
             HttpStatus.INTERNAL_SERVER_ERROR,
             "MULTIPART_FILE_500",
             "파일 업로드 중 문제가 발생했습니다."),
+    UNSUPPORTED_UPLOAD_PURPOSE_REQUEST(HttpStatus.BAD_REQUEST,
+            "MULTIPART_FILE_400",
+            "지원하지 않는 파일 업로드 목적입니다."),
 
     // TERM
     TERM_NOT_FOUND(

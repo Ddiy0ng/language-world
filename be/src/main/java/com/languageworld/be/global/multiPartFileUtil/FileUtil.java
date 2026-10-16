@@ -33,11 +33,14 @@ public class FileUtil {
             // 파일 공백 확인
             fileEmptyCheck(requestedFile);
 
-            // 파일 확장자 추출
-            String extension = extractExtension(requestedFile.getContentType());
+            // ContentType 검증
+            String contentType = validateContentType(requestedFile);
 
-            // 확장장 검증
-            Path uploadPath = fileContentTypeCheckByPurpose(requestedFile, requestedPurpose);
+            // 확장자 검증
+            Path uploadPath = fileContentTypeCheckByPurpose(contentType, requestedPurpose);
+
+            // 파일 확장자 추출
+            String extension = contentType.substring(contentType.indexOf("/") + 1);
 
             // 파일 이름
             String fileName = UUID.randomUUID() + "." + extension;
@@ -68,22 +71,12 @@ public class FileUtil {
                     saveFile(requestedFile, fileUploadedPath, LogEventReasonCode.SAVE_PNG_EXCEPTION);
 
                     break;
-                default:
-                    CustomLogger.warn(
-                            LogEventCode.MULTIPART_FILE,
-                            "FAIL",
-                            LogEventReasonCode.UNSUPPORTED_CONTENT_TYPE,
-                            LogEventReasonCode.UNSUPPORTED_CONTENT_TYPE.getMessage() + " - File extension: " + extension,
-                            null
-                    );
-
-                    throw new CustomException(CustomExceptionCode.INVALID_FILE_TYPE);
             }
 
             // 성공 로그
             CustomLogger.info(LogEventCode.MULTIPART_FILE,
                     "SUCCESS",
-                    SuccessCode.FILE_UPLOAD_SUCCESS.getMessage(),
+                    SuccessCode.FILE_UPLOAD_SUCCESS.getMessage() + " - Purpose: " + requestedPurpose + " - contentType: " + contentType,
                     null);
 
             return fileUploadedPath.toString();
@@ -94,12 +87,12 @@ public class FileUtil {
                 Files.createDirectories(uploadPath);
             } catch (IOException e) {
 
-                CustomLogger.warn(
+                CustomLogger.error(
                         LogEventCode.MULTIPART_FILE,
                         "FAIL",
                         logEventReasonCode,
                         logEventReasonCode.getMessage() + " - IOException while creating file upload directory",
-                        null
+                        e
                 );
 
                 throw new CustomException(CustomExceptionCode.CREATE_DIR_EXCEPTION);
@@ -112,12 +105,12 @@ public class FileUtil {
                 multipartFile.transferTo(fileUploadedPath);
             } catch (IOException e) {
 
-                CustomLogger.warn(
+                CustomLogger.error(
                         LogEventCode.MULTIPART_FILE,
                         "FAIL",
                         logEventReasonCode,
                         logEventReasonCode.getMessage() + " - IOException while saving file",
-                        null
+                        e
                 );
 
                 throw new CustomException(CustomExceptionCode.SAVE_FILE_EXCEPTION);
@@ -139,25 +132,24 @@ public class FileUtil {
             }
         }
 
-        // 경로 결정, 타입 검사
-        private Path fileContentTypeCheckByPurpose(MultipartFile multipartFile, FilePurposeCode filePurpose) {
+        // 경로 결정, 목적 검사
+        private Path fileContentTypeCheckByPurpose(String contentType, FilePurposeCode filePurpose) {
 
-            String requestedContentType = multipartFile.getContentType();
 
-            if(requestedContentType == null) {
+            if (filePurpose == null ){
                 CustomLogger.warn(
                         LogEventCode.MULTIPART_FILE,
                         "FAIL",
-                        LogEventReasonCode.CONTENT_TYPE_NULL,
-                        LogEventReasonCode.CONTENT_TYPE_NULL.getMessage() + " - MultipartFile.contentType is null",
+                        LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST,
+                        LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST.getMessage() + " - File purpose is null",
                         null
                 );
 
-                throw new CustomException(CustomExceptionCode.INVALID_FILE_TYPE);
+                throw new CustomException(CustomExceptionCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST);
             }
             else if(filePurpose == FilePurposeCode.TERM) {
 
-                if (!requestedContentType.equals(FileTypeCode.PDF.getContentType())) {
+                if (!contentType.equals(FileTypeCode.PDF.getContentType())) {
                     CustomLogger.warn(
                             LogEventCode.MULTIPART_FILE,
                             "FAIL",
@@ -174,8 +166,7 @@ public class FileUtil {
 
             else if(filePurpose == FilePurposeCode.POST || filePurpose == FilePurposeCode.PROFILE) {
 
-                if(!requestedContentType.equals(FileTypeCode.JPEG.getContentType()) && !requestedContentType.equals(FileTypeCode.PNG.getContentType())) {
-
+                if(!contentType.equals(FileTypeCode.JPEG.getContentType()) && !contentType.equals(FileTypeCode.PNG.getContentType())) {
                     CustomLogger.warn(
                             LogEventCode.MULTIPART_FILE,
                             "FAIL",
@@ -192,27 +183,37 @@ public class FileUtil {
                 else
                     return profilePath;
             }
-
             else {
-
                 CustomLogger.warn(
                         LogEventCode.MULTIPART_FILE,
                         "FAIL",
                         LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST,
-                        LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST.getMessage() + " - " + filePurpose.name() + "is unsupported purpose: TERM, POST, PROFILE only supported",
+                        LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST.getMessage() + " - " + filePurpose.name() + " is unsupported purpose: TERM, POST, PROFILE only supported",
+                        null
+                );
+
+                throw new CustomException(CustomExceptionCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST);
+            }
+        }
+
+        // contentType null check
+        private String validateContentType(MultipartFile requestedFile) {
+
+            String contentType = requestedFile.getContentType();
+
+            if(contentType == null) {
+
+                CustomLogger.warn(
+                        LogEventCode.MULTIPART_FILE,
+                        "FAIL",
+                        LogEventReasonCode.CONTENT_TYPE_NULL,
+                        LogEventReasonCode.CONTENT_TYPE_NULL.getMessage(),
                         null
                 );
 
                 throw new CustomException(CustomExceptionCode.INVALID_FILE_TYPE);
             }
 
-        }
-
-        // 확장자 반환
-        private String extractExtension(String contentType) {
-
-            String extension = contentType.substring(contentType.indexOf("/") + 1);
-
-            return extension;
+            return contentType;
         }
 }

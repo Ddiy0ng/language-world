@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 public class CustomLogger {
 
     public static void info(LogEventCode logEventCode, String result, String description, Long userId) {
@@ -29,6 +28,18 @@ public class CustomLogger {
                 logEventReasonCode,
                 description,
                 userId
+        );
+    }
+
+    public static void error(LogEventCode logEventCode, String result, LogEventReasonCode logEventReasonCode, String description, Exception e) {
+
+        log.error(
+                "event = {}  result = {}  reason = {} description = {}",
+                logEventCode,
+                result,
+                logEventReasonCode,
+                description,
+                e
         );
     }
 }
