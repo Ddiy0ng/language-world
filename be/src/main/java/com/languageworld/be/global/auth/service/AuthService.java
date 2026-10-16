@@ -18,6 +18,7 @@ import com.languageworld.be.global.auth.dto.social.*;
 import com.languageworld.be.global.auth.entity.SocialAuthorizedUser;
 import com.languageworld.be.global.auth.enumGroup.SocialTypeCode;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.enumGroup.SuccessCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.jwt.JwtProvider;
 import com.languageworld.be.global.log.CustomLogger;
@@ -25,11 +26,9 @@ import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -40,7 +39,7 @@ public class AuthService {
     private final AgreedTermRepository agreedTermRepository;
     private final LanguageService languageService;
     private final TermService termService;
-    private final AuthUtil authUtil;
+    private final PasswordUtil passwordUtil;
     private final GoogleUtil googleUtil;
     private final KakaoUtil kakaoUtil;
     private final JwtProvider jwtProvider;
@@ -66,10 +65,10 @@ public class AuthService {
 
         // 비밀번호 유효성 검사
         String password = serviceSignupRequestDto.password();
-        authUtil.validatePassword(password);
+        passwordUtil.validatePassword(password);
 
         // 비밀번호 암호화
-        String encodedPassword = authUtil.encodePassword(password);
+        String encodedPassword = passwordUtil.encodePassword(password);
 
         // 참조 객체
         Language motherTongue = languageService.getLanguageById(serviceSignupRequestDto.motherTongueId());
@@ -102,6 +101,12 @@ public class AuthService {
         serviceAccountRepository.save(serviceAccount);
         agreedTermRepository.save(agreedServiceTerm);
         agreedTermRepository.save(agreedPersonalInfoUseTerm);
+        CustomLogger.info(
+                LogEventCode.SIGNUP,
+                "SUCCESS",
+                SuccessCode.SIGNUP_SUCCESS.getMessage() + " - userUuid: " + user.getUuid(),
+                null
+        );
     }
 
     // 서비스 자체 로그인
@@ -127,30 +132,35 @@ public class AuthService {
         // 비밀번호 일치 검사
         String rawPassword = serviceLoginRequestDto.password();
         String encodedPassword = serviceAccount.getPassword();
-        if(!authUtil.isPasswordMatches(rawPassword, encodedPassword))
+        if(!passwordUtil.isPasswordMatches(rawPassword, encodedPassword)) {
+
+            CustomLogger.warn(
+                    LogEventCode.LOGIN,
+                    "FAIL",
+                    LogEventReasonCode.PASSWORD_MISMATCH,
+                    LogEventReasonCode.PASSWORD_MISMATCH.getMessage() + " - Requested email: " + email,
+                    null
+            );
             throw new CustomException(CustomExceptionCode.LOGIN_FAILED);
+        }
 
         // 사용자 데이터 조회
         User user = serviceAccount.getUser();
 
         // 사용자 탈퇴 여부 확인
-        if (user.getDeletedAt() != null) {
-
-            CustomLogger.warn(
-                    LogEventCode.LOGIN,
-                    "FAIL",
-                    LogEventReasonCode.DELETED_USER,
-                    LogEventReasonCode.DELETED_USER.getMessage(),
-                    null
-            );
-
-            throw new CustomException(CustomExceptionCode.DELETED_USER);
-        }
+        validateUserNotDeleted(user);
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
         String refreshToken = jwtProvider.generateRefreshToken(user);
         LoginResponseDto loginResponseDto = LoginResponseDto.of(accessToken, refreshToken);
+        CustomLogger.info(
+                LogEventCode.LOGIN,
+                "SUCCESS",
+                SuccessCode.LOGIN_SUCCESS.getMessage() + " - userUuid: " + user.getUuid(),
+                null
+        );
+
 
         return loginResponseDto;
     }
@@ -159,18 +169,9 @@ public class AuthService {
     @Transactional
     public void signup(String socialSignupType, SocialSignupRequestDto socialSignupRequestDto) {
 
-
         SocialTypeCode type = SocialTypeCode.from(socialSignupType);
         String token = socialSignupRequestDto.token();
-        SocialAuthorizedUser socialAuthorizedUser;
-
-        switch(type) {
-            case GOOGLE -> socialAuthorizedUser = googleUtil.verifyGoogleIdToken(token);
-            case KAKAO -> socialAuthorizedUser = kakaoUtil.getSocialAuthorizedUser(token);
-
-            // TODO: Custom log, customException 처리
-            default -> throw new RuntimeException();
-        }
+        SocialAuthorizedUser socialAuthorizedUser = getSocialAuthorizedUserBySocialType(type, token);
 
         // 소셜 파트
         String sub = socialAuthorizedUser.sub();
@@ -178,7 +179,7 @@ public class AuthService {
 
         // spring 파트
         //회원가입 여부 확인;
-        userExistCheckForSignup(type, sub);
+        validateUserExistForSignup(type, sub);
 
         // 참조 객체
         Language motherTongue = languageService.getLanguageById(socialSignupRequestDto.motherTongueId());
@@ -211,7 +212,12 @@ public class AuthService {
         socialAccountRepository.save(socialAccount);
         agreedTermRepository.save(agreedServiceTerm);
         agreedTermRepository.save(agreedPersonalInfoUseTerm);
-
+        CustomLogger.info(
+                LogEventCode.SIGNUP,
+                "SUCCESS",
+                SuccessCode.SIGNUP_SUCCESS.getMessage() + " - userUuid: " + user.getUuid(),
+                null
+        );
     }
 
     // 소셜 로그인
@@ -220,38 +226,47 @@ public class AuthService {
 
         SocialTypeCode type = SocialTypeCode.from(socialLoginType);
         String token = socialLoginRequestDto.token();
-        SocialAuthorizedUser socialAuthorizedUser;
+        SocialAuthorizedUser socialAuthorizedUser = getSocialAuthorizedUserBySocialType(type, token);
 
-        switch(type) {
-            case GOOGLE -> socialAuthorizedUser = googleUtil.verifyGoogleIdToken(token);
-            case KAKAO -> socialAuthorizedUser = kakaoUtil.getSocialAuthorizedUser(token);
-
-            // TODO: Custom log, customException 처리
-            default -> throw new RuntimeException();
-        }
-
-        // spring 파트
-        // 회원 존재 여부 확인
+        // 사용자 존재 확인
         String sub = socialAuthorizedUser.sub();
-        SocialAccount socialAccount = userExistCheckForLogin(type, sub);
+        SocialAccount socialAccount = validateUserExistForLogin(type, sub);
         User user = socialAccount.getUser();
 
+        // 탈퇴 확인
+        validateUserNotDeleted(user);
+
+        // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
         String refreshToken = jwtProvider.generateRefreshToken(user);
-
         LoginResponseDto loginResponseDto = LoginResponseDto.of(accessToken, refreshToken);
+        CustomLogger.info(
+                LogEventCode.LOGIN,
+                "SUCCESS",
+                SuccessCode.LOGIN_SUCCESS.getMessage() + " - userUuid: " + user.getUuid(),
+                null
+        );
 
         return loginResponseDto;
     }
 
+    // 소셜 코드에 따라 인증 유저 가져오기
+    private SocialAuthorizedUser getSocialAuthorizedUserBySocialType(SocialTypeCode socialTypeCode, String token) {
+
+        return switch(socialTypeCode) {
+            case GOOGLE -> googleUtil.verifyGoogleIdToken(token);
+            case KAKAO -> kakaoUtil.getSocialAuthorizedUser(token);
+        };
+    }
+
     // 사용자 존재 여부 확인: signup type + sub
-    private void userExistCheckForSignup(SocialTypeCode socialTypeCode, String sub) {
+    private void validateUserExistForSignup(SocialTypeCode socialTypeCode, String sub) {
 
         Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findBySignupTypeAndSub(socialTypeCode, sub);
         if(optionalSocialAccount.isPresent()) {
 
             CustomLogger.warn(
-              LogEventCode.OAUTH2,
+              LogEventCode.SOCIAL,
                     "FAIL",
                     LogEventReasonCode.SOCIAL_SUB_ALREADY_EXIST,
                     LogEventReasonCode.SOCIAL_SUB_ALREADY_EXIST.getMessage() + " - type: " + socialTypeCode + ", sub: " + sub,
@@ -262,16 +277,17 @@ public class AuthService {
         }
     }
 
-    private SocialAccount userExistCheckForLogin(SocialTypeCode loginTypeCode, String sub) {
+    // 사용자 존재 여부 확인: login type + sub
+    private SocialAccount validateUserExistForLogin(SocialTypeCode loginTypeCode, String sub) {
 
         Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findBySignupTypeAndSub(loginTypeCode, sub);
         if(optionalSocialAccount.isEmpty()) {
 
             CustomLogger.warn(
-                    LogEventCode.OAUTH2,
+                    LogEventCode.SOCIAL,
                     "FAIL",
                     LogEventReasonCode.SOCIAL_SUB_NOT_EXIST,
-                    LogEventReasonCode.SOCIAL_SUB_NOT_EXIST.getMessage() + " - sub: " + sub,
+                    LogEventReasonCode.SOCIAL_SUB_NOT_EXIST.getMessage() + " - type: " + loginTypeCode +  " - sub: " + sub,
                     null
             );
 
@@ -281,5 +297,22 @@ public class AuthService {
         SocialAccount socialAccount = optionalSocialAccount.get();
 
         return socialAccount;
+    }
+
+    private void validateUserNotDeleted(User user) {
+
+        // 사용자 탈퇴 여부 확인
+        if (user.getDeletedAt() != null) {
+
+            CustomLogger.warn(
+                    LogEventCode.LOGIN,
+                    "FAIL",
+                    LogEventReasonCode.DELETED_USER,
+                    LogEventReasonCode.DELETED_USER.getMessage() + " - userUuid: " + user.getUuid(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.DELETED_USER);
+        }
     }
 }

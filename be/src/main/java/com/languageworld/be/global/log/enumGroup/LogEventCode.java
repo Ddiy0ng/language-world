@@ -6,7 +6,7 @@ public enum LogEventCode {
     LOGIN,
     JWT,
     AUTH_FILTER,
-    OAUTH2,
+    SOCIAL,
     TERM,
     MULTIPART_FILE,
     LANGUAGE
