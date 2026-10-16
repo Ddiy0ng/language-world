@@ -11,12 +11,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AuthUtil {
+public class PasswordUtil {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    /*
-    * 비밀번호
-    */
 
     // 비밀번호 유효성 검사(공백 + 형식)
     protected void validatePassword(String password) {
@@ -60,18 +57,6 @@ public class AuthUtil {
     // 비밀번호 일치 여부
     protected boolean isPasswordMatches(String rawPassword, String encodedPassword) {
 
-        if(!bCryptPasswordEncoder.matches(rawPassword, encodedPassword)) {
-            CustomLogger.warn(
-                    LogEventCode.LOGIN,
-                    "FAIL",
-                    LogEventReasonCode.PASSWORD_MISMATCH,
-                    LogEventReasonCode.PASSWORD_MISMATCH.getMessage(),
-                    null
-            );
-
-            return false;
-        }
-
-        return true;
+        return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
     }
 }

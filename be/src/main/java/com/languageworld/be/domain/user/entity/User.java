@@ -32,7 +32,7 @@ public class User extends ChangeableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, updatable = false)
+    @Column(unique = true, updatable = false, nullable = false)
     private UUID uuid;
 
     @Column(name = "user_role", nullable = false)

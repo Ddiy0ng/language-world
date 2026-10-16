@@ -4,7 +4,11 @@ import com.languageworld.be.global.auth.entity.KakaoResponse;
 import com.languageworld.be.global.auth.entity.SocialAuthorizedUser;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
+import com.languageworld.be.global.log.CustomLogger;
+import com.languageworld.be.global.log.enumGroup.LogEventCode;
+import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -14,75 +18,82 @@ import org.springframework.web.client.RestClientException;
 public class KakaoUtil {
 
     private final RestClient kakaoRestClient;
-    private final String uri = "/v2/user/me";
+
+    private static final String USER_INFO_URI =
+            "/v2/user/me";
 
     public KakaoUtil(
             @Qualifier("kakaoRestClient")
             RestClient restClient
     ) {
-        kakaoRestClient = restClient;
+        this.kakaoRestClient = restClient;
     }
 
     public SocialAuthorizedUser getSocialAuthorizedUser(String accessToken) {
-
-        SocialAuthorizedUser socialAuthorizedUser;
 
         try {
 
             KakaoResponse kakaoResponse =
                     kakaoRestClient
                             .get()
-                            .uri(uri)
-                            .headers(
-                                    headers ->
-                                            headers.setBearerAuth(accessToken)
-                            )
+                            .uri(USER_INFO_URI)
+                            .headers(headers -> headers.setBearerAuth(accessToken))
                             .retrieve()
                             .body(KakaoResponse.class);
 
+            // Kakao 사용자 식별정보 확인
             if (kakaoResponse == null || kakaoResponse.id() == null) {
 
-                // TODO: custom log 작성, CustomException 작성
-                System.out.println("=====================1");
-                throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+                CustomLogger.warn(
+                        LogEventCode.SOCIAL,
+                        "FAIL",
+                        LogEventReasonCode.INVALID_KAKAO_RESPONSE,
+                        LogEventReasonCode.INVALID_KAKAO_RESPONSE
+                                .getMessage() + " - KakaoResponse 또는 user id가 없습니다.",
+                        null
+                );
+
+                throw new CustomException(
+                        CustomExceptionCode.INVALID_KAKAO_RESPONSE
+                );
             }
 
-            String profileImageUrl;
+            String profileImageUrl = null;
+            if (kakaoResponse.kakaoAccount() != null && kakaoResponse.kakaoAccount().profile() != null)
+                profileImageUrl = kakaoResponse.kakaoAccount().profile().profileImageUrl();
 
-            if (kakaoResponse.kakaoAccount() == null) {
-                // TODO: custom log 작성, CustomException 작성
-                System.out.println("=====================2");
-                throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
-            }
-
-            KakaoResponse.KakaoAccount kakaoAccount = kakaoResponse.kakaoAccount();
-
-            if (kakaoResponse.kakaoAccount().profile() == null) {
-                // TODO: custom log 작성, CustomException 작성
-                System.out.println("=====================3");
-                throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
-            }
-
-            profileImageUrl = kakaoAccount.profile().profileImageUrl();
-
-            socialAuthorizedUser = SocialAuthorizedUser.of(
+            return SocialAuthorizedUser.of(
                     kakaoResponse.id().toString(),
                     profileImageUrl
             );
+
         } catch (HttpClientErrorException e) {
 
-            // TODO: custom log 작성, CustomException 작성
-            System.out.println("=====================4");
-            System.out.println("status = " + e.getStatusCode());
-            System.out.println("body = " + e.getResponseBodyAsString());
-            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+            CustomLogger.warn(
+                    LogEventCode.SOCIAL,
+                    "FAIL",
+                    LogEventReasonCode.INVALID_SOCIAL_TOKEN,
+                    LogEventReasonCode.INVALID_SOCIAL_TOKEN.getMessage() + " - provider: KAKAO",
+                    null
+            );
+
+            throw new CustomException(
+                    CustomExceptionCode.INVALID_SOCIAL_TOKEN
+            );
+
         } catch (RestClientException e) {
 
-            // TODO: custom log 작성, CustomException 작성
-            System.out.println("=====================5");
-            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
-        }
+            CustomLogger.warn(
+                    LogEventCode.SOCIAL,
+                    "FAIL",
+                    LogEventReasonCode.SOCIAL_API_REQUEST_FAILED,
+                    LogEventReasonCode.SOCIAL_API_REQUEST_FAILED.getMessage() + " - provider: KAKAO",
+                    null
+            );
 
-        return socialAuthorizedUser;
+            throw new CustomException(
+                    CustomExceptionCode.SOCIAL_API_REQUEST_FAILED
+            );
+        }
     }
 }

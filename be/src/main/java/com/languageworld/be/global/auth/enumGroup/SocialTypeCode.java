@@ -27,7 +27,7 @@ public enum SocialTypeCode {
         }
 
         CustomLogger.warn(
-                LogEventCode.OAUTH2,
+                LogEventCode.SOCIAL,
                 "FAIL",
                 LogEventReasonCode.UNSUPPORTED_SOCIAL_TYPE,
                 LogEventReasonCode.UNSUPPORTED_SOCIAL_TYPE.getMessage() + " - RequestType: " + name,

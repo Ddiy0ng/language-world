@@ -21,7 +21,6 @@ public class GoogleUtil {
 
     private final GoogleIdTokenVerifier googleIdTokenVerifier;
 
-
     // googleIdToken 검증
     public SocialAuthorizedUser verifyGoogleIdToken(String idTokenString) {
 
@@ -34,14 +33,14 @@ public class GoogleUtil {
             if(googleIdToken == null) {
 
                 CustomLogger.warn(
-                        LogEventCode.OAUTH2,
+                        LogEventCode.SOCIAL,
                         "FAIL",
-                        LogEventReasonCode.GOOGLE_ID_TOKEN_NULL,
-                        LogEventReasonCode.GOOGLE_ID_TOKEN_NULL.getMessage(),
+                        LogEventReasonCode.INVALID_GOOGLE_TOKEN,
+                        LogEventReasonCode.INVALID_GOOGLE_TOKEN.getMessage() + " - GoogleIdToken이 없습니다.",
                         null
                 );
 
-                throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+                throw new CustomException(CustomExceptionCode.INVALID_SOCIAL_TOKEN);
             }
 
             // Token의 payload
@@ -50,8 +49,24 @@ public class GoogleUtil {
             // sub
             String sub = payload.getSubject();
 
+            // sub 체크
+            if(sub == null || sub.isBlank()) {
+
+                CustomLogger.warn(
+                        LogEventCode.SOCIAL,
+                        "FAIL",
+                        LogEventReasonCode.INVALID_GOOGLE_TOKEN,
+                        LogEventReasonCode.INVALID_GOOGLE_TOKEN.getMessage() + " - Google 토큰의 subject가 없습니다.",
+                        null
+                );
+
+                throw new CustomException(CustomExceptionCode.INVALID_SOCIAL_TOKEN);
+            }
+
             // profile
-            String profileImageUrl = payload.get("picture").toString();
+            String profileImageUrl = null;
+            if(payload.get("picture") != null)
+                    profileImageUrl = payload.get("picture").toString();
 
             // SocialAuthorizedUserDto
             SocialAuthorizedUser socialAuthorizedUser = SocialAuthorizedUser.of(sub, profileImageUrl);
@@ -61,25 +76,25 @@ public class GoogleUtil {
         } catch (GeneralSecurityException e) {
 
             CustomLogger.warn(
-                    LogEventCode.OAUTH2,
+                    LogEventCode.SOCIAL,
                     "FAIL",
-                    LogEventReasonCode.INVALID_GOOGLE_TOKEN,
-                    LogEventReasonCode.INVALID_GOOGLE_TOKEN.getMessage() + " - GeneralSecurityException while verifying google id token",
+                    LogEventReasonCode.SOCIAL_TOKEN_VERIFICATION_FAILED,
+                    LogEventReasonCode.SOCIAL_TOKEN_VERIFICATION_FAILED.getMessage() + " - provider: Google",
                     null
             );
 
-            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+            throw new CustomException(CustomExceptionCode.INVALID_SOCIAL_TOKEN);
         } catch(IOException e) {
 
             CustomLogger.warn(
-                    LogEventCode.OAUTH2,
+                    LogEventCode.SOCIAL,
                     "FAIL",
-                    LogEventReasonCode.INVALID_GOOGLE_TOKEN,
-                    LogEventReasonCode.INVALID_TOKEN.getMessage() + " - IOExcepton while verifying google id token",
+                    LogEventReasonCode.SOCIAL_API_REQUEST_FAILED,
+                    LogEventReasonCode.SOCIAL_API_REQUEST_FAILED.getMessage() + " - provider: Google",
                     null
             );
 
-            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+            throw new CustomException(CustomExceptionCode.SOCIAL_API_REQUEST_FAILED);
         }
     }
 }
