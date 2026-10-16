@@ -56,7 +56,6 @@ public enum CustomExceptionCode {
             HttpStatus.BAD_REQUEST,
             "AUTH_400", "존재하지 않는 계정입니다."),
     EXPIRED_TOKEN(
-
             HttpStatus.UNAUTHORIZED,
             "AUTH_401",
             "만료된 토큰입니다."),
