@@ -107,6 +107,10 @@ public enum CustomExceptionCode {
             HttpStatus.NOT_FOUND,
             "TERM_404",
             "약관을 찾을 수 없습니다."),
+    AGREED_TERM_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "TERM_404",
+            "동의한 약관을 찾을 수 없습니다."),
     TERM_ALREADY_EXIST(
             HttpStatus.BAD_REQUEST,
             "TERM_400",

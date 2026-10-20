@@ -9,7 +9,6 @@ public enum LogEventReasonCode {
 
     // AUTH_FILTER
     UNAUTHORIZED("인증되지 않은 사용자입니다."),
-    ACCESS_REQUIRED("권한이 필요합니다."),
     ADMIN_ACCESS_REQUIRED("관리자 권한이 필요합니다."),
 
     // AUTH
@@ -50,6 +49,7 @@ public enum LogEventReasonCode {
 
     // TERM
     TERM_NOT_FOUND("약관을 찾을 수 없습니다."),
+    AGREED_TERM_NOT_FOUND("동의한 약관을 찾을 수 업습니다."),
     TERM_ALREADY_EXIST("이미 등록된 약관입니다."),
 
     // LANGUAGE

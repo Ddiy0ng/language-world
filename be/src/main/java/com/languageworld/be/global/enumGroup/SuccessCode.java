@@ -16,7 +16,13 @@ public enum SuccessCode {
     FILE_UPLOAD_SUCCESS(HttpStatus.OK, "MULTIPART_FILE_200", "파일 업로드를 성공했습니다."),
 
     // TERM
-    TERM_CREATED(HttpStatus.CREATED, "MULTIPART_FILE_201", "약관 등록을 완료했습니다.");
+    TERM_CREATED(HttpStatus.CREATED, "TERM_201", "약관 등록을 완료했습니다."),
+    TERM_READ_SUCCESS(HttpStatus.OK, "TERM_200", "약관 조회에 성공했습니다."),
+    AGREED_TERM_READ_SUCCESS(HttpStatus.OK, "TERM_200", "동의한 약관 조회에 성공했습니다."),
+    TERM_STATUS_UPDATE_SUCCESS(HttpStatus.OK, "TERM_200", "약관 상태 업데이트에 성공했습니다."),
+    AGREED_TERM_IS_AGREED_UPDATE_SUCCESS(HttpStatus.OK, "TERM_200", "약관 동의 여부 변경에 성공했습니다."),
+    TERM_DELETE_SUCCESS(HttpStatus.OK, "TERM_200", "약관 삭제에 성공했습니다."),
+    ;
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

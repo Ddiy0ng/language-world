@@ -1,6 +1,6 @@
 package com.languageworld.be.domain.term.entity;
 
-import com.languageworld.be.domain.term.dto.TermCreateRequestDto;
+import com.languageworld.be.domain.term.dto.request.TermRequestDto;
 import com.languageworld.be.domain.term.enumGroup.TermPurposeCode;
 import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
-
 @Getter
 public class Term extends CreatableEntity {
 
@@ -37,15 +36,23 @@ public class Term extends CreatableEntity {
     @Column(name = "activated_at")
     private LocalDateTime activatedAt;
 
-    public static Term of(TermCreateRequestDto termCreateRequestDto, String fileUploadedPath, String version) {
+    public static Term of(TermRequestDto.TermCreate termRequestDto, String fileUploadedPath, String version) {
 
         Term term = Term.builder()
-                .purpose(termCreateRequestDto.purpose())
+                .purpose(termRequestDto.purpose())
                 .termPdfUrl(fileUploadedPath)
                 .isActive(false)
                 .version(version)
                 .build();
 
         return term;
+    }
+
+    public void activate() {
+        isActive = true;
+    }
+
+    public void deActivate() {
+        isActive = false;
     }
 }

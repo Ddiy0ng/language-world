@@ -41,4 +41,12 @@ public class AgreedTerm extends ChangeableEntity {
 
         return agreedTerm;
     }
+
+    public void agree() {
+        isAgreed = true;
+    }
+
+    public void disAgree() {
+        isAgreed = false;
+    }
 }
