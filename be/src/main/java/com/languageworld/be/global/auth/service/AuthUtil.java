@@ -1,5 +1,7 @@
 package com.languageworld.be.global.auth.service;
 
+import com.languageworld.be.global.auth.entity.CustomPrincipal;
+import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PasswordUtil {
+public class AuthUtil {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -58,5 +60,22 @@ public class PasswordUtil {
     protected boolean isPasswordMatches(String rawPassword, String encodedPassword) {
 
         return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    // 권한 검사-ADMIN
+    public void adminAuthorizationCheck(CustomPrincipal customPrincipal) {
+
+        if(!customPrincipal.userRole().equals(UserRoleCode.ADMIN.name())){
+
+            CustomLogger.warn(
+                    LogEventCode.TERM,
+                    "FAIL",
+                    LogEventReasonCode.ADMIN_ACCESS_REQUIRED,
+                    LogEventReasonCode.ADMIN_ACCESS_REQUIRED.getMessage(),
+                    customPrincipal.uuid()
+            );
+
+            throw new CustomException(CustomExceptionCode.ADMIN_ACCESS_REQUIRED);
+        }
     }
 }

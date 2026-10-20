@@ -39,7 +39,7 @@ public class AuthService {
     private final AgreedTermRepository agreedTermRepository;
     private final LanguageService languageService;
     private final TermService termService;
-    private final PasswordUtil passwordUtil;
+    private final AuthUtil authUtil;
     private final GoogleUtil googleUtil;
     private final KakaoUtil kakaoUtil;
     private final JwtProvider jwtProvider;
@@ -65,10 +65,10 @@ public class AuthService {
 
         // 비밀번호 유효성 검사
         String password = serviceSignupRequestDto.password();
-        passwordUtil.validatePassword(password);
+        authUtil.validatePassword(password);
 
         // 비밀번호 암호화
-        String encodedPassword = passwordUtil.encodePassword(password);
+        String encodedPassword = authUtil.encodePassword(password);
 
         // 참조 객체
         Language motherTongue = languageService.getLanguageById(serviceSignupRequestDto.motherTongueId());
@@ -132,7 +132,7 @@ public class AuthService {
         // 비밀번호 일치 검사
         String rawPassword = serviceLoginRequestDto.password();
         String encodedPassword = serviceAccount.getPassword();
-        if(!passwordUtil.isPasswordMatches(rawPassword, encodedPassword)) {
+        if(!authUtil.isPasswordMatches(rawPassword, encodedPassword)) {
 
             CustomLogger.warn(
                     LogEventCode.LOGIN,
