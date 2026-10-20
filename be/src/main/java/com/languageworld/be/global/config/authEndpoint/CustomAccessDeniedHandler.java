@@ -58,8 +58,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             CustomLogger.warn(
                     LogEventCode.AUTH_FILTER,
                     "FAIL",
-                    LogEventReasonCode.ACCESS_REQUIRED,
-                    LogEventReasonCode.ACCESS_REQUIRED.getMessage(),
+                    LogEventReasonCode.UNAUTHORIZED,
+                    LogEventReasonCode.UNAUTHORIZED.getMessage(),
                     null
             );
 
