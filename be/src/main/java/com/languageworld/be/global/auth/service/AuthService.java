@@ -150,6 +150,8 @@ public class AuthService {
         // 사용자 탈퇴 여부 확인
         validateUserNotDeleted(user);
 
+        // TODO 약관 동의 여부 확인(활성화된 약관)
+
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
         String refreshToken = jwtProvider.generateRefreshToken(user);
@@ -235,6 +237,8 @@ public class AuthService {
 
         // 탈퇴 확인
         validateUserNotDeleted(user);
+
+        // TODO 약관 동의 여부 확인(활성화된 약관)
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);

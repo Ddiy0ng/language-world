@@ -3,12 +3,18 @@ package com.languageworld.be.global.auth.dto.social;
 import com.languageworld.be.domain.user.enumGroup.NationCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-
 import java.time.LocalDate;
 
-@Schema(name = "GoogleSignupRequestDto")
+@Schema(
+        name = "SocialSignupRequestDto",
+        description = "Google·Kakao 소셜 회원가입 요청"
+)
 public record SocialSignupRequestDto(
 
+        @Schema(
+                description = "소셜 인증 제공자가 발급한 토큰",
+                example = "eyJhbGciOiJSUzI1NiJ9..."
+        )
         @NotBlank
         String token,
 
@@ -29,8 +35,8 @@ public record SocialSignupRequestDto(
         LocalDate birth,
 
         @Schema(
-                name = "nation",
-                example = "EN"
+                description = "사용자의 국가 코드",
+                example = "KR"
         )
         @NotNull
         NationCode nation,

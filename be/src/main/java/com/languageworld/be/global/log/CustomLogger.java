@@ -8,26 +8,26 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CustomLogger {
 
-    public static void info(LogEventCode logEventCode, String result, String description, Long userId) {
+    public static void info(LogEventCode logEventCode, String result, String description, String userUuid) {
 
         log.info(
-                "event = {}  result = {} description = {} userId = {}",
+                "event = {}  result = {} description = {} userUuid = {}",
                 logEventCode,
                 result,
                 description,
-                userId
+                userUuid
         );
     }
 
-    public static void warn(LogEventCode logEventCode, String result, LogEventReasonCode logEventReasonCode, String description, Long userId) {
+    public static void warn(LogEventCode logEventCode, String result, LogEventReasonCode logEventReasonCode, String description, String userUuid) {
 
         log.warn(
-                "event = {}  result = {}  reason = {} description = {} userId = {}",
+                "event = {}  result = {}  reason = {} description = {} userUuid = {}",
                 logEventCode,
                 result,
                 logEventReasonCode,
                 description,
-                userId
+                userUuid
         );
     }
 

@@ -31,9 +31,8 @@ public class SecurityConfig {
             "/auth/signup/**",
             "/auth/login/**",
             "/swagger-ui/**",
-            "/v3/api-docs",
-            "/static/test.html",
-            "/**"
+            "/v3/api-docs/**",
+            "/static/test.html"
     };
 
     //SecurityFilterChain Bean

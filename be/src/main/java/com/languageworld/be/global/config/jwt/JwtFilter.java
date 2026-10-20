@@ -69,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
             throw new CustomException(CustomExceptionCode.INVALID_TOKEN); // CustomException 처리: 액세스 토큰 필요
         }
         // 인증 사용자 객체 셍성
-        CustomPrincipal customPrincipal = new CustomPrincipal(jwtUtil.getUsername(claims), jwtUtil.getUserRole(claims));
+        CustomPrincipal customPrincipal = new CustomPrincipal(jwtUtil.getUuid(claims), jwtUtil.getUserRole(claims));
 
         // 인증 객체 생성
         Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(

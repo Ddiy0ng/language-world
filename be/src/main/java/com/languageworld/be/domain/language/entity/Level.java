@@ -1,5 +1,6 @@
 package com.languageworld.be.domain.language.entity;
 
+import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class Level {
+public class Level extends CreatableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

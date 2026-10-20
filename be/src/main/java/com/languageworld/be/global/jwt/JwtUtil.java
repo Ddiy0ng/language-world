@@ -83,12 +83,12 @@ public class JwtUtil {
         return claims;
     }
 
-    // username 추출
-    public String getUsername(Claims claims) {
+    // userUuid 추출
+    public String getUuid(Claims claims) {
 
-        String username = claims.getSubject();
+        String uuid = claims.getSubject();
 
-        return username;
+        return uuid;
     }
 
     // userRole 추출

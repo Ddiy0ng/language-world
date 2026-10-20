@@ -3,31 +3,33 @@ package com.languageworld.be.global.auth.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
-@Schema(name = "LoginResponseDto")
+@Schema(
+        name = "LoginResponseDto",
+        description = "서비스 로그인 성공 시 반환되는 JWT 토큰"
+)
 @Builder
 public record LoginResponseDto(
 
         @Schema(
-                name = "accessToken",
-                description = "자체 서비스에서 발급한 액세스 토큰"
+                description = "보호된 API 호출에 사용하는 JWT Access Token",
+                example = "eyJhbGciOiJIUzI1NiJ9..."
         )
         String accessToken,
 
         @Schema(
-                name = "refreshToken",
-                description = "자체 서비스에서 발급한 리프레시 토큰"
-
+                description = "Access Token 재발급에 사용하는 JWT Refresh Token",
+                example = "eyJhbGciOiJIUzI1NiJ9..."
         )
         String refreshToken
 ) {
 
-    public static LoginResponseDto of (String accessToken, String refreshToken) {
-
-        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+    public static LoginResponseDto of(
+            String accessToken,
+            String refreshToken
+    ) {
+        return LoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-
-        return loginResponseDto;
     }
 }

@@ -43,12 +43,12 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                     null
             );
 
-            response.setStatus(CustomExceptionCode.ADMIN_ACCESS_DENIED.getHttpStatus().value());
+            response.setStatus(CustomExceptionCode.ADMIN_ACCESS_REQUIRED.getHttpStatus().value());
 
             ApiResponse<Void> apiResponse =
                     ApiResponse.<Void>builder()
-                            .customCode(CustomExceptionCode.ADMIN_ACCESS_DENIED.getCustomCode())
-                            .message(CustomExceptionCode.ADMIN_ACCESS_DENIED.getMessage())
+                            .customCode(CustomExceptionCode.ADMIN_ACCESS_REQUIRED.getCustomCode())
+                            .message(CustomExceptionCode.ADMIN_ACCESS_REQUIRED.getMessage())
                             .build();
 
             objectMapper.writeValue(response.getWriter(), apiResponse);

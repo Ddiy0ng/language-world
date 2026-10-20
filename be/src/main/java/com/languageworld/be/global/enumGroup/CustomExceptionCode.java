@@ -21,7 +21,7 @@ public enum CustomExceptionCode {
     ACCESS_DENIED(HttpStatus.FORBIDDEN,
             "AUTH_FILTER_403",
             "권한이 없습니다."),
-    ADMIN_ACCESS_DENIED(
+    ADMIN_ACCESS_REQUIRED(
             HttpStatus.FORBIDDEN,
             "AUTH_FILTER_403",
             "관리자 권한이 없습니다."),
