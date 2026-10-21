@@ -1,8 +1,6 @@
 package com.languageworld.be.domain.term.service;
 
-import com.languageworld.be.domain.term.dto.request.AgreedTermIsAgreedUpdateRequestDto;
 import com.languageworld.be.domain.term.dto.request.TermCreateRequestDto;
-import com.languageworld.be.domain.term.dto.request.TermStatusUpdateRequestDto;
 import com.languageworld.be.domain.term.dto.response.AgreedTermResponseDto;
 import com.languageworld.be.domain.term.dto.response.TermResponseDto;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
@@ -107,14 +105,17 @@ public class TermService {
 
     // TODO 약관 상태 변경(ADMIN): Active/Inactive
     @Transactional
-    public void updateTermStatus(Long termId, TermStatusUpdateRequestDto termStatusUpdateRequestDto) {
+    public void updateTermStatus(Long termId) {
 
-        // 상태 변경
-        Term term = getTermById(termId);
-        if(termStatusUpdateRequestDto.changeIntoStatus())
-            term.activate();
-        else
+        Term activeTerm = getTermById(termId);
+
+        // 서비스 약관 활성화된 것
+        List<Term> activatedTermList = termRepository.findAllByIsActiveAndPurpose(true, activeTerm.getPurpose());
+        for(Term term : activatedTermList) {
             term.deActivate();
+        }
+
+        activeTerm.activate();
     }
 
     // TODO 약관 동의 철회(USER)

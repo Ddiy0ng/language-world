@@ -16,4 +16,6 @@ public interface TermRepository extends JpaRepository<Term, Long> {
     List<Term> findAllByIsActive(boolean b);
 
     Optional<Term> findByIsActiveAndPurpose(boolean b, TermPurposeCode termPurposeCode);
+
+    List<Term> findAllByIsActiveAndPurpose(boolean b, TermPurposeCode termPurposeCode);
 }

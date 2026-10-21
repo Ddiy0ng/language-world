@@ -1,7 +1,6 @@
 package com.languageworld.be.domain.term.controller;
 
 import com.languageworld.be.domain.term.dto.request.TermCreateRequestDto;
-import com.languageworld.be.domain.term.dto.request.TermStatusUpdateRequestDto;
 import com.languageworld.be.domain.term.dto.response.AgreedTermResponseDto;
 import com.languageworld.be.domain.term.dto.response.TermResponseDto;
 import com.languageworld.be.domain.term.service.TermService;
@@ -59,10 +58,9 @@ public class TermController {
     }
 
     @PatchMapping("/admin/{termId}")
-    public ResponseEntity<ApiResponse<Void>> updateTermStatus(@PathVariable Long termId,
-                                                              @Valid @RequestBody TermStatusUpdateRequestDto termStatusUpdateRequestDto) {
+    public ResponseEntity<ApiResponse<Void>> updateTermStatus(@PathVariable Long termId) {
 
-        termService.updateTermStatus(termId, termStatusUpdateRequestDto);
+        termService.updateTermStatus(termId);
 
         return ResponseEntityUtil.success(SuccessCode.TERM_STATUS_UPDATE_SUCCESS);
     }
