@@ -23,7 +23,7 @@ public class AuthUtil {
         // 공백 검사
         if(password == null || password.isBlank()) {
             CustomLogger.warn(
-                    LogEventCode.SIGNUP,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.PASSWORD_REQUIRED,
                     LogEventReasonCode.PASSWORD_MISMATCH.getMessage(),
@@ -37,7 +37,7 @@ public class AuthUtil {
         String regex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=])[A-Za-z\\d!@#$%^&*()_+\\-=]{8,20}$";
         if(!password.matches(regex)) {
             CustomLogger.warn(
-                    LogEventCode.SIGNUP,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.INVALID_PASSWORD,
                     LogEventReasonCode.INVALID_PASSWORD.getMessage(),
@@ -62,20 +62,4 @@ public class AuthUtil {
         return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
     }
 
-    // 권한 검사-ADMIN
-    public void adminAuthorizationCheck(CustomPrincipal customPrincipal) {
-
-        if(!customPrincipal.userRole().equals(UserRoleCode.ADMIN.name())){
-
-            CustomLogger.warn(
-                    LogEventCode.TERM,
-                    "FAIL",
-                    LogEventReasonCode.ADMIN_ACCESS_REQUIRED,
-                    LogEventReasonCode.ADMIN_ACCESS_REQUIRED.getMessage(),
-                    customPrincipal.uuid()
-            );
-
-            throw new CustomException(CustomExceptionCode.ADMIN_ACCESS_REQUIRED);
-        }
-    }
 }

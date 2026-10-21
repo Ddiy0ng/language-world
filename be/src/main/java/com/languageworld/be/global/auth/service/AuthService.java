@@ -53,7 +53,7 @@ public class AuthService {
         boolean isUserExist = serviceAccountRepository.existsByEmail(email);
         if(isUserExist) {
             CustomLogger.warn(
-                    LogEventCode.SIGNUP,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.EMAIL_ALREADY_EXIST,
                     LogEventReasonCode.EMAIL_ALREADY_EXIST.getMessage() + " - Requested email: " + email,
@@ -77,7 +77,7 @@ public class AuthService {
         if(!learningLanguage.equals(learningLanguageLevel.getLanguage())) {
 
             CustomLogger.warn(
-                    LogEventCode.SIGNUP,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.NOT_PROPER_LEVEL_FOR_LANGUAGE,
                     LogEventReasonCode.NOT_PROPER_LEVEL_FOR_LANGUAGE.getMessage() + " - LearningLanguage: " + learningLanguage.getType() + ", Level: " + learningLanguageLevel.getLevel(),
@@ -102,7 +102,7 @@ public class AuthService {
         agreedTermRepository.save(agreedServiceTerm);
         agreedTermRepository.save(agreedPersonalInfoUseTerm);
         CustomLogger.info(
-                LogEventCode.SIGNUP,
+                LogEventCode.AUTH,
                 "SUCCESS",
                 SuccessCode.SIGNUP_SUCCESS.getMessage() + " - userUuid: " + user.getUuid(),
                 null
@@ -118,7 +118,7 @@ public class AuthService {
         Optional<ServiceAccount> optionalServiceAccount = serviceAccountRepository.findByEmail(email);
         if(optionalServiceAccount.isEmpty()) {
             CustomLogger.warn(
-                    LogEventCode.LOGIN,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.EMAIL_NOT_FOUND,
                     LogEventReasonCode.EMAIL_NOT_FOUND.getMessage() + " - Requested email: " +email,
@@ -135,7 +135,7 @@ public class AuthService {
         if(!authUtil.isPasswordMatches(rawPassword, encodedPassword)) {
 
             CustomLogger.warn(
-                    LogEventCode.LOGIN,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.PASSWORD_MISMATCH,
                     LogEventReasonCode.PASSWORD_MISMATCH.getMessage() + " - Requested email: " + email,
@@ -157,7 +157,7 @@ public class AuthService {
         String refreshToken = jwtProvider.generateRefreshToken(user);
         LoginResponseDto loginResponseDto = LoginResponseDto.of(accessToken, refreshToken);
         CustomLogger.info(
-                LogEventCode.LOGIN,
+                LogEventCode.AUTH,
                 "SUCCESS",
                 SuccessCode.LOGIN_SUCCESS.getMessage() + " - userUuid: " + user.getUuid(),
                 null
@@ -190,7 +190,7 @@ public class AuthService {
         if(!learningLanguage.equals(learningLanguageLevel.getLanguage())) {
 
             CustomLogger.warn(
-                    LogEventCode.SIGNUP,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.NOT_PROPER_LEVEL_FOR_LANGUAGE,
                     LogEventReasonCode.NOT_PROPER_LEVEL_FOR_LANGUAGE.getMessage() + " - LearningLanguage: " + learningLanguage.getType() + ", Level: " + learningLanguageLevel.getLevel(),
@@ -215,7 +215,7 @@ public class AuthService {
         agreedTermRepository.save(agreedServiceTerm);
         agreedTermRepository.save(agreedPersonalInfoUseTerm);
         CustomLogger.info(
-                LogEventCode.SIGNUP,
+                LogEventCode.AUTH,
                 "SUCCESS",
                 SuccessCode.SIGNUP_SUCCESS.getMessage() + " - userUuid: " + user.getUuid(),
                 null
@@ -245,7 +245,7 @@ public class AuthService {
         String refreshToken = jwtProvider.generateRefreshToken(user);
         LoginResponseDto loginResponseDto = LoginResponseDto.of(accessToken, refreshToken);
         CustomLogger.info(
-                LogEventCode.LOGIN,
+                LogEventCode.AUTH,
                 "SUCCESS",
                 SuccessCode.LOGIN_SUCCESS.getMessage() + " - userUuid: " + user.getUuid(),
                 null
@@ -309,7 +309,7 @@ public class AuthService {
         if (user.getDeletedAt() != null) {
 
             CustomLogger.warn(
-                    LogEventCode.LOGIN,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.DELETED_USER,
                     LogEventReasonCode.DELETED_USER.getMessage() + " - userUuid: " + user.getUuid(),

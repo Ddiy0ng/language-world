@@ -13,20 +13,22 @@ public enum CustomExceptionCode {
             "UNDEFINED_500",
             "500에러:정의되지 않은 오류가 발생했습니다."),
 
-    // AUTH_FILTER
+    // AUTH
     UNAUTHORIZED(
             HttpStatus.UNAUTHORIZED,
-            "AUTH_FILTER_401",
+            "AUTH_401",
             "인증되지 않은 사용자입니다."),
+    UNSUPPORTED_USER_ROLE_TYPE(
+            HttpStatus.BAD_REQUEST,
+            "AUTH_401",
+            "지원하지 않는 권한입니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN,
-            "AUTH_FILTER_403",
+            "AUTH_403",
             "권한이 없습니다."),
     ADMIN_ACCESS_REQUIRED(
             HttpStatus.FORBIDDEN,
-            "AUTH_FILTER_403",
+            "AUTH_403",
             "관리자 권한이 없습니다."),
-
-    // AUTH
     DELETED_USER(
             HttpStatus.NOT_FOUND,
             "AUTH_404",
@@ -44,7 +46,6 @@ public enum CustomExceptionCode {
             "AUTH_400",
             "비밀번호를 입력해주세요."),
     INVALID_PASSWORD(
-
             HttpStatus.BAD_REQUEST,
             "AUTH_400",
             "영문, 숫자, 특수문자의 8~20자 이내의 비밀번호여야 합니다"),
@@ -115,6 +116,9 @@ public enum CustomExceptionCode {
             HttpStatus.BAD_REQUEST,
             "TERM_400",
             "이미 등록된 약관입니다."),
+    NOT_AGREED_TERM_OWNER(HttpStatus.UNAUTHORIZED,
+            "TERM_401",
+            "본인이 동의한 약관이 아닙니다."),
 
     // LANGUAGE
     UNSUPPORTED_LANGUAGE(
