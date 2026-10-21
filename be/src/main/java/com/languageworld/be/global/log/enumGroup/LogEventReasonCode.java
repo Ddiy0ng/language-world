@@ -7,11 +7,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum LogEventReasonCode {
 
-    // AUTH_FILTER
-    UNAUTHORIZED("인증되지 않은 사용자입니다."),
-    ADMIN_ACCESS_REQUIRED("관리자 권한이 필요합니다."),
-
     // AUTH
+    UNAUTHORIZED("인증되지 않은 사용자입니다."),
+    UNSUPPORTED_USER_ROLE_TYPE("지원하지 않는 권한입니다."),
+    ADMIN_ACCESS_REQUIRED("관리자 권한이 필요합니다."),
     DELETED_USER("탈퇴한 사용자입니다."),
     EMAIL_ALREADY_EXIST("이미 가입된 이메일입니다."),
     EMAIL_NOT_FOUND("존재하지 않는 이메일입니다."),
@@ -51,6 +50,7 @@ public enum LogEventReasonCode {
     TERM_NOT_FOUND("약관을 찾을 수 없습니다."),
     AGREED_TERM_NOT_FOUND("동의한 약관을 찾을 수 업습니다."),
     TERM_ALREADY_EXIST("이미 등록된 약관입니다."),
+    NOT_AGREED_TERM_OWNER("본인이 동의한 약관이 아닙니다."),
 
     // LANGUAGE
     UNSUPPORTED_LANGUAGE("지원하지 않는 언어입니다."),

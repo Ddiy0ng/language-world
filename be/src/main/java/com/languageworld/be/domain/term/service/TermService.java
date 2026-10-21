@@ -1,14 +1,15 @@
 package com.languageworld.be.domain.term.service;
 
+import com.languageworld.be.domain.term.dto.request.AgreedTermIsAgreedUpdateRequestDto;
+import com.languageworld.be.domain.term.dto.request.TermCreateRequestDto;
+import com.languageworld.be.domain.term.dto.request.TermStatusUpdateRequestDto;
 import com.languageworld.be.domain.term.dto.response.AgreedTermResponseDto;
 import com.languageworld.be.domain.term.dto.response.TermResponseDto;
-import com.languageworld.be.domain.term.dto.request.TermRequestDto;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
 import com.languageworld.be.domain.term.entity.Term;
 import com.languageworld.be.domain.term.repository.AgreedTermRepository;
 import com.languageworld.be.domain.term.repository.TermRepository;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
-import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.global.auth.service.AuthUtil;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
@@ -21,10 +22,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +37,10 @@ public class TermService {
     private final AuthUtil authUtil;
 
     @Transactional
-    public void createTerm(CustomPrincipal customPrincipal, MultipartFile pdf, TermRequestDto.TermCreate termRequestDto) {
-
-        // admin 권한 확인
-        authUtil.adminAuthorizationCheck(customPrincipal);
+    public void createTerm(CustomPrincipal customPrincipal, MultipartFile pdf, TermCreateRequestDto termCreateRequestDto) {
 
         // 버전명
-        String version = termRequestDto.purpose() + LocalDate.now().toString();
+        String version = termCreateRequestDto.purpose() + LocalDate.now().toString();
 
         //동일 약관 존재 확인(목적 + 버전)
         boolean isTermExist = termRepository.existsByVersion(version);
@@ -60,13 +58,24 @@ public class TermService {
         String fileUploadedPath = fileUtil.uploadFile(pdf, FilePurposeCode.TERM);
 
         // term 객체 생성
-        Term term = Term.of(termRequestDto, fileUploadedPath, version);
+        Term term = Term.of(termCreateRequestDto, fileUploadedPath, version);
 
         // 저장
         termRepository.save(term);
     }
 
-    // TODO 약관 조회(ADMIN): active인 서비스 이용, 개인정보 수집 약관 조회
+    public List<TermResponseDto> getAllTerm() {
+
+        List<Term> termlist = termRepository.findAll();
+        List<TermResponseDto> termResponseDtoList =
+                termlist.stream()
+                        .map(TermResponseDto::from)
+                        .toList();
+
+        return termResponseDtoList;
+    }
+
+    // TODO 약관 조회: active인 서비스 이용, 개인정보 수집 약관 조회
     @Transactional
     public List<TermResponseDto> getActiveTerm() {
 
@@ -96,38 +105,27 @@ public class TermService {
 
     // TODO 약관 상태 변경(ADMIN): Active/Inactive
     @Transactional
-    public void updateTermStatus(CustomPrincipal customPrincipal, Long termId, TermRequestDto.TermStatusUpdate termRequestDto) {
-
-        // admin 권한 확인
-        authUtil.adminAuthorizationCheck(customPrincipal);
+    public void updateTermStatus(CustomPrincipal customPrincipal, Long termId, TermStatusUpdateRequestDto termStatusUpdateRequestDto) {
 
         // 상태 변경
         Term term = getTermById(termId);
-        if(termRequestDto.changeIntoStatus())
+        if(termStatusUpdateRequestDto.changeIntoStatus())
             term.activate();
         else
             term.deActivate();
     }
 
-    // TODO 약관 동의 여부 변경(USER): 동의 철회
+    // TODO 약관 동의 철회(USER)
     @Transactional
-    public void updateAgreedTermIsAgreed(Long agreedTermId, TermRequestDto.AgreedTermIsAgreedUpdate termRequestDto) {
+    public void disAgreeAgreedTerm(CustomPrincipal customPrincipal, Long agreedTermId) {
 
         AgreedTerm agreedTerm = getAgreedTermById(agreedTermId);
 
-        // agreedTerm 삭제
+        // 본인이 동의한 약관인지 확인
+        agreedTermOwnerCheck(customPrincipal.uuid(), agreedTerm);
+
+        // agreedTerm 동의 철회
         agreedTermRepository.delete(agreedTerm);
-    }
-
-    // TODO 약관 삭제
-    @Transactional
-    public void deleteTerm(CustomPrincipal customPrincipal, Long termId) {
-
-        authUtil.adminAuthorizationCheck(customPrincipal);
-
-        Term term = getTermById(termId);
-
-        termRepository.delete(term);
     }
 
     @Transactional
@@ -154,6 +152,7 @@ public class TermService {
 
         Optional<AgreedTerm> optionalAgreedTerm = agreedTermRepository.findById(agreedTermId);
         if(optionalAgreedTerm.isEmpty()) {
+
             CustomLogger.warn(LogEventCode.TERM,
                     "FAIL",
                     LogEventReasonCode.AGREED_TERM_NOT_FOUND,
@@ -169,4 +168,21 @@ public class TermService {
         return agreedTerm;
     }
 
+    // 약관 주인 확인
+    private void agreedTermOwnerCheck(UUID uuid, AgreedTerm agreedTerm) {
+
+        UUID ownerUuid = agreedTerm.getUser().getUuid();
+
+        if(!uuid.equals(ownerUuid)) {
+
+            CustomLogger.warn(LogEventCode.TERM,
+                    "FAIL",
+                    LogEventReasonCode.NOT_AGREED_TERM_OWNER,
+                    LogEventReasonCode.NOT_AGREED_TERM_OWNER.getMessage() + " - TermId: " + agreedTerm.getId() + " - triedUserUuid: " + uuid,
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.NOT_AGREED_TERM_OWNER);
+        }
+    }
 }

@@ -2,10 +2,8 @@ package com.languageworld.be.global.log.enumGroup;
 
 public enum LogEventCode {
 
-    SIGNUP,
-    LOGIN,
+    AUTH,
     JWT,
-    AUTH_FILTER,
     SOCIAL,
     TERM,
     MULTIPART_FILE,

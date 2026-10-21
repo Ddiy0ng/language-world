@@ -29,10 +29,7 @@ public class SecurityConfig {
     private final String[] WHITE_LIST_URL = {
             "/",
             "/auth/signup/**",
-            "/auth/login/**",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/static/test.html"
+            "/auth/login/**"
     };
 
     //SecurityFilterChain Bean
@@ -60,7 +57,7 @@ public class SecurityConfig {
                 // 엔드포인트 인가 관리
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/term/admin", "/term/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
 

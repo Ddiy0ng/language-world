@@ -1,6 +1,7 @@
 package com.languageworld.be.global.config.jwt;
 
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
+import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.jwt.JwtUtil;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -68,8 +70,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
             throw new CustomException(CustomExceptionCode.INVALID_TOKEN); // CustomException 처리: 액세스 토큰 필요
         }
+
         // 인증 사용자 객체 셍성
-        CustomPrincipal customPrincipal = new CustomPrincipal(jwtUtil.getUuid(claims), jwtUtil.getUserRole(claims));
+        CustomPrincipal customPrincipal = new CustomPrincipal(UUID.fromString(jwtUtil.getUuid(claims)), UserRoleCode.from(jwtUtil.getUserRole(claims)));
 
         // 인증 객체 생성
         Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(
