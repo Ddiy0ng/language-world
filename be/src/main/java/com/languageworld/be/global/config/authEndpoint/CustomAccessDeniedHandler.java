@@ -36,7 +36,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         if(uri.equals("/admin") || uri.startsWith("/admin/")) {
 
             CustomLogger.warn(
-                    LogEventCode.AUTH_FILTER,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.ADMIN_ACCESS_REQUIRED,
                     LogEventReasonCode.ADMIN_ACCESS_REQUIRED.getMessage(),
@@ -56,7 +56,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         else {
 
             CustomLogger.warn(
-                    LogEventCode.AUTH_FILTER,
+                    LogEventCode.AUTH,
                     "FAIL",
                     LogEventReasonCode.UNAUTHORIZED,
                     LogEventReasonCode.UNAUTHORIZED.getMessage(),

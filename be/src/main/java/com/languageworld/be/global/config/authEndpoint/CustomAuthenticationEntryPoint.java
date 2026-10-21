@@ -29,7 +29,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
 
         CustomLogger.warn(
-                LogEventCode.AUTH_FILTER,
+                LogEventCode.AUTH,
                 "FAIL",
                 LogEventReasonCode.UNAUTHORIZED,
                 LogEventReasonCode.UNAUTHORIZED.getMessage(),
