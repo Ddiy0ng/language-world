@@ -32,6 +32,11 @@ public class SecurityConfig {
             "/auth/login/**"
     };
 
+    private final String[] ADMIN_AUTH_URL = {
+            "/term/admin",
+            "/term/admin/**"
+    };
+
     //SecurityFilterChain Bean
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
@@ -57,7 +62,7 @@ public class SecurityConfig {
                 // 엔드포인트 인가 관리
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
-                        .requestMatchers("/term/admin", "/term/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers(ADMIN_AUTH_URL).hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
 
