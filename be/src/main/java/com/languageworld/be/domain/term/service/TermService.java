@@ -22,7 +22,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,7 +40,7 @@ public class TermService {
     public void createTerm(CustomPrincipal customPrincipal, MultipartFile pdf, TermCreateRequestDto termCreateRequestDto) {
 
         // 버전명
-        String version = termCreateRequestDto.purpose() + LocalDate.now().toString();
+        String version = termCreateRequestDto.purpose() + LocalDateTime.now().toString();
 
         //동일 약관 존재 확인(목적 + 버전)
         boolean isTermExist = termRepository.existsByVersion(version);
