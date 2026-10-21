@@ -33,10 +33,9 @@ public class TermService {
     private final TermRepository termRepository;
     private final AgreedTermRepository agreedTermRepository;
     private final FileUtil fileUtil;
-    private final AuthUtil authUtil;
 
     @Transactional
-    public void createTerm(MultipartFile pdf, TermCreateRequestDto termCreateRequestDto) {
+    public void registerTerm(MultipartFile pdf, TermCreateRequestDto termCreateRequestDto) {
 
         // 버전명
         String version = termCreateRequestDto.purpose() + LocalDateTime.now().toString();
@@ -63,7 +62,7 @@ public class TermService {
         termRepository.save(term);
     }
 
-    public List<TermResponseDto> getAllTerm() {
+    public List<TermResponseDto> findAllTerm() {
 
         List<Term> termlist = termRepository.findAll();
         List<TermResponseDto> termResponseDtoList =
@@ -76,7 +75,7 @@ public class TermService {
 
     // TODO 약관 조회: active인 서비스 이용, 개인정보 수집 약관 조회: 회원가입 시 동의해야 하는 약관 조회용
     @Transactional
-    public TermResponseDto[] getActiveTerm() {
+    public TermResponseDto[] findActiveTerm() {
 
         Term serviceTerm = getTermByPurpose(TermPurposeCode.SERVICE_USE);
         Term personalInfoTerm = getTermByPurpose(TermPurposeCode.SERVICE_USE);
@@ -91,7 +90,7 @@ public class TermService {
 
     // TODO 약관 조회(USER): 동의한 약관 확인
     @Transactional
-    public List<AgreedTermResponseDto> getAgreedTermList(CustomPrincipal customPrincipal) {
+    public List<AgreedTermResponseDto> findAgreedTermList(CustomPrincipal customPrincipal) {
 
         // 인증 사용자가 동의한 agreedTerm 조회
         List<AgreedTerm> termList = agreedTermRepository.findAllByUser_Uuid(customPrincipal.uuid());
@@ -105,7 +104,7 @@ public class TermService {
 
     // TODO 약관 상태 변경(ADMIN): Active/Inactive
     @Transactional
-    public void updateTermStatus(Long termId) {
+    public void activateTermStatus(Long termId) {
 
         Term activeTerm = getTermById(termId);
 
