@@ -24,43 +24,43 @@ public class TermController {
     private final TermService termService;
 
     @PostMapping("/admin")
-    public ResponseEntity<ApiResponse<Void>> createTerm(@RequestPart("file") MultipartFile multipartFile,
+    public ResponseEntity<ApiResponse<Void>> registerTerm(@RequestPart("file") MultipartFile multipartFile,
                                                         @Valid @RequestPart("json") TermCreateRequestDto termCreateRequestDto) {
 
-        termService.createTerm(multipartFile, termCreateRequestDto);
+        termService.registerTerm(multipartFile, termCreateRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.TERM_CREATED);
     }
 
     //TODO 약관 전체 조회(ADMIN)
     @GetMapping("/admin")
-    public ResponseEntity<ApiResponse<List<TermResponseDto>>> getTermList() {
+    public ResponseEntity<ApiResponse<List<TermResponseDto>>> findTermList() {
 
-        List<TermResponseDto> termResponseDtoList= termService.getAllTerm();
+        List<TermResponseDto> termResponseDtoList= termService.findAllTerm();
 
         return ResponseEntityUtil.success(SuccessCode.TERM_READ_SUCCESS, termResponseDtoList);
     }
 
     @GetMapping()
-    public ResponseEntity<ApiResponse<TermResponseDto[]>> getActiveTerm() {
+    public ResponseEntity<ApiResponse<TermResponseDto[]>> findActiveTerm() {
 
-         TermResponseDto[] termResponseDtoArr = termService.getActiveTerm();
+         TermResponseDto[] termResponseDtoArr = termService.findActiveTerm();
 
         return ResponseEntityUtil.success(SuccessCode.TERM_READ_SUCCESS, termResponseDtoArr);
     }
 
     @GetMapping("/agreed")
-    public ResponseEntity<ApiResponse<List<AgreedTermResponseDto>>> getAgreedTermList(@AuthenticationPrincipal CustomPrincipal customPrincipal) {
+    public ResponseEntity<ApiResponse<List<AgreedTermResponseDto>>> findAgreedTermList(@AuthenticationPrincipal CustomPrincipal customPrincipal) {
 
-        List<AgreedTermResponseDto> agreedTermList = termService.getAgreedTermList(customPrincipal);
+        List<AgreedTermResponseDto> agreedTermList = termService.findAgreedTermList(customPrincipal);
 
         return ResponseEntityUtil.success(SuccessCode.AGREED_TERM_READ_SUCCESS, agreedTermList);
     }
 
     @PatchMapping("/admin/{termId}")
-    public ResponseEntity<ApiResponse<Void>> updateTermStatus(@PathVariable Long termId) {
+    public ResponseEntity<ApiResponse<Void>> activateTermStatus(@PathVariable Long termId) {
 
-        termService.updateTermStatus(termId);
+        termService.activateTermStatus(termId);
 
         return ResponseEntityUtil.success(SuccessCode.TERM_STATUS_UPDATE_SUCCESS);
     }
