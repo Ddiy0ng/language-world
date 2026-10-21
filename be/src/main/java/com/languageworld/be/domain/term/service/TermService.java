@@ -7,6 +7,7 @@ import com.languageworld.be.domain.term.dto.response.AgreedTermResponseDto;
 import com.languageworld.be.domain.term.dto.response.TermResponseDto;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
 import com.languageworld.be.domain.term.entity.Term;
+import com.languageworld.be.domain.term.enumGroup.TermPurposeCode;
 import com.languageworld.be.domain.term.repository.AgreedTermRepository;
 import com.languageworld.be.domain.term.repository.TermRepository;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
@@ -37,7 +38,7 @@ public class TermService {
     private final AuthUtil authUtil;
 
     @Transactional
-    public void createTerm(CustomPrincipal customPrincipal, MultipartFile pdf, TermCreateRequestDto termCreateRequestDto) {
+    public void createTerm(MultipartFile pdf, TermCreateRequestDto termCreateRequestDto) {
 
         // 버전명
         String version = termCreateRequestDto.purpose() + LocalDateTime.now().toString();
@@ -75,18 +76,19 @@ public class TermService {
         return termResponseDtoList;
     }
 
-    // TODO 약관 조회: active인 서비스 이용, 개인정보 수집 약관 조회
+    // TODO 약관 조회: active인 서비스 이용, 개인정보 수집 약관 조회: 회원가입 시 동의해야 하는 약관 조회용
     @Transactional
-    public List<TermResponseDto> getActiveTerm() {
+    public TermResponseDto[] getActiveTerm() {
 
-        // active 상태인 term 조회
-        List<Term> termList = termRepository.findAllByIsActive(true);
-        List<TermResponseDto> termResponseDtoList =
-                termList.stream()
-                        .map(TermResponseDto::from)
-                        .toList();
+        Term serviceTerm = getTermByPurpose(TermPurposeCode.SERVICE_USE);
+        Term personalInfoTerm = getTermByPurpose(TermPurposeCode.SERVICE_USE);
 
-        return termResponseDtoList;
+        TermResponseDto serviceTermResponseDto = TermResponseDto.from(serviceTerm);
+        TermResponseDto personalInfoTermResponseDto = TermResponseDto.from(personalInfoTerm);
+
+        TermResponseDto[] termResponseDtoArr = {serviceTermResponseDto, personalInfoTermResponseDto};
+
+        return termResponseDtoArr;
     }
 
     // TODO 약관 조회(USER): 동의한 약관 확인
@@ -105,7 +107,7 @@ public class TermService {
 
     // TODO 약관 상태 변경(ADMIN): Active/Inactive
     @Transactional
-    public void updateTermStatus(CustomPrincipal customPrincipal, Long termId, TermStatusUpdateRequestDto termStatusUpdateRequestDto) {
+    public void updateTermStatus(Long termId, TermStatusUpdateRequestDto termStatusUpdateRequestDto) {
 
         // 상태 변경
         Term term = getTermById(termId);
@@ -166,6 +168,26 @@ public class TermService {
         AgreedTerm  agreedTerm = optionalAgreedTerm.get();
 
         return agreedTerm;
+    }
+
+    @Transactional
+    private Term getTermByPurpose(TermPurposeCode termPurposeCode) {
+
+        Optional<Term> optionalTerm = termRepository.findByIsActiveAndPurpose(true, termPurposeCode);
+
+        if(optionalTerm.isEmpty()) {
+            CustomLogger.warn(LogEventCode.TERM,
+                    "FAIL",
+                    LogEventReasonCode.TERM_NOT_FOUND,
+                    LogEventReasonCode.TERM_NOT_FOUND.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.TERM_NOT_FOUND);
+        }
+        Term term = optionalTerm.get();
+
+        return term;
     }
 
     // 약관 주인 확인

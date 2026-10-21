@@ -2,6 +2,7 @@ package com.languageworld.be.domain.term.entity;
 
 import com.languageworld.be.domain.term.dto.request.TermCreateRequestDto;
 import com.languageworld.be.domain.term.enumGroup.TermPurposeCode;
+import com.languageworld.be.global.baseEntity.ChangeableEntity;
 import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 @Getter
-public class Term extends CreatableEntity {
+public class Term extends ChangeableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

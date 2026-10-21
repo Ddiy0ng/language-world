@@ -25,11 +25,10 @@ public class TermController {
     private final TermService termService;
 
     @PostMapping("/admin")
-    public ResponseEntity<ApiResponse<Void>> createTerm(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                        @RequestPart("file") MultipartFile multipartFile,
+    public ResponseEntity<ApiResponse<Void>> createTerm(@RequestPart("file") MultipartFile multipartFile,
                                                         @Valid @RequestPart("json") TermCreateRequestDto termCreateRequestDto) {
 
-        termService.createTerm(customPrincipal, multipartFile, termCreateRequestDto);
+        termService.createTerm(multipartFile, termCreateRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.TERM_CREATED);
     }
@@ -44,11 +43,11 @@ public class TermController {
     }
 
     @GetMapping()
-    public ResponseEntity<ApiResponse<List<TermResponseDto>>> getActiveTerm() {
+    public ResponseEntity<ApiResponse<TermResponseDto[]>> getActiveTerm() {
 
-         List<TermResponseDto> termResponseDtoList = termService.getActiveTerm();
+         TermResponseDto[] termResponseDtoArr = termService.getActiveTerm();
 
-        return ResponseEntityUtil.success(SuccessCode.TERM_READ_SUCCESS, termResponseDtoList);
+        return ResponseEntityUtil.success(SuccessCode.TERM_READ_SUCCESS, termResponseDtoArr);
     }
 
     @GetMapping("/agreed")
@@ -60,11 +59,10 @@ public class TermController {
     }
 
     @PatchMapping("/admin/{termId}")
-    public ResponseEntity<ApiResponse<Void>> updateTermStatus(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                              @PathVariable Long termId,
+    public ResponseEntity<ApiResponse<Void>> updateTermStatus(@PathVariable Long termId,
                                                               @Valid @RequestBody TermStatusUpdateRequestDto termStatusUpdateRequestDto) {
 
-        termService.updateTermStatus(customPrincipal, termId, termStatusUpdateRequestDto);
+        termService.updateTermStatus(termId, termStatusUpdateRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.TERM_STATUS_UPDATE_SUCCESS);
     }
