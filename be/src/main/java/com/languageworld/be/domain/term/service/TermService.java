@@ -104,7 +104,7 @@ public class TermService {
     public TermResponseDto[] findActiveTerm() {
 
         Term serviceTerm = termUtil.getTermByPurpose(TermPurposeCode.SERVICE_USE);
-        Term personalInfoTerm = termUtil.getTermByPurpose(TermPurposeCode.SERVICE_USE);
+        Term personalInfoTerm = termUtil.getTermByPurpose(TermPurposeCode.PERSONAL_INFO_USE);
 
         TermResponseDto serviceTermResponseDto = TermResponseDto.from(serviceTerm);
         TermResponseDto personalInfoTermResponseDto = TermResponseDto.from(personalInfoTerm);
