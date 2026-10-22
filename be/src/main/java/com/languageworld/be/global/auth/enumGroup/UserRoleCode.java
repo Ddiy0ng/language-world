@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 public enum UserRoleCode {
 
     ADMIN,
-    USER;
+    USER,
+    SERVICE_FORBIDDEN_USER;
 
     public static UserRoleCode from(String name) {
 
@@ -31,4 +32,4 @@ public enum UserRoleCode {
 
         throw new CustomException(CustomExceptionCode.UNSUPPORTED_USER_ROLE_TYPE);
     }
-}
+}// term 필수 동의안 하면 userRoleCode를 수정, 이건 다른 곳에도 쓰임

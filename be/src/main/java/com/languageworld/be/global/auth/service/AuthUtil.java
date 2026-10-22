@@ -1,5 +1,9 @@
 package com.languageworld.be.global.auth.service;
 
+import com.languageworld.be.domain.term.entity.AgreedTerm;
+import com.languageworld.be.domain.term.service.TermUtil;
+import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.domain.user.repository.UserRepository;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
@@ -7,15 +11,20 @@ import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class AuthUtil {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final TermUtil termUtil;
+
 
     // 비밀번호 유효성 검사(공백 + 형식)
     protected void validatePassword(String password) {
@@ -62,4 +71,11 @@ public class AuthUtil {
         return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
     }
 
+    @Transactional
+    public void userRoleChangeAccordingToTerm(User user) {
+
+        UserRoleCode userTypeCode = termUtil.validateTermCheck(user.getAgreedTermList());
+
+        user.changeUserRole(userTypeCode);
+    }
 }

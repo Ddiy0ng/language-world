@@ -34,9 +34,9 @@ public class TermController {
     }
 
     @PostMapping()
-    public ResponseEntity<ApiResponse<Void>> agreeTerm(@AuthenticationPrincipal CustomPrincipal customPrincipal, TermAgreeRequestDto termAgreeRequestDto) {
+    public ResponseEntity<ApiResponse<Void>> agreeTermForAuthenticatedUser (@AuthenticationPrincipal CustomPrincipal customPrincipal, @Valid @RequestBody TermAgreeRequestDto termAgreeRequestDto) {
 
-        termService.agreeTerm(customPrincipal, termAgreeRequestDto);
+        termService.agreeTermForAuthenticatedUser(customPrincipal, termAgreeRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.AGREE_TERM_SUCCESS);
     }
@@ -65,6 +65,8 @@ public class TermController {
 
         return ResponseEntityUtil.success(SuccessCode.AGREED_TERM_READ_SUCCESS, agreedTermList);
     }
+
+    // TODO 비동의한 필수 약관 조회
 
     @PatchMapping("/admin/{termId}")
     public ResponseEntity<ApiResponse<Void>> activateTermStatus(@PathVariable Long termId) {

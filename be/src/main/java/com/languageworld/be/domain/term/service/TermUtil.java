@@ -5,6 +5,7 @@ import com.languageworld.be.domain.term.entity.Term;
 import com.languageworld.be.domain.term.enumGroup.TermPurposeCode;
 import com.languageworld.be.domain.term.repository.AgreedTermRepository;
 import com.languageworld.be.domain.term.repository.TermRepository;
+import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
@@ -43,7 +44,7 @@ public class TermUtil {
         return term;
     }
 
-    protected void termPurposeCheck(Term term, TermPurposeCode termPurposeCode) {
+    public void termPurposeCheck(Term term, TermPurposeCode termPurposeCode) {
 
         if(term.getPurpose() != termPurposeCode) {
 
@@ -115,7 +116,12 @@ public class TermUtil {
         }
     }
 
-    public void validateTermCheck(List<AgreedTerm> agreedTermList) {
+    public boolean isTermPurposeCorrect(Term term, TermPurposeCode termPurposeCode) {
+
+        return term.getPurpose() == termPurposeCode;
+    }
+
+    public UserRoleCode validateTermCheck(List<AgreedTerm> agreedTermList) {
 
         List<Term> activeTermList = termRepository.findAllByIsActive(true);
 
@@ -129,10 +135,10 @@ public class TermUtil {
                 Term term = agreedTerm.getTerm();
 
                 if(activeTerm.getId().equals(term.getId()) && agreedTerm.isAgreed()) {
-                    if (term.getPurpose() == TermPurposeCode.SERVICE_USE) {
+                    if (isTermPurposeCorrect(term, TermPurposeCode.SERVICE_USE)) {
                         isServiceTermAgreed = true;
                         break;
-                    } else if (term.getPurpose() == TermPurposeCode.PERSONAL_INFO_USE) {
+                    } else if (isTermPurposeCorrect(term, TermPurposeCode.PERSONAL_INFO_USE)) {
                         isPersonalInfoTermAgreed = true;
                         break;
                     }
@@ -149,7 +155,9 @@ public class TermUtil {
                     null
             );
 
-            throw new CustomException(CustomExceptionCode.REQUIRED_TERM_NOT_AGREED);
+            return UserRoleCode.SERVICE_FORBIDDEN_USER;
         }
+
+        return UserRoleCode.USER;
     }
 }

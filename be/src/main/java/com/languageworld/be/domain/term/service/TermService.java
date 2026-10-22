@@ -65,7 +65,7 @@ public class TermService {
     }
 
     @Transactional
-    public void agreeTerm(CustomPrincipal customPrincipal, TermAgreeRequestDto termAgreeRequestDto) {
+    public void agreeTermForAuthenticatedUser(CustomPrincipal customPrincipal, TermAgreeRequestDto termAgreeRequestDto) {
 
         User user = userUtil.getUserByUuid(customPrincipal.uuid());
 
