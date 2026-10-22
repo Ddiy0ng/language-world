@@ -45,7 +45,7 @@ public class TermController {
     @GetMapping("/admin")
     public ResponseEntity<ApiResponse<List<TermResponseDto>>> findTermList() {
 
-        List<TermResponseDto> termResponseDtoList= termService.findAllTerm();
+        List<TermResponseDto> termResponseDtoList= termService.findTermList();
 
         return ResponseEntityUtil.success(SuccessCode.TERM_READ_SUCCESS, termResponseDtoList);
     }

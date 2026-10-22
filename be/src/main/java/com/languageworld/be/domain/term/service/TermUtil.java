@@ -76,6 +76,25 @@ public class TermUtil {
         return agreedTerm;
     }
 
+    protected Term getTermByPurpose(TermPurposeCode termPurposeCode) {
+
+        Optional<Term> optionalTerm = termRepository.findByIsActiveAndPurpose(true, termPurposeCode);
+
+        if(optionalTerm.isEmpty()) {
+            CustomLogger.warn(LogEventCode.TERM,
+                    "FAIL",
+                    LogEventReasonCode.TERM_NOT_FOUND,
+                    LogEventReasonCode.TERM_NOT_FOUND.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.TERM_NOT_FOUND);
+        }
+        Term term = optionalTerm.get();
+
+        return term;
+    }
+
     // 약관 주인 확인
     protected void agreedTermOwnerCheck(UUID uuid, AgreedTerm agreedTerm) {
 

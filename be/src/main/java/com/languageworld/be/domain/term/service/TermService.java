@@ -2,7 +2,6 @@ package com.languageworld.be.domain.term.service;
 
 import com.languageworld.be.domain.term.dto.request.TermAgreeRequestDto;
 import com.languageworld.be.domain.term.dto.request.TermCreateRequestDto;
-import com.languageworld.be.domain.term.dto.request.TermActivenessUpdateRequestDto;
 import com.languageworld.be.domain.term.dto.response.AgreedTermResponseDto;
 import com.languageworld.be.domain.term.dto.response.TermResponseDto;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
@@ -14,12 +13,12 @@ import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.service.UserUtil;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
-import com.languageworld.be.global.log.enumGroup.LogEventCode;
-import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
-import com.languageworld.be.global.multiPartFileUtil.enumGroup.FilePurposeCode;
+import com.languageworld.be.global.log.enumGroup.LogEventCode;
+import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import com.languageworld.be.global.multiPartFileUtil.FileUtil;
+import com.languageworld.be.global.multiPartFileUtil.enumGroup.FilePurposeCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -89,7 +88,7 @@ public class TermService {
         }
     }
 
-    public List<TermResponseDto> findAllTerm() {
+    public List<TermResponseDto> findTermList() {
 
         List<Term> termlist = termRepository.findAll();
         List<TermResponseDto> termResponseDtoList =
@@ -104,8 +103,8 @@ public class TermService {
     @Transactional
     public TermResponseDto[] findActiveTerm() {
 
-        Term serviceTerm = getTermByPurpose(TermPurposeCode.SERVICE_USE);
-        Term personalInfoTerm = getTermByPurpose(TermPurposeCode.SERVICE_USE);
+        Term serviceTerm = termUtil.getTermByPurpose(TermPurposeCode.SERVICE_USE);
+        Term personalInfoTerm = termUtil.getTermByPurpose(TermPurposeCode.SERVICE_USE);
 
         TermResponseDto serviceTermResponseDto = TermResponseDto.from(serviceTerm);
         TermResponseDto personalInfoTermResponseDto = TermResponseDto.from(personalInfoTerm);
@@ -133,14 +132,13 @@ public class TermService {
     @Transactional
     public void activateTermStatus(Long termId) {
 
-        Term activeTerm = getTermById(termId);
+        Term activeTerm = termUtil.getTermById(termId);
 
         // 서비스 약관 활성화된 것
         List<Term> activatedTermList = termRepository.findAllByIsActiveAndPurpose(true, activeTerm.getPurpose());
-        for(Term term : activatedTermList) {
+        for (Term term : activatedTermList) {
             term.deActivate();
         }
-    }
         activeTerm.activate();
     }
 
@@ -156,4 +154,6 @@ public class TermService {
         // agreedTerm 동의 철회
         agreedTermRepository.delete(agreedTerm);
     }
+
+
 }
