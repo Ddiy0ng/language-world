@@ -7,6 +7,7 @@ import com.languageworld.be.domain.term.entity.AgreedTerm;
 import com.languageworld.be.domain.term.entity.Term;
 import com.languageworld.be.domain.term.repository.AgreedTermRepository;
 import com.languageworld.be.domain.term.service.TermService;
+import com.languageworld.be.domain.term.service.TermUtil;
 import com.languageworld.be.domain.user.entity.ServiceAccount;
 import com.languageworld.be.domain.user.entity.SocialAccount;
 import com.languageworld.be.domain.user.entity.User;
@@ -39,6 +40,7 @@ public class AuthService {
     private final AgreedTermRepository agreedTermRepository;
     private final LanguageService languageService;
     private final TermService termService;
+    private final TermUtil termUtil;
     private final AuthUtil authUtil;
     private final GoogleUtil googleUtil;
     private final KakaoUtil kakaoUtil;
@@ -87,8 +89,8 @@ public class AuthService {
             throw new CustomException(CustomExceptionCode.NOT_PROPER_LEVEL_FOR_LANGUAGE);
         }
 
-        Term serviceUseTerm = termService.getTermById(serviceSignupRequestDto.serviceUseTermId());
-        Term personalInfoUseTerm = termService.getTermById(serviceSignupRequestDto.personalInfoUseTermId());
+        Term serviceUseTerm = termUtil.getTermById(serviceSignupRequestDto.serviceUseTermId());
+        Term personalInfoUseTerm = termUtil.getTermById(serviceSignupRequestDto.personalInfoUseTermId());
 
         // 회원가입: user + account + term
         User user = User.of(serviceSignupRequestDto, motherTongue, learningLanguage, learningLanguageLevel);
@@ -147,10 +149,7 @@ public class AuthService {
         // 사용자 데이터 조회
         User user = serviceAccount.getUser();
 
-        // 사용자 탈퇴 여부 확인
-        validateUserNotDeleted(user);
-
-        // TODO 약관 동의 여부 확인(활성화된 약관)
+        termUtil.validateTermCheck(user.getAgreedTermList());
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
@@ -200,8 +199,8 @@ public class AuthService {
             throw new CustomException(CustomExceptionCode.NOT_PROPER_LEVEL_FOR_LANGUAGE);
         }
 
-        Term serviceUseTerm = termService.getTermById(socialSignupRequestDto.serviceUseTermId());
-        Term personalInfoUseTerm = termService.getTermById(socialSignupRequestDto.personalInfoUseTermId());
+        Term serviceUseTerm = termUtil.getTermById(socialSignupRequestDto.serviceUseTermId());
+        Term personalInfoUseTerm = termUtil.getTermById(socialSignupRequestDto.personalInfoUseTermId());
 
         // 회원가입
         User user = User.of(socialSignupRequestDto, profileImageUrl, motherTongue, learningLanguage, learningLanguageLevel);
@@ -235,10 +234,8 @@ public class AuthService {
         SocialAccount socialAccount = validateUserExistForLogin(type, sub);
         User user = socialAccount.getUser();
 
-        // 탈퇴 확인
-        validateUserNotDeleted(user);
-
         // TODO 약관 동의 여부 확인(활성화된 약관)
+        termUtil.validateTermCheck(user.getAgreedTermList());
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
@@ -301,22 +298,5 @@ public class AuthService {
         SocialAccount socialAccount = optionalSocialAccount.get();
 
         return socialAccount;
-    }
-
-    private void validateUserNotDeleted(User user) {
-
-        // 사용자 탈퇴 여부 확인
-        if (user.getDeletedAt() != null) {
-
-            CustomLogger.warn(
-                    LogEventCode.AUTH,
-                    "FAIL",
-                    LogEventReasonCode.DELETED_USER,
-                    LogEventReasonCode.DELETED_USER.getMessage() + " - userUuid: " + user.getUuid(),
-                    null
-            );
-
-            throw new CustomException(CustomExceptionCode.DELETED_USER);
-        }
     }
 }

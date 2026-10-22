@@ -21,7 +21,7 @@ public enum SuccessCode {
     AGREED_TERM_READ_SUCCESS(HttpStatus.OK, "TERM_200", "동의한 약관 조회에 성공했습니다."),
     TERM_STATUS_UPDATE_SUCCESS(HttpStatus.OK, "TERM_200", "약관 상태 업데이트에 성공했습니다."),
     AGREED_TERM_DISAGREE_SUCCESS(HttpStatus.OK, "TERM_200", "약관 동의 철회에 성공했습니다."),
-    TERM_DELETE_SUCCESS(HttpStatus.OK, "TERM_200", "약관 삭제에 성공했습니다."),;
+    AGREE_TERM_SUCCESS(HttpStatus.OK, "TERM_200", "약관 동의에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

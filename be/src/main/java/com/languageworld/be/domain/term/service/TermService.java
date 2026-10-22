@@ -1,6 +1,8 @@
 package com.languageworld.be.domain.term.service;
 
+import com.languageworld.be.domain.term.dto.request.TermAgreeRequestDto;
 import com.languageworld.be.domain.term.dto.request.TermCreateRequestDto;
+import com.languageworld.be.domain.term.dto.request.TermActivenessUpdateRequestDto;
 import com.languageworld.be.domain.term.dto.response.AgreedTermResponseDto;
 import com.languageworld.be.domain.term.dto.response.TermResponseDto;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
@@ -8,8 +10,9 @@ import com.languageworld.be.domain.term.entity.Term;
 import com.languageworld.be.domain.term.enumGroup.TermPurposeCode;
 import com.languageworld.be.domain.term.repository.AgreedTermRepository;
 import com.languageworld.be.domain.term.repository.TermRepository;
+import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.domain.user.service.UserUtil;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
-import com.languageworld.be.global.auth.service.AuthUtil;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
@@ -23,8 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,8 @@ public class TermService {
     private final TermRepository termRepository;
     private final AgreedTermRepository agreedTermRepository;
     private final FileUtil fileUtil;
+    private final TermUtil termUtil;
+    private final UserUtil userUtil;
 
     @Transactional
     public void registerTerm(MultipartFile pdf, TermCreateRequestDto termCreateRequestDto) {
@@ -60,6 +63,30 @@ public class TermService {
 
         // 저장
         termRepository.save(term);
+    }
+
+    @Transactional
+    public void agreeTerm(CustomPrincipal customPrincipal, TermAgreeRequestDto termAgreeRequestDto) {
+
+        User user = userUtil.getUserByUuid(customPrincipal.uuid());
+
+        if(termAgreeRequestDto.serviceTermId() != null) {
+            Term serviceTerm = termUtil.getTermById(termAgreeRequestDto.serviceTermId());
+            termUtil.termPurposeCheck(serviceTerm, TermPurposeCode.SERVICE_USE);
+
+            AgreedTerm agreedTerm = AgreedTerm.of(true, user, serviceTerm);
+
+            agreedTermRepository.save(agreedTerm);
+        }
+
+        if(termAgreeRequestDto.personalInfoTermId() != null) {
+            Term personalInfoTerm = termUtil.getTermById(termAgreeRequestDto.personalInfoTermId());
+            termUtil.termPurposeCheck(personalInfoTerm, TermPurposeCode.PERSONAL_INFO_USE);
+
+            AgreedTerm agreedTerm = AgreedTerm.of(true, user, personalInfoTerm);
+
+            agreedTermRepository.save(agreedTerm);
+        }
     }
 
     public List<TermResponseDto> findAllTerm() {
@@ -113,7 +140,7 @@ public class TermService {
         for(Term term : activatedTermList) {
             term.deActivate();
         }
-
+    }
         activeTerm.activate();
     }
 
@@ -121,90 +148,12 @@ public class TermService {
     @Transactional
     public void disAgreeAgreedTerm(CustomPrincipal customPrincipal, Long agreedTermId) {
 
-        AgreedTerm agreedTerm = getAgreedTermById(agreedTermId);
+        AgreedTerm agreedTerm = termUtil.getAgreedTermById(agreedTermId);
 
         // 본인이 동의한 약관인지 확인
-        agreedTermOwnerCheck(customPrincipal.uuid(), agreedTerm);
+        termUtil.agreedTermOwnerCheck(customPrincipal.uuid(), agreedTerm);
 
         // agreedTerm 동의 철회
         agreedTermRepository.delete(agreedTerm);
-    }
-
-    @Transactional
-    public Term getTermById(Long termId) {
-
-        Optional<Term> optionalTerm = termRepository.findById(termId);
-        if(optionalTerm.isEmpty()) {
-            CustomLogger.warn(LogEventCode.TERM,
-                    "FAIL",
-                    LogEventReasonCode.TERM_NOT_FOUND,
-                    LogEventReasonCode.TERM_NOT_FOUND.getMessage() + " - TermId: " + termId,
-                    null
-            );
-
-            throw new CustomException(CustomExceptionCode.TERM_NOT_FOUND);
-        }
-        Term term = optionalTerm.get();
-
-        return term;
-    }
-
-    @Transactional
-    private AgreedTerm getAgreedTermById(Long agreedTermId) {
-
-        Optional<AgreedTerm> optionalAgreedTerm = agreedTermRepository.findById(agreedTermId);
-        if(optionalAgreedTerm.isEmpty()) {
-
-            CustomLogger.warn(LogEventCode.TERM,
-                    "FAIL",
-                    LogEventReasonCode.AGREED_TERM_NOT_FOUND,
-                    LogEventReasonCode.AGREED_TERM_NOT_FOUND.getMessage() + " - TermId: " + agreedTermId,
-                    null
-            );
-
-            throw new CustomException(CustomExceptionCode.AGREED_TERM_NOT_FOUND);
-        }
-
-        AgreedTerm  agreedTerm = optionalAgreedTerm.get();
-
-        return agreedTerm;
-    }
-
-    @Transactional
-    private Term getTermByPurpose(TermPurposeCode termPurposeCode) {
-
-        Optional<Term> optionalTerm = termRepository.findByIsActiveAndPurpose(true, termPurposeCode);
-
-        if(optionalTerm.isEmpty()) {
-            CustomLogger.warn(LogEventCode.TERM,
-                    "FAIL",
-                    LogEventReasonCode.TERM_NOT_FOUND,
-                    LogEventReasonCode.TERM_NOT_FOUND.getMessage(),
-                    null
-            );
-
-            throw new CustomException(CustomExceptionCode.TERM_NOT_FOUND);
-        }
-        Term term = optionalTerm.get();
-
-        return term;
-    }
-
-    // 약관 주인 확인
-    private void agreedTermOwnerCheck(UUID uuid, AgreedTerm agreedTerm) {
-
-        UUID ownerUuid = agreedTerm.getUser().getUuid();
-
-        if(!uuid.equals(ownerUuid)) {
-
-            CustomLogger.warn(LogEventCode.TERM,
-                    "FAIL",
-                    LogEventReasonCode.NOT_AGREED_TERM_OWNER,
-                    LogEventReasonCode.NOT_AGREED_TERM_OWNER.getMessage() + " - TermId: " + agreedTerm.getId() + " - triedUserUuid: " + uuid,
-                    null
-            );
-
-            throw new CustomException(CustomExceptionCode.NOT_AGREED_TERM_OWNER);
-        }
     }
 }

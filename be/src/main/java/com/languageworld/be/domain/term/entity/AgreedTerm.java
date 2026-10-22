@@ -31,7 +31,7 @@ public class AgreedTerm extends ChangeableEntity {
     @JoinColumn(name= "term_id", nullable = false)
     private Term term;
 
-    public static AgreedTerm of(Boolean isTermAgreed, User user, Term term) {
+    public static AgreedTerm of(boolean isTermAgreed, User user, Term term) {
 
         AgreedTerm agreedTerm = AgreedTerm.builder()
                 .isAgreed(isTermAgreed)

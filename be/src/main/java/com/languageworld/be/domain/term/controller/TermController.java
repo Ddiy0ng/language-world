@@ -1,5 +1,6 @@
 package com.languageworld.be.domain.term.controller;
 
+import com.languageworld.be.domain.term.dto.request.TermAgreeRequestDto;
 import com.languageworld.be.domain.term.dto.request.TermCreateRequestDto;
 import com.languageworld.be.domain.term.dto.response.AgreedTermResponseDto;
 import com.languageworld.be.domain.term.dto.response.TermResponseDto;
@@ -30,6 +31,14 @@ public class TermController {
         termService.registerTerm(multipartFile, termCreateRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.TERM_CREATED);
+    }
+
+    @PostMapping()
+    public ResponseEntity<ApiResponse<Void>> agreeTerm(@AuthenticationPrincipal CustomPrincipal customPrincipal, TermAgreeRequestDto termAgreeRequestDto) {
+
+        termService.agreeTerm(customPrincipal, termAgreeRequestDto);
+
+        return ResponseEntityUtil.success(SuccessCode.AGREE_TERM_SUCCESS);
     }
 
     //TODO 약관 전체 조회(ADMIN)

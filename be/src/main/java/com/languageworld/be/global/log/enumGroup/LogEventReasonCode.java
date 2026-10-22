@@ -51,11 +51,16 @@ public enum LogEventReasonCode {
     AGREED_TERM_NOT_FOUND("동의한 약관을 찾을 수 업습니다."),
     TERM_ALREADY_EXIST("이미 등록된 약관입니다."),
     NOT_AGREED_TERM_OWNER("본인이 동의한 약관이 아닙니다."),
+    REQUIRED_TERM_NOT_AGREED("활성화되지 않은 약관입니다."),
+    UNMATCHED_TERM_PURPOSE("약관 목적이 요청받은 약관의 목적과 일치하지 않습니다."),
 
     // LANGUAGE
     UNSUPPORTED_LANGUAGE("지원하지 않는 언어입니다."),
     LEVEL_NOT_FOUND("해당 등급이 존재하지 않습니다."),
-    NOT_PROPER_LEVEL_FOR_LANGUAGE("해당 언어에서 제공하는 등급이 아닙니다.");
+    NOT_PROPER_LEVEL_FOR_LANGUAGE("해당 언어에서 제공하는 등급이 아닙니다."),
+
+    // USER
+    USER_NOT_FOUND("존재하지 않는 사용자입니다.");
 
     private final String message;
 }
