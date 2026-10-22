@@ -1,7 +1,8 @@
 package com.languageworld.be.domain.term.controller;
 
+import com.languageworld.be.domain.term.dto.request.TermAgreeRequestDto;
 import com.languageworld.be.domain.term.dto.request.TermCreateRequestDto;
-import com.languageworld.be.domain.term.dto.request.TermStatusUpdateRequestDto;
+import com.languageworld.be.domain.term.dto.request.TermActivenessUpdateRequestDto;
 import com.languageworld.be.domain.term.dto.response.AgreedTermResponseDto;
 import com.languageworld.be.domain.term.dto.response.TermResponseDto;
 import com.languageworld.be.domain.term.service.TermService;
@@ -29,9 +30,17 @@ public class TermController {
                                                         @RequestPart("file") MultipartFile multipartFile,
                                                         @Valid @RequestPart("json") TermCreateRequestDto termCreateRequestDto) {
 
-        termService.createTerm(customPrincipal, multipartFile, termCreateRequestDto);
+        termService.createTerm(multipartFile, termCreateRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.TERM_CREATED);
+    }
+
+    @PostMapping()
+    public ResponseEntity<ApiResponse<Void>> agreeTerm(@AuthenticationPrincipal CustomPrincipal customPrincipal, TermAgreeRequestDto termAgreeRequestDto) {
+
+        termService.agreeTerm(customPrincipal, termAgreeRequestDto);
+
+        return ResponseEntityUtil.success(SuccessCode.AGREE_TERM_SUCCESS);
     }
 
     //TODO 약관 전체 조회(ADMIN)
@@ -60,11 +69,10 @@ public class TermController {
     }
 
     @PatchMapping("/admin/{termId}")
-    public ResponseEntity<ApiResponse<Void>> updateTermStatus(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                              @PathVariable Long termId,
-                                                              @Valid @RequestBody TermStatusUpdateRequestDto termStatusUpdateRequestDto) {
+    public ResponseEntity<ApiResponse<Void>> updateTermStatus(@PathVariable Long termId,
+                                                              @Valid @RequestBody TermActivenessUpdateRequestDto termActivenessUpdateRequestDto) {
 
-        termService.updateTermStatus(customPrincipal, termId, termStatusUpdateRequestDto);
+        termService.updateTermActiveness(termId, termActivenessUpdateRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.TERM_STATUS_UPDATE_SUCCESS);
     }

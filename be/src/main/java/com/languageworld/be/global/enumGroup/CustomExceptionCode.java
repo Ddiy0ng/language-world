@@ -116,9 +116,19 @@ public enum CustomExceptionCode {
             HttpStatus.BAD_REQUEST,
             "TERM_400",
             "이미 등록된 약관입니다."),
-    NOT_AGREED_TERM_OWNER(HttpStatus.UNAUTHORIZED,
+    NOT_AGREED_TERM_OWNER(
+            HttpStatus.UNAUTHORIZED,
             "TERM_401",
             "본인이 동의한 약관이 아닙니다."),
+    REQUIRED_TERM_NOT_AGREED(
+            HttpStatus.BAD_REQUEST,
+            "TERM_400",
+            "활성화되지 않은 약관입니다."),
+    UNMATCHED_TERM_PURPOSE(
+            HttpStatus.BAD_REQUEST,
+            "TERM_400",
+            "목적과 요청 약관의 목적이 일치하지 않습니다."
+    ),
 
     // LANGUAGE
     UNSUPPORTED_LANGUAGE(
@@ -132,7 +142,15 @@ public enum CustomExceptionCode {
     NOT_PROPER_LEVEL_FOR_LANGUAGE(
             HttpStatus.BAD_REQUEST,
             "LANGUAGE_400",
-            "해당 언어에서 제공하는 등급이 아닙니다.");
+            "해당 언어에서 제공하는 등급이 아닙니다."),
+
+    // USER
+    USER_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "USER_404",
+            "존재하지 않는 사용자입니다."
+    )
+    ;
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드
