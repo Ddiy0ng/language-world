@@ -5,6 +5,7 @@ import com.languageworld.be.domain.language.entity.Level;
 import com.languageworld.be.domain.language.service.LanguageService;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
 import com.languageworld.be.domain.term.entity.Term;
+import com.languageworld.be.domain.term.enumGroup.TermPurposeCode;
 import com.languageworld.be.domain.term.repository.AgreedTermRepository;
 import com.languageworld.be.domain.term.service.TermService;
 import com.languageworld.be.domain.term.service.TermUtil;
@@ -18,6 +19,7 @@ import com.languageworld.be.global.auth.dto.*;
 import com.languageworld.be.global.auth.dto.social.*;
 import com.languageworld.be.global.auth.entity.SocialAuthorizedUser;
 import com.languageworld.be.global.auth.enumGroup.SocialTypeCode;
+import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.enumGroup.SuccessCode;
 import com.languageworld.be.global.exception.CustomException;
@@ -90,7 +92,9 @@ public class AuthService {
         }
 
         Term serviceUseTerm = termUtil.getTermById(serviceSignupRequestDto.serviceUseTermId());
+        termUtil.termPurposeCheck(serviceUseTerm, TermPurposeCode.SERVICE_USE);
         Term personalInfoUseTerm = termUtil.getTermById(serviceSignupRequestDto.personalInfoUseTermId());
+        termUtil.termPurposeCheck(personalInfoUseTerm, TermPurposeCode.PERSONAL_INFO_USE);
 
         // 회원가입: user + account + term
         User user = User.of(serviceSignupRequestDto, motherTongue, learningLanguage, learningLanguageLevel);
@@ -149,7 +153,8 @@ public class AuthService {
         // 사용자 데이터 조회
         User user = serviceAccount.getUser();
 
-        termUtil.validateTermCheck(user.getAgreedTermList());
+        if(user.getUserRole() != UserRoleCode.ADMIN)
+            authUtil.userRoleChangeAccordingToTerm(user);
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
@@ -161,7 +166,6 @@ public class AuthService {
                 SuccessCode.LOGIN_SUCCESS.getMessage() + " - userUuid: " + user.getUuid(),
                 null
         );
-
 
         return loginResponseDto;
     }
@@ -200,7 +204,9 @@ public class AuthService {
         }
 
         Term serviceUseTerm = termUtil.getTermById(socialSignupRequestDto.serviceUseTermId());
+        termUtil.termPurposeCheck(serviceUseTerm, TermPurposeCode.SERVICE_USE);
         Term personalInfoUseTerm = termUtil.getTermById(socialSignupRequestDto.personalInfoUseTermId());
+        termUtil.termPurposeCheck(personalInfoUseTerm, TermPurposeCode.PERSONAL_INFO_USE);
 
         // 회원가입
         User user = User.of(socialSignupRequestDto, profileImageUrl, motherTongue, learningLanguage, learningLanguageLevel);
@@ -235,7 +241,8 @@ public class AuthService {
         User user = socialAccount.getUser();
 
         // TODO 약관 동의 여부 확인(활성화된 약관)
-        termUtil.validateTermCheck(user.getAgreedTermList());
+        if(user.getUserRole() != UserRoleCode.ADMIN)
+            authUtil.userRoleChangeAccordingToTerm(user);
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);

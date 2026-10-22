@@ -63,7 +63,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
                         .requestMatchers(ADMIN_AUTH_URL).hasAuthority("ADMIN")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/term/agree", "/term").permitAll()
+                        .anyRequest().hasAnyAuthority("ADMIN", "USER")
                 )
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

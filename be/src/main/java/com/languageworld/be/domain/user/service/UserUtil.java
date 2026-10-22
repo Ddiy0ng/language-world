@@ -8,12 +8,14 @@ import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 @RequiredArgsConstructor
 public class UserUtil {
 

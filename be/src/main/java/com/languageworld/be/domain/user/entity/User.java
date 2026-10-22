@@ -139,4 +139,8 @@ public class User extends ChangeableEntity {
         return user;
 
     }
+
+    public void changeUserRole(UserRoleCode userRoleCode) {
+        userRole = userRoleCode;
+    }
 }
