@@ -7,5 +7,5 @@ public enum LogEventCode {
     SOCIAL,
     TERM,
     MULTIPART_FILE,
-    LANGUAGE
+    USER, LANGUAGE
 }
