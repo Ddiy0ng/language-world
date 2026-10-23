@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface ServiceAccountRepository extends JpaRepository<ServiceAccount, Long> {
@@ -12,4 +13,6 @@ public interface ServiceAccountRepository extends JpaRepository<ServiceAccount, 
     boolean existsByEmail(String email);
 
     Optional<ServiceAccount> findByEmail(String email);
+
+    Optional<ServiceAccount> findByUser_Uuid(UUID userUuid);
 }

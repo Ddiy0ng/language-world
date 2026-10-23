@@ -53,7 +53,41 @@ public enum SuccessCode {
     AGREED_TERM_DISAGREE_SUCCESS(
             HttpStatus.OK,
             "TERM_200",
-            "약관 동의 철회에 성공했습니다.");
+            "약관 동의 철회에 성공했습니다."),
+
+    // USER
+    AUTHENTICATED_USER_INFO_READ_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "인증된 사용자 정보 조회에 성공했습니다."),
+    USER_INFO_READ_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "사용자의 정보 조회에 성공했습니다."),
+    USER_INFO_SUMMARY_READ_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "사용자 정보 요약 조회에 성공했습니다."),
+    AUTHENTICATED_USER_INFO_UPDATE_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "인증된 사용자 정보 수정에 성공했습니다."),
+    AUTHENTICATED_USER_LANGUAGE_INFO_UPDATE_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "인증된 사용자 언어 정보 수정에 성공했습니다."),
+    AUTHENTICATED_USER_PASSWORD_UPDATE_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "인증된 사용자 비밀번호 수정에 성공했습니다."),
+    AUTHENTICATED_USER_PROFILE_UPDATE_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "인증된 사용자  프로필 수정에 성공했습니다."),
+    AUTHENTICATED_USER_REMOVE_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "인증된 사용자 탈퇴에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

@@ -127,8 +127,7 @@ public enum CustomExceptionCode {
     UNMATCHED_TERM_PURPOSE(
             HttpStatus.BAD_REQUEST,
             "TERM_400",
-            "목적과 요청 약관의 목적이 일치하지 않습니다."
-    ),
+            "목적과 요청 약관의 목적이 일치하지 않습니다."),
 
     // LANGUAGE
     UNSUPPORTED_LANGUAGE(
@@ -148,9 +147,15 @@ public enum CustomExceptionCode {
     USER_NOT_FOUND(
             HttpStatus.NOT_FOUND,
             "USER_404",
-            "존재하지 않는 사용자입니다."
-    )
-    ;
+            "존재하지 않는 사용자입니다."),
+    LEARNING_LANGUAGE_AND_LEVEL_BOTH_REQUIRE(
+            HttpStatus.BAD_REQUEST,
+            "USER_400",
+            "학습어와 레벨 모두 입력해야 합니다."),
+    NOT_SUPPORTED__FOR_SOCIAL_USER(
+            HttpStatus.BAD_REQUEST,
+            "USER_400",
+            "소셜 로그인 사용자에게 제공되지 않는 기능입니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드

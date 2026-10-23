@@ -1,6 +1,8 @@
 package com.languageworld.be.domain.user.service;
 
+import com.languageworld.be.domain.user.entity.ServiceAccount;
 import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.domain.user.repository.ServiceAccountRepository;
 import com.languageworld.be.domain.user.repository.UserRepository;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class UserUtil {
 
     private final UserRepository userRepository;
+    private final ServiceAccountRepository serviceAccountRepository;
 
     public User getUserByUuid(UUID uuid) {
 
@@ -36,6 +39,28 @@ public class UserUtil {
         }
 
         return optionalUser.get();
+    }
+
+    protected ServiceAccount getServiceAccountByUserUuid(UUID userUuid) {
+
+        Optional<ServiceAccount> optionalServiceAccount = serviceAccountRepository.findByUser_Uuid(userUuid);
+
+        if(optionalServiceAccount.isEmpty()) {
+
+            CustomLogger.warn(
+                    LogEventCode.USER,
+                    "FAIL",
+                    LogEventReasonCode.PROVIDED_FOR_SERVICE_USER,
+                    LogEventReasonCode.PROVIDED_FOR_SERVICE_USER.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.NOT_SUPPORTED__FOR_SOCIAL_USER);
+        }
+
+        ServiceAccount serviceAccount = optionalServiceAccount.get();
+
+        return serviceAccount;
     }
 
     // 나이대 계산

@@ -60,7 +60,10 @@ public enum LogEventReasonCode {
     NOT_PROPER_LEVEL_FOR_LANGUAGE("해당 언어에서 제공하는 등급이 아닙니다."),
 
     // USER
-    USER_NOT_FOUND("존재하지 않는 사용자입니다.");
+    USER_NOT_FOUND("존재하지 않는 사용자입니다."),
+    LEARNING_LANGUAGE_AND_LEVEL_BOTH_REQUIRE("학습어와 레벨 모두 필요합니다."),
+    PROVIDED_FOR_SERVICE_USER("서비스 로그인 사용자에게만 제공되는 기능입니다.");
+
 
     private final String message;
 }

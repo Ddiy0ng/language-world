@@ -2,12 +2,11 @@ package com.languageworld.be.global.auth.service;
 
 import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;
-import com.languageworld.be.domain.language.service.LanguageService;
+import com.languageworld.be.domain.language.service.LanguageUtil;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
 import com.languageworld.be.domain.term.entity.Term;
 import com.languageworld.be.domain.term.enumGroup.TermPurposeCode;
 import com.languageworld.be.domain.term.repository.AgreedTermRepository;
-import com.languageworld.be.domain.term.service.TermService;
 import com.languageworld.be.domain.term.service.TermUtil;
 import com.languageworld.be.domain.user.entity.ServiceAccount;
 import com.languageworld.be.domain.user.entity.SocialAccount;
@@ -40,10 +39,9 @@ public class AuthService {
     private final ServiceAccountRepository serviceAccountRepository;
     private final SocialAccountRepository socialAccountRepository;
     private final AgreedTermRepository agreedTermRepository;
-    private final LanguageService languageService;
-    private final TermService termService;
+    private final LanguageUtil languageUtil;
     private final TermUtil termUtil;
-    private final AuthUtil authUtil;
+    private final PasswordUtil passwordUtil;
     private final GoogleUtil googleUtil;
     private final KakaoUtil kakaoUtil;
     private final JwtProvider jwtProvider;
@@ -69,15 +67,15 @@ public class AuthService {
 
         // 비밀번호 유효성 검사
         String password = serviceSignupRequestDto.password();
-        authUtil.validatePassword(password);
+        passwordUtil.validatePassword(password);
 
         // 비밀번호 암호화
-        String encodedPassword = authUtil.encodePassword(password);
+        String encodedPassword = passwordUtil.encodePassword(password);
 
         // 참조 객체
-        Language motherTongue = languageService.getLanguageById(serviceSignupRequestDto.motherTongueId());
-        Language learningLanguage = languageService.getLanguageById(serviceSignupRequestDto.learningLanguageId());
-        Level learningLanguageLevel = languageService.getLevelById(serviceSignupRequestDto.learningLanguageLevelId());
+        Language motherTongue = languageUtil.getLanguageById(serviceSignupRequestDto.motherTongueId());
+        Language learningLanguage = languageUtil.getLanguageById(serviceSignupRequestDto.learningLanguageId());
+        Level learningLanguageLevel = languageUtil.getLevelById(serviceSignupRequestDto.learningLanguageLevelId());
         if(!learningLanguage.equals(learningLanguageLevel.getLanguage())) {
 
             CustomLogger.warn(
@@ -138,7 +136,7 @@ public class AuthService {
         // 비밀번호 일치 검사
         String rawPassword = serviceLoginRequestDto.password();
         String encodedPassword = serviceAccount.getPassword();
-        if(!authUtil.isPasswordMatches(rawPassword, encodedPassword)) {
+        if(!passwordUtil.isPasswordMatches(rawPassword, encodedPassword)) {
 
             CustomLogger.warn(
                     LogEventCode.AUTH,
@@ -154,7 +152,7 @@ public class AuthService {
         User user = serviceAccount.getUser();
 
         if(user.getUserRole() != UserRoleCode.ADMIN)
-            authUtil.userRoleChangeAccordingToTerm(user);
+            userRoleChangeAccordingToTerm(user);
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
@@ -187,9 +185,9 @@ public class AuthService {
         validateUserExistForSignup(type, sub);
 
         // 참조 객체
-        Language motherTongue = languageService.getLanguageById(socialSignupRequestDto.motherTongueId());
-        Language learningLanguage = languageService.getLanguageById(socialSignupRequestDto.learningLanguageId());
-        Level learningLanguageLevel = languageService.getLevelById(socialSignupRequestDto.learningLanguageLevelId());
+        Language motherTongue = languageUtil.getLanguageById(socialSignupRequestDto.motherTongueId());
+        Language learningLanguage = languageUtil.getLanguageById(socialSignupRequestDto.learningLanguageId());
+        Level learningLanguageLevel = languageUtil.getLevelById(socialSignupRequestDto.learningLanguageLevelId());
         if(!learningLanguage.equals(learningLanguageLevel.getLanguage())) {
 
             CustomLogger.warn(
@@ -242,7 +240,7 @@ public class AuthService {
 
         // TODO 약관 동의 여부 확인(활성화된 약관)
         if(user.getUserRole() != UserRoleCode.ADMIN)
-            authUtil.userRoleChangeAccordingToTerm(user);
+            userRoleChangeAccordingToTerm(user);
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
@@ -305,5 +303,12 @@ public class AuthService {
         SocialAccount socialAccount = optionalSocialAccount.get();
 
         return socialAccount;
+    }
+
+    private void userRoleChangeAccordingToTerm(User user) {
+
+        UserRoleCode userTypeCode = termUtil.validateTermCheck(user.getAgreedTermList());
+
+        user.changeUserRole(userTypeCode);
     }
 }

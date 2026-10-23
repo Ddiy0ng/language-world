@@ -2,6 +2,8 @@ package com.languageworld.be.domain.user.entity;
 
 import com.languageworld.be.domain.game.entity.GameResult;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
+import com.languageworld.be.domain.user.dto.request.ChangeUserInfoRequestDto;
+import com.languageworld.be.domain.user.dto.request.ChangeUserLanguageInfoRequestDto;
 import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
 import com.languageworld.be.global.auth.dto.social.SocialSignupRequestDto;
 import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
@@ -142,5 +144,21 @@ public class User extends ChangeableEntity {
 
     public void changeUserRole(UserRoleCode userRoleCode) {
         userRole = userRoleCode;
+    }
+
+    public void changeUserName(String name) {this.name = name;}
+
+    public void changeUserBio(String bio) {this.bio = bio;}
+
+    public void changeUserNation(NationCode nation) {this.nation = nation;}
+
+    public void changeUserMotherTongue(Language motherTongue) {this.motherTongue = motherTongue;}
+
+    public void changeUserProfileImageUrl(String profileImageUrl) {this.profileImageUrl = profileImageUrl;}
+
+    public void changeUserLearningLanguageAndLevel(Language learningLanguage, Level learningLanguageLevel) {
+
+        this.learningLanguage = learningLanguage;
+        this.learningLanguageLevel = learningLanguageLevel;
     }
 }

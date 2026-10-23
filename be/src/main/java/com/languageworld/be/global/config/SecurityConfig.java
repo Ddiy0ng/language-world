@@ -30,7 +30,7 @@ public class SecurityConfig {
             "/",
             "/auth/signup/**",
             "/auth/login/**",
-
+            "/user/**",
             "/term/active"
     };
 

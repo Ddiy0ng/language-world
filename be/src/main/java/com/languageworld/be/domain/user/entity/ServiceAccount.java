@@ -35,4 +35,9 @@ public class ServiceAccount {
 
         return serviceAccount;
     }
+
+    public void changeUserPassword(String newPassword) {
+
+        password = newPassword;
+    }
 }

@@ -40,7 +40,7 @@ public class TermController {
 
         termService.agreeTermForAuthenticatedUser(customPrincipal, termAgreeRequestDto);
 
-        return ResponseEntityUtil.success(SuccessCode.AGREE_TERM_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.AGREED_TERM_READ_SUCCESS);
     }
 
     // 약관 전체 조회(ADMIN)
