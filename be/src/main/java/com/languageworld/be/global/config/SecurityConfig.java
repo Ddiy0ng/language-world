@@ -29,12 +29,20 @@ public class SecurityConfig {
     private final String[] WHITE_LIST_URL = {
             "/",
             "/auth/signup/**",
-            "/auth/login/**"
+            "/auth/login/**",
+
+            "/term/active"
     };
 
     private final String[] ADMIN_AUTH_URL = {
-            "/term/admin",
-            "/term/admin/**"
+            "/*/admin",
+            "/*/admin/**"
+    };
+
+    private final String[] AUTHENTICATED_USER_URL = {
+            "/term/agree",
+            "/term",
+            "/term/agreed/**",
     };
 
     //SecurityFilterChain Bean
@@ -61,9 +69,9 @@ public class SecurityConfig {
 
                 // 엔드포인트 인가 관리
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(WHITE_LIST_URL).permitAll()
+                        .requestMatchers(WHITE_LIST_URL).permitAll()    // 인증 불필요
+                        .requestMatchers(AUTHENTICATED_USER_URL).hasAnyAuthority("ADMIN", "USER", "SERVICE_FORBIDDEN_USER")    // 인증 필요
                         .requestMatchers(ADMIN_AUTH_URL).hasAuthority("ADMIN")
-                        .requestMatchers("/term/agree", "/term").permitAll()
                         .anyRequest().hasAnyAuthority("ADMIN", "USER")
                 )
 

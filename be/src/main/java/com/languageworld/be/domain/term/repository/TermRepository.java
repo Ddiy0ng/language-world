@@ -18,4 +18,6 @@ public interface TermRepository extends JpaRepository<Term, Long> {
     Optional<Term> findByIsActiveAndPurpose(boolean b, TermPurposeCode termPurposeCode);
 
     List<Term> findAllByIsActiveAndPurpose(boolean b, TermPurposeCode termPurposeCode);
+
+    List<Term> findAllByIdNotIn(List<Long> agreedTermIdList);
 }
