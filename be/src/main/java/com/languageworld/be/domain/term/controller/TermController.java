@@ -24,6 +24,7 @@ public class TermController {
 
     private final TermService termService;
 
+    // 약관 등록(ADMIN)
     @PostMapping("/admin")
     public ResponseEntity<ApiResponse<Void>> registerTerm(@RequestPart("file") MultipartFile multipartFile,
                                                         @Valid @RequestPart("json") TermCreateRequestDto termCreateRequestDto) {
@@ -33,7 +34,8 @@ public class TermController {
         return ResponseEntityUtil.success(SuccessCode.TERM_CREATED);
     }
 
-    @PostMapping()
+    // 인증 사용자의 필수 약관 동의(ADMIN, USER, SERVICE_FORBIDDEN_USER)
+    @PostMapping("/agree")
     public ResponseEntity<ApiResponse<Void>> agreeTermForAuthenticatedUser (@AuthenticationPrincipal CustomPrincipal customPrincipal, @Valid @RequestBody TermAgreeRequestDto termAgreeRequestDto) {
 
         termService.agreeTermForAuthenticatedUser(customPrincipal, termAgreeRequestDto);
@@ -41,23 +43,35 @@ public class TermController {
         return ResponseEntityUtil.success(SuccessCode.AGREE_TERM_SUCCESS);
     }
 
-    //TODO 약관 전체 조회(ADMIN)
+    // 약관 전체 조회(ADMIN)
     @GetMapping("/admin")
     public ResponseEntity<ApiResponse<List<TermResponseDto>>> findTermList() {
 
         List<TermResponseDto> termResponseDtoList= termService.findTermList();
 
-        return ResponseEntityUtil.success(SuccessCode.TERM_READ_SUCCESS, termResponseDtoList);
+        return ResponseEntityUtil.success(SuccessCode.ALL_TERM_READ_SUCCESS, termResponseDtoList);
     }
 
+    // 활성화된 약관 전체 조회(PermitAll)
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse<TermResponseDto[]>> findActiveTermList() {
+
+         TermResponseDto[] termResponseDtoArr = termService.findActiveTermList();
+
+        return ResponseEntityUtil.success(SuccessCode.ALL_ACTIVE_TERM_READ_SUCCESS, termResponseDtoArr);
+    }
+
+    // 동의 필요한 필수 약관 조회(ADMIN, USER, SERVICE_FORBIDDEN_USER)
+    // TODO 비동의한 필수 약관 조회
     @GetMapping()
-    public ResponseEntity<ApiResponse<TermResponseDto[]>> findActiveTerm() {
+    public ResponseEntity<ApiResponse<List<TermResponseDto>>> findNotAgreedActiveTermList(@AuthenticationPrincipal CustomPrincipal customPrincipal) {
 
-         TermResponseDto[] termResponseDtoArr = termService.findActiveTerm();
+        List<TermResponseDto> notAgreedActiveTermList = termService.findNotAgreedActiveTermList(customPrincipal);
 
-        return ResponseEntityUtil.success(SuccessCode.TERM_READ_SUCCESS, termResponseDtoArr);
+        return ResponseEntityUtil.success(SuccessCode.NOT_AGREED_ACTIVE_TERM_READ_SUCCESS, notAgreedActiveTermList);
     }
 
+    // 동의한 약관 전체 조회(ADMIN, USER, SERVICE_FORBIDDEN_USER)
     @GetMapping("/agreed")
     public ResponseEntity<ApiResponse<List<AgreedTermResponseDto>>> findAgreedTermList(@AuthenticationPrincipal CustomPrincipal customPrincipal) {
 
@@ -66,16 +80,16 @@ public class TermController {
         return ResponseEntityUtil.success(SuccessCode.AGREED_TERM_READ_SUCCESS, agreedTermList);
     }
 
-    // TODO 비동의한 필수 약관 조회
-
+    // 약관 활성화(ADMIN)
     @PatchMapping("/admin/{termId}")
-    public ResponseEntity<ApiResponse<Void>> activateTermStatus(@PathVariable Long termId) {
+    public ResponseEntity<ApiResponse<Void>> activateTerm(@AuthenticationPrincipal CustomPrincipal customPrincipal, @PathVariable Long termId) {
 
-        termService.activateTermStatus(termId);
+        termService.activateTerm(termId);
 
         return ResponseEntityUtil.success(SuccessCode.TERM_STATUS_UPDATE_SUCCESS);
     }
 
+    // 동의한 약관 동의 철회(ADMIN, USER, SERVICE_FORBIDDEN_USER)
     @PatchMapping("/agreed/{agreedTermId}")
     public ResponseEntity<ApiResponse<Void>> disAgreeAgreedTerm(@AuthenticationPrincipal CustomPrincipal customPrincipal, @PathVariable Long agreedTermId) {
 

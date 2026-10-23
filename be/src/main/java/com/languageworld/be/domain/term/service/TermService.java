@@ -21,6 +21,7 @@ import com.languageworld.be.global.multiPartFileUtil.FileUtil;
 import com.languageworld.be.global.multiPartFileUtil.enumGroup.FilePurposeCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
@@ -101,7 +102,7 @@ public class TermService {
 
     // TODO 약관 조회: active인 서비스 이용, 개인정보 수집 약관 조회: 회원가입 시 동의해야 하는 약관 조회용
     @Transactional
-    public TermResponseDto[] findActiveTerm() {
+    public TermResponseDto[] findActiveTermList() {
 
         Term serviceTerm = termUtil.getTermByPurpose(TermPurposeCode.SERVICE_USE);
         Term personalInfoTerm = termUtil.getTermByPurpose(TermPurposeCode.PERSONAL_INFO_USE);
@@ -112,6 +113,22 @@ public class TermService {
         TermResponseDto[] termResponseDtoArr = {serviceTermResponseDto, personalInfoTermResponseDto};
 
         return termResponseDtoArr;
+    }
+
+    public List<TermResponseDto> findNotAgreedActiveTermList(CustomPrincipal customPrincipal) {
+
+        List<AgreedTerm> agreedTermList = agreedTermRepository.findAllByUser_Uuid(customPrincipal.uuid());
+        List<Long> agreedTermIdList = agreedTermList.stream()
+                .map(agreedTerm -> agreedTerm.getTerm().getId())
+                .toList();
+
+        List<Term> notAgreedActiveTermList = termRepository.findAllByIdNotIn(agreedTermIdList);
+
+        List<TermResponseDto> notAgreedActiveTermResponseDtoList = notAgreedActiveTermList.stream()
+                .map(TermResponseDto::from)
+                .toList();
+
+        return notAgreedActiveTermResponseDtoList;
     }
 
     // TODO 약관 조회(USER): 동의한 약관 확인
@@ -130,7 +147,7 @@ public class TermService {
 
     // TODO 약관 상태 변경(ADMIN): Active/Inactive
     @Transactional
-    public void activateTermStatus(Long termId) {
+    public void activateTerm(Long termId) {
 
         Term activeTerm = termUtil.getTermById(termId);
 
@@ -154,6 +171,4 @@ public class TermService {
         // agreedTerm 동의 철회
         agreedTermRepository.delete(agreedTerm);
     }
-
-
 }
