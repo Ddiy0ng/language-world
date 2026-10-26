@@ -93,7 +93,19 @@ public enum SuccessCode {
     ALL_LANGUAGE_AND_LEVEL_READ_SUCCESS(
             HttpStatus.OK,
             "LANGUAGE_200",
-            "지원하는 언어와 레벨 전체 조회에 성공했습니다.");
+            "지원하는 언어와 레벨 전체 조회에 성공했습니다."),
+
+    // User
+    DELETE_SERVICE_ACCOUNT_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "서비스 계정 삭제에 성공했습니다."
+    ),
+    DELETE_SOCIAL_ACCOUNT_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "소셜 계정 삭제에 성공했습니다."
+    );
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

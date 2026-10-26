@@ -6,8 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface SocialAccountRepository extends JpaRepository<SocialAccount, Long> {
     Optional<SocialAccount> findBySignupTypeAndSub(SocialTypeCode signupType, String sub);
+
+    Optional<SocialAccount> findByUser_Uuid(UUID userUuid);
 }

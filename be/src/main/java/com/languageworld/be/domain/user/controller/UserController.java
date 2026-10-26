@@ -9,9 +9,12 @@ import com.languageworld.be.global.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -85,11 +88,13 @@ public class UserController {
     }
 
     // TODO 프로필 수정(MultipartFile)
-    @PatchMapping("/me/profile")
+    @PatchMapping(
+            value = "/me/profile",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Void>> changeUserProfile(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                           @RequestBody ChangeUserProfileRequestDto changeUserProfileRequestDto) {
+                                                               @RequestPart("file") MultipartFile multipartFile) {
 
-        userService.changeUserProfile(customPrincipal, changeUserProfileRequestDto);
+        userService.changeUserProfile(customPrincipal, multipartFile);
 
         return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_PROFILE_UPDATE_SUCCESS);
     }

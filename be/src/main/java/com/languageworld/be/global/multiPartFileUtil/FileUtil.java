@@ -82,6 +82,37 @@ public class FileUtil {
             return fileUploadedPath.toString();
         }
 
+         public void deleteFile(FilePurposeCode filePurposeCode, String requestedFileUrl) {
+
+
+             if(requestedFileUrl == null || requestedFileUrl.isEmpty()) {
+
+                 return;
+             }
+
+             // 소셜 계정 프로필 소셜 제공자
+             if (filePurposeCode == FilePurposeCode.PROFILE
+                     && (requestedFileUrl.startsWith("https://") || requestedFileUrl.startsWith("http://")))
+                 return;
+
+             Path fileUploadedPath = Path.of(requestedFileUrl).toAbsolutePath();
+
+             try {
+
+                 Files.deleteIfExists(fileUploadedPath);
+             } catch(IOException e) {
+
+                 CustomLogger.error(
+                         LogEventCode.MULTIPART_FILE,
+                         "FAIL",
+                         LogEventReasonCode.MULTIPART_FILE_DELETE_FAILED,
+                         LogEventReasonCode.MULTIPART_FILE_DELETE_FAILED.getMessage() + " - throw IOException",
+                         null
+                 );
+                 throw new CustomException(CustomExceptionCode.MULTIPART_FILE_DELETE_FAILED);
+             }
+         }
+
         private void createFileUploadDir(Path uploadPath, LogEventReasonCode logEventReasonCode) {
             try {
                 Files.createDirectories(uploadPath);

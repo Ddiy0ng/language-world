@@ -45,6 +45,7 @@ public enum LogEventReasonCode {
     SAVE_JPEG_EXCEPTION("jpeg 파일 업로드 중 문제가 발생했습니다."),
     CREATE_PNG_DIR_EXCEPTION("png 파일 업로드 폴더 생성 중 문제가 발생했습니다."),
     SAVE_PNG_EXCEPTION("png 파일 업로드 중 문제가 발생했습니다."),
+    MULTIPART_FILE_DELETE_FAILED("파일 삭제에 실패했습니다."),
 
     // TERM
     TERM_NOT_FOUND("약관을 찾을 수 없습니다."),
