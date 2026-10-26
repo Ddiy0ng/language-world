@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface AgreedTermRepository extends JpaRepository<AgreedTerm, Long> {
 
     List<AgreedTerm> findAllByUser_Uuid(UUID uuid);
+
+    void deleteAllByUser_Uuid(UUID uuid);
 }

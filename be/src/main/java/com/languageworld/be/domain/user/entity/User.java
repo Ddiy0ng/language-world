@@ -35,7 +35,7 @@ public class User extends ChangeableEntity {
     private Long id;
 
     @Column(unique = true, updatable = false, nullable = false)
-    private UUID uuid;
+    private UUID uuid;  //
 
     @Column(name = "user_role", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -71,32 +71,6 @@ public class User extends ChangeableEntity {
     @ManyToOne
     @JoinColumn(name = "learning_language_level_id", nullable = false)
     private Level learningLanguageLevel;
-
-    @OneToOne(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private ServiceAccount serviceAccount;
-
-    @OneToOne(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private SocialAccount socialAccount;
-
-    @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<AgreedTerm> agreedTermList = new ArrayList<>();
-
-    @OneToMany(
-            mappedBy = "participant"
-    )
-    private List<GameResult> gameResultList = new ArrayList<>();
 
     @Column(name = "deleted_at")
      private LocalDateTime deletedAt;
@@ -141,6 +115,21 @@ public class User extends ChangeableEntity {
         return user;
 
     }
+
+     public void softDeleteUser(Integer ageGroup) {
+
+        // name, birth, profileImageUrl, bio 제거
+        this.name = null;
+        this.birth = null;
+        this.profileImageUrl = null;
+        this.bio = null;
+
+         // ageGroup 계산
+         this.ageGroup = ageGroup;
+
+         // deletedAt 할당
+         this.deletedAt = LocalDateTime.now();
+     }
 
     public void changeUserRole(UserRoleCode userRoleCode) {
         userRole = userRoleCode;

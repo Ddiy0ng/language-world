@@ -1,10 +1,13 @@
 package com.languageworld.be.domain.user.service;
 
 import com.languageworld.be.domain.user.entity.ServiceAccount;
+import com.languageworld.be.domain.user.entity.SocialAccount;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.repository.ServiceAccountRepository;
+import com.languageworld.be.domain.user.repository.SocialAccountRepository;
 import com.languageworld.be.domain.user.repository.UserRepository;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.enumGroup.SuccessCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
@@ -22,6 +25,7 @@ public class UserUtil {
 
     private final UserRepository userRepository;
     private final ServiceAccountRepository serviceAccountRepository;
+    private final SocialAccountRepository socialAccountRepository;
 
     public User getUserByUuid(UUID uuid) {
 
@@ -62,8 +66,42 @@ public class UserUtil {
         return serviceAccount;
     }
 
+    protected void deleteIfServiceAccountExist(UUID userUuid) {
+
+        Optional<ServiceAccount> optionalServiceAccount = serviceAccountRepository.findByUser_Uuid(userUuid);
+
+        if(optionalServiceAccount.isPresent()) {
+
+            serviceAccountRepository.delete(optionalServiceAccount.get());
+
+            CustomLogger.info(
+                    LogEventCode.USER,
+                    "SUCCESS",
+                    SuccessCode.DELETE_SERVICE_ACCOUNT_SUCCESS.getMessage(),
+                    userUuid.toString()
+            );
+        }
+    }
+
+    protected void deleteIfSocialAccountExist(UUID userUuid) {
+
+        Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findByUser_Uuid(userUuid);
+
+        if(optionalSocialAccount.isPresent()) {
+
+            socialAccountRepository.delete(optionalSocialAccount.get());
+
+            CustomLogger.info(
+                    LogEventCode.USER,
+                    "SUCCESS",
+                    SuccessCode.DELETE_SOCIAL_ACCOUNT_SUCCESS.getMessage(),
+                    userUuid.toString()
+            );
+        }
+    }
+
     // 나이대 계산
-    private int calculateAgeGroup(LocalDate birth) {
+    protected int calculateAgeGroup(LocalDate birth) {
 
         LocalDate now = LocalDate.now();
 

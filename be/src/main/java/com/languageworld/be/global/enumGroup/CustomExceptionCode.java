@@ -102,6 +102,11 @@ public enum CustomExceptionCode {
     UNSUPPORTED_UPLOAD_PURPOSE_REQUEST(HttpStatus.BAD_REQUEST,
             "MULTIPART_FILE_400",
             "지원하지 않는 파일 업로드 목적입니다."),
+    MULTIPART_FILE_DELETE_FAILED(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "MULTIPART_FILE_500",
+            "파일 삭제에 실패했습니다."
+    ),
 
     // TERM
     TERM_NOT_FOUND(

@@ -307,7 +307,7 @@ public class AuthService {
 
     private void userRoleChangeAccordingToTerm(User user) {
 
-        UserRoleCode userTypeCode = termUtil.validateTermCheck(user.getAgreedTermList());
+        UserRoleCode userTypeCode = termUtil.validateTermCheck(agreedTermRepository.findAllByUser_Uuid(user.getUuid()));
 
         user.changeUserRole(userTypeCode);
     }
