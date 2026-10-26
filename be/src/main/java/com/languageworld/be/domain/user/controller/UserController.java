@@ -32,6 +32,18 @@ public class UserController {
         return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_INFO_READ_SUCCESS, userInfoResponseDto);
     }
 
+    // TODO 회원 정보 조회(키워드 사용해 조건 검색 또는 전체 - 요약 조회): 프로필 이미지, 이름, 국적, 학습어 + 레벨    // 자기 자신은 검색에서 제외
+    @GetMapping()
+    public ResponseEntity<ApiResponse<List<UserSummaryResponseDto>>> searchUserSummaryList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                                                           @RequestParam(required = false) String keyword,
+                                                                                           @RequestParam(required = false) Long learningLanguageId,
+                                                                                           @RequestParam(required = false) Long learningLanguageLevelId) {
+
+        List<UserSummaryResponseDto> userSummaryResponseDtoList = userService.searchUserSummaryList(customPrincipal, keyword, learningLanguageId, learningLanguageLevelId);
+
+        return ResponseEntityUtil.success(SuccessCode.USER_INFO_SUMMARY_READ_SUCCESS, userSummaryResponseDtoList);
+    }
+
     // TODO 회원 정보 상세 조회(단건): 프로필 이미지, 이름, 국적, 모국어, 학습어 + 레벨, 바이오
     @GetMapping("/{userUuid}")
     public ResponseEntity<ApiResponse<UserInfoResponseDto>> findUserInfo(@PathVariable UUID userUuid) {
@@ -40,19 +52,6 @@ public class UserController {
         UserInfoResponseDto userInfoResponseDto = userService.findUserInfo(userUuid);
 
         return ResponseEntityUtil.success(SuccessCode.USER_INFO_READ_SUCCESS, userInfoResponseDto);
-    }
-
-
-    // TODO 회원 정보 조회(키워드 사용해 조건 검색 또는 전체 - 요약 조회): 프로필 이미지, 이름, 국적, 학습어 + 레벨    // 자기 자신은 검색에서 제외
-    @GetMapping()
-    public ResponseEntity<ApiResponse<List<UserSummaryResponseDto>>> searchUserSummaryList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                                         @RequestParam String keyword,
-                                                                                         @RequestParam String learningLanguage,
-                                                                                         @RequestParam String level) {
-
-        List<UserSummaryResponseDto> userSummaryResponseDtoList = userService.searchUserSummaryList(customPrincipal, keyword, learningLanguage, level);
-
-        return ResponseEntityUtil.success(SuccessCode.USER_INFO_SUMMARY_READ_SUCCESS, userSummaryResponseDtoList);
     }
 
     // TODO 회원 정보 수정: 이름, 국적, 바이오, 모국어

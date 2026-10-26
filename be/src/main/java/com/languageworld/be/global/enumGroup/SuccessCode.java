@@ -87,7 +87,13 @@ public enum SuccessCode {
     AUTHENTICATED_USER_REMOVE_SUCCESS(
             HttpStatus.OK,
             "USER_200",
-            "인증된 사용자 탈퇴에 성공했습니다.");
+            "인증된 사용자 탈퇴에 성공했습니다."),
+
+    // Language
+    ALL_LANGUAGE_AND_LEVEL_READ_SUCCESS(
+            HttpStatus.OK,
+            "LANGUAGE_200",
+            "지원하는 언어와 레벨 전체 조회에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

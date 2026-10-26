@@ -30,8 +30,9 @@ public class SecurityConfig {
             "/",
             "/auth/signup/**",
             "/auth/login/**",
-            "/user/**",
-            "/term/active"
+            "/user/**", // test
+            "/language",
+            "/term/active"  // 미인증 사용자도 조회 필요
     };
 
     private final String[] ADMIN_AUTH_URL = {

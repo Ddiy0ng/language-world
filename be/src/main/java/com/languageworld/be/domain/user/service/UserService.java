@@ -42,11 +42,11 @@ public class UserService {
     }
 
     @Transactional
-    public List<UserSummaryResponseDto> searchUserSummaryList(CustomPrincipal customPrincipal, String keyword, String learningLanguage, String level) {
+    public List<UserSummaryResponseDto> searchUserSummaryList(CustomPrincipal customPrincipal, String keyword, Long learningLanguageId, Long learningLanguageLevelId) {
 
         // 스스로는 조회 제외
         UUID authenticatedUserUuid = customPrincipal.uuid();
-        List<User> userList = userRepository.findAllByUuidNot(authenticatedUserUuid);
+        List<User> userList = userRepository.findAllByUuidNot(authenticatedUserUuid, keyword, learningLanguageId, learningLanguageLevelId);
 
         List<UserSummaryResponseDto> userSummaryResponseDtoList = userList.stream()
                 .map(UserSummaryResponseDto::from)
