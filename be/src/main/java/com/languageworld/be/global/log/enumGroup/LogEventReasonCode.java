@@ -63,7 +63,16 @@ public enum LogEventReasonCode {
     // USER
     USER_NOT_FOUND("존재하지 않는 사용자입니다."),
     LEARNING_LANGUAGE_AND_LEVEL_BOTH_REQUIRE("학습어와 레벨 모두 필요합니다."),
-    PROVIDED_FOR_SERVICE_USER("서비스 로그인 사용자에게만 제공되는 기능입니다.");
+    PROVIDED_FOR_SERVICE_USER("서비스 로그인 사용자에게만 제공되는 기능입니다."),
+    CANT_ADD_SELF_AS_FRIEND("스스로를 친구추가할 수 없습니다."),
+
+    // FRIEND
+    ALREADY_FRIEND("이미 친구추가된 사용자입니다."),
+    RECEIVED_FRIEND_REQUEST_NOT_FOUND("받은 친구 요청이 없습니다."),
+    SENT_FRIEND_REQUEST_NOT_FOUND("전송한 친구 요청이 없습니다."),
+    ACCEPTED_FRIEND_REQUEST_NOT_FOUND("수락한 친구 요청이 없습니다."),
+    NOT_PROPER_STATUS_FOR_THE_REQUEST("요청에 적합한 친구 요청 상태가 아닙니다."),
+    CANT_CANCEL_ACCEPTED_REQUEST("친구 요청을 수락한 상태일 때만 취소가 가능합니다.");
 
 
     private final String message;

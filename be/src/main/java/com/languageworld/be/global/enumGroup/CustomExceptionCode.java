@@ -160,7 +160,31 @@ public enum CustomExceptionCode {
     NOT_SUPPORTED__FOR_SOCIAL_USER(
             HttpStatus.BAD_REQUEST,
             "USER_400",
-            "소셜 로그인 사용자에게 제공되지 않는 기능입니다.");
+            "지원하지 않는 기능입니다."),
+    CANT_ADD_SELF_AS_FRIEND(
+            HttpStatus.BAD_REQUEST,
+            "USER_400",
+            "스스로 친구추가할 수 없습니다."),
+    ALREADY_FRIEND(
+            HttpStatus.BAD_REQUEST,
+            "USER_400",
+            "이미 친구추가된 사용자입니다."),
+    RECEIVED_FRIEND_REQUEST_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "USER_404",
+            "받은 친구 요청이 없습니다."),
+    SENT_FRIEND_REQUEST_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "USER_404",
+            "전송한 친구 요청이 없습니다."),
+    ACCEPTED_FRIEND_REQUEST_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "USER_404",
+            "수락한 친구 요청이 없습니다."),
+    NOT_PROPER_STATUS_FOR_THE_REQUEST(
+            HttpStatus.BAD_REQUEST,
+            "USER_400",
+            "요청에 적합한 친구 요청 상태가 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드

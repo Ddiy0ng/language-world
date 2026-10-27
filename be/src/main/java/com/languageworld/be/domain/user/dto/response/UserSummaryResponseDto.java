@@ -3,11 +3,10 @@ package com.languageworld.be.domain.user.dto.response;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.enumGroup.NationCode;
 import lombok.Builder;
-
 import java.util.UUID;
 
 @Builder
-public record UserSummaryResponseDto (
+public record UserSummaryResponseDto(
 
         UUID userUuid,
 
@@ -36,4 +35,5 @@ public record UserSummaryResponseDto (
 
         return userSummaryResponseDto;
     }
+
 }

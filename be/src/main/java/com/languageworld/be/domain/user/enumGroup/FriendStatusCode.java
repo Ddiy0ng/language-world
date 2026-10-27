@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum FriendStatusCode {
 
     REQUESTED("요청"),
-    ACCEPTED("수락");
+    ACCEPTED("수락"),
+    REJECTED("거절됨");
 
     private final String statusMeaning;
 

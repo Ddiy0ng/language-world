@@ -105,7 +105,41 @@ public enum SuccessCode {
             HttpStatus.OK,
             "USER_200",
             "소셜 계정 삭제에 성공했습니다."
-    );
+    ),
+
+    // FRIEND
+    ADD_FRIEND_SUCCESS(
+            HttpStatus.CREATED,
+            "USER_200",
+            "친구 요청에 성공했습니다."),
+    FIND_ALL_FRIEND_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "친구 조회에 성공했습니다."),
+    ACCEPT_FRIEND_REQUEST_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "친구 요청 수락에 성공했습니다."),
+    REJECT_FRIEND_REQUEST_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "친구 요청 거절에 성공했습니다."),
+    CANCEL_FRIEND_REQUEST_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "친구 요청 취소에 성공했습니다."),
+    REMOVE_FRIEND_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "친구 삭제에 성공했습니다."),
+    FIND_SENT_FRIEND_REQUEST_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "전송한 친구 요청 조회에 성공했습니다."),
+    FIND_RECEIVED_FRIEND_REQUEST(
+            HttpStatus.OK,
+            "USER_200",
+            "요청받은 친구 요청 조회에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

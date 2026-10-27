@@ -3,6 +3,7 @@ package com.languageworld.be.domain.user.service;
 import com.languageworld.be.domain.user.entity.ServiceAccount;
 import com.languageworld.be.domain.user.entity.SocialAccount;
 import com.languageworld.be.domain.user.entity.User;
+import com.languageworld.be.domain.user.repository.FriendRepository;
 import com.languageworld.be.domain.user.repository.ServiceAccountRepository;
 import com.languageworld.be.domain.user.repository.SocialAccountRepository;
 import com.languageworld.be.domain.user.repository.UserRepository;
@@ -26,7 +27,9 @@ public class UserUtil {
     private final UserRepository userRepository;
     private final ServiceAccountRepository serviceAccountRepository;
     private final SocialAccountRepository socialAccountRepository;
+    private final FriendRepository friendRepository;
 
+    // USER
     public User getUserByUuid(UUID uuid) {
 
         Optional<User> optionalUser = userRepository.findByUuid(uuid);
@@ -100,7 +103,6 @@ public class UserUtil {
         }
     }
 
-    // 나이대 계산
     protected int calculateAgeGroup(LocalDate birth) {
 
         LocalDate now = LocalDate.now();
