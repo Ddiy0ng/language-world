@@ -3,13 +3,11 @@ package com.languageworld.be.domain.user.entity;
 import com.languageworld.be.global.baseEntity.ChangeableEntity;
 import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Table(name = "blocked_users")
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -28,4 +26,14 @@ public class BlockedUser extends CreatableEntity {
     @ManyToOne
     @JoinColumn(name = "blocked_user_id", nullable = false)
     private User blockedUser;
+
+    public static BlockedUser of(User user, User requestedUser) {
+
+        BlockedUser blockedUser = BlockedUser.builder()
+                .user(user)
+                .blockedUser(requestedUser)
+                .build();
+
+        return blockedUser;
+    }
 }
