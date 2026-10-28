@@ -91,10 +91,10 @@ public class FriendController {
     }
 
     // TODO 친구 삭제
-    @DeleteMapping("/{friendUuid}")
-    public ResponseEntity<ApiResponse<Void>> removeFriend(@AuthenticationPrincipal CustomPrincipal customPrincipal, @PathVariable UUID friendUuid) {
+    @DeleteMapping("/{friendId}")
+    public ResponseEntity<ApiResponse<Void>> removeFriend(@AuthenticationPrincipal CustomPrincipal customPrincipal, @PathVariable Long friendId) {
 
-        friendService.removeFriend(customPrincipal, friendUuid);
+        friendService.removeFriend(customPrincipal, friendId);
 
         return ResponseEntityUtil.success(SuccessCode.REMOVE_FRIEND_SUCCESS);
     }

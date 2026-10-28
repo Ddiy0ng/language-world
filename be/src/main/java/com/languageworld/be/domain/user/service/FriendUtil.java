@@ -64,9 +64,9 @@ public class FriendUtil {
     }
 
     // friend 또는 user가 authenticatedUser인 것을 찾기
-    protected Friend getAcceptedFriendRequest(UUID authenticatedUserUuid, UUID friendUuid) {
+    protected Friend getAcceptedFriendRequest(UUID authenticatedUserUuid, Long friendId) {
 
-        Optional<Friend> optionalFriend = friendRepository.findByUserPariAndStatus(authenticatedUserUuid, friendUuid, FriendStatusCode.ACCEPTED);
+        Optional<Friend> optionalFriend = friendRepository.findByIdAndFriendStatus(friendId, FriendStatusCode.ACCEPTED);
 
         if(optionalFriend.isEmpty()) {
 
@@ -76,7 +76,7 @@ public class FriendUtil {
                     LogEventReasonCode.ACCEPTED_FRIEND_REQUEST_NOT_FOUND,
                     LogEventReasonCode.ACCEPTED_FRIEND_REQUEST_NOT_FOUND.getMessage()
                             + " - userUuid: " + authenticatedUserUuid
-                            + " - friendUuid: " + friendUuid,
+                            + " - requestId: " + friendId,
                     authenticatedUserUuid.toString()
             );
 
