@@ -139,7 +139,21 @@ public enum SuccessCode {
     FIND_RECEIVED_FRIEND_REQUEST(
             HttpStatus.OK,
             "USER_200",
-            "요청받은 친구 요청 조회에 성공했습니다.");
+            "요청받은 친구 요청 조회에 성공했습니다."),
+
+    // BLOCKED_USER
+    USER_BLOCK_SUCCESS(
+            HttpStatus.CREATED,
+            "USER_201",
+            "사용자 차단에 성공했습니다."),
+    ALL_BLOCKED_USER_FIND_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "차단한 사용자 조회에 성공했습니다."),
+    BLOCK_CANCEL_SUCCESS(
+            HttpStatus.OK,
+            "USER_200",
+            "사용자 차단 취소에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

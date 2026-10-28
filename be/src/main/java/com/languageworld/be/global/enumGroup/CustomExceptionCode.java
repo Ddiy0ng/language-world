@@ -160,7 +160,9 @@ public enum CustomExceptionCode {
     NOT_SUPPORTED__FOR_SOCIAL_USER(
             HttpStatus.BAD_REQUEST,
             "USER_400",
-            "지원하지 않는 기능입니다."),
+            "소셜 사용자에게 지원하지 않는 기능입니다."),
+
+    // FRIEND
     CANT_ADD_SELF_AS_FRIEND(
             HttpStatus.BAD_REQUEST,
             "USER_400",
@@ -184,7 +186,33 @@ public enum CustomExceptionCode {
     NOT_PROPER_STATUS_FOR_THE_REQUEST(
             HttpStatus.BAD_REQUEST,
             "USER_400",
-            "요청에 적합한 친구 요청 상태가 아닙니다.");
+            "요청에 적합한 친구 요청 상태가 아닙니다."),
+    FORBIDDEN_FRIEND_REMOVE_REQUEST(
+            HttpStatus.FORBIDDEN,
+            "USER_403",
+            "해당 인증된 사용자가 삭제할 수 있는 친구가 아닙니다."),
+
+    // BLOCKED USER
+    CANT_BLOCK_SELF(
+            HttpStatus.BAD_REQUEST,
+            "USER_400",
+            "스스로를 차단할 수 없습니다."),
+    ALREADY_BLOCKED(
+            HttpStatus.BAD_REQUEST,
+            "USER_400",
+            "이미 차단된 사용자입니다."),
+    BLOCKED_USER_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "USER_404",
+            "차단된 사용자를 찾을 수 없습니다."),
+    REQUEST_FORBIDDEN_FOR_BLOCKED_USER(
+            HttpStatus.FORBIDDEN,
+            "USER_403",
+            "차단된 사용자에 대해 할 수 없는 요청입니다."),
+    FORBIDDEN_BLOCK_REQUEST(
+            HttpStatus.FORBIDDEN,
+            "USER_403",
+            "해당 인증된 사용자가 취소할 수 있는 차단된 사용자가 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드
