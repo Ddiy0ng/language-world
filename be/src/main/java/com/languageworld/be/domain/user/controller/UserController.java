@@ -32,7 +32,7 @@ public class UserController {
         // customPrincipal
         UserInfoResponseDto userInfoResponseDto = userService.findUserInfo(customPrincipal.uuid());
 
-        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_INFO_READ_SUCCESS, userInfoResponseDto);
+        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_INFO_FIND_SUCCESS, userInfoResponseDto);
     }
 
     // TODO 회원 정보 조회(키워드 사용해 조건 검색 또는 전체 - 요약 조회): 프로필 이미지, 이름, 국적, 학습어 + 레벨    // 자기 자신은 검색에서 제외
@@ -44,7 +44,7 @@ public class UserController {
 
         List<UserSummaryResponseDto> userSummaryResponseDtoList = userService.searchUserSummaryList(customPrincipal, keyword, learningLanguageId, learningLanguageLevelId);
 
-        return ResponseEntityUtil.success(SuccessCode.USER_INFO_SUMMARY_READ_SUCCESS, userSummaryResponseDtoList);
+        return ResponseEntityUtil.success(SuccessCode.USER_INFO_SUMMARY_FIND_SUCCESS, userSummaryResponseDtoList);
     }
 
     // TODO 회원 정보 상세 조회(단건): 프로필 이미지, 이름, 국적, 모국어, 학습어 + 레벨, 바이오
@@ -54,7 +54,7 @@ public class UserController {
         // by uuid
         UserInfoResponseDto userInfoResponseDto = userService.findUserInfo(userUuid);
 
-        return ResponseEntityUtil.success(SuccessCode.USER_INFO_READ_SUCCESS, userInfoResponseDto);
+        return ResponseEntityUtil.success(SuccessCode.USER_INFO_FIND_SUCCESS, userInfoResponseDto);
     }
 
     // TODO 회원 정보 수정: 이름, 국적, 바이오, 모국어
@@ -64,7 +64,7 @@ public class UserController {
 
         userService.changeUserInfo(customPrincipal, changeUserInfoRequestDto);
 
-        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_INFO_UPDATE_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_INFO_CHANGE_SUCCESS);
     }
 
     // TODO 학습어 관련 정보 변경
@@ -74,7 +74,7 @@ public class UserController {
 
         userService.changeUserLanguageInfo(customPrincipal, changeUserLanguageInfoRequestDto);
 
-        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_LANGUAGE_INFO_UPDATE_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_LANGUAGE_INFO_CHANGE_SUCCESS);
     }
 
     // TODO 회원 비밀번호 수정
@@ -84,7 +84,7 @@ public class UserController {
 
         userService.changeUserPassword(customPrincipal, changeUserPasswordRequestDto);
 
-        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_PASSWORD_UPDATE_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_PASSWORD_CHANGE_SUCCESS);
     }
 
     // TODO 프로필 수정(MultipartFile)
@@ -96,7 +96,7 @@ public class UserController {
 
         userService.changeUserProfile(customPrincipal, multipartFile);
 
-        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_PROFILE_UPDATE_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_PROFILE_CHANGE_SUCCESS);
     }
 
     // TODO 인증된 사용자 회원 탈퇴(SoftDelete)

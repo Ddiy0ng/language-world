@@ -3,7 +3,6 @@ package com.languageworld.be.domain.user.service;
 import com.languageworld.be.domain.user.entity.ServiceAccount;
 import com.languageworld.be.domain.user.entity.SocialAccount;
 import com.languageworld.be.domain.user.entity.User;
-import com.languageworld.be.domain.user.repository.FriendRepository;
 import com.languageworld.be.domain.user.repository.ServiceAccountRepository;
 import com.languageworld.be.domain.user.repository.SocialAccountRepository;
 import com.languageworld.be.domain.user.repository.UserRepository;
@@ -27,7 +26,6 @@ public class UserUtil {
     private final UserRepository userRepository;
     private final ServiceAccountRepository serviceAccountRepository;
     private final SocialAccountRepository socialAccountRepository;
-    private final FriendRepository friendRepository;
 
     // USER
     public User getUserByUuid(UUID uuid) {
@@ -80,7 +78,7 @@ public class UserUtil {
             CustomLogger.info(
                     LogEventCode.USER,
                     "SUCCESS",
-                    SuccessCode.DELETE_SERVICE_ACCOUNT_SUCCESS.getMessage(),
+                    SuccessCode.SERVICE_ACCOUNT_REMOVE_SUCCESS.getMessage(),
                     userUuid.toString()
             );
         }
@@ -97,7 +95,7 @@ public class UserUtil {
             CustomLogger.info(
                     LogEventCode.USER,
                     "SUCCESS",
-                    SuccessCode.DELETE_SOCIAL_ACCOUNT_SUCCESS.getMessage(),
+                    SuccessCode.SOCIAL_ACCOUNT_REMOVE_SUCCESS.getMessage(),
                     userUuid.toString()
             );
         }

@@ -40,7 +40,7 @@ public class TermController {
 
         termService.agreeTermForAuthenticatedUser(customPrincipal, termAgreeRequestDto);
 
-        return ResponseEntityUtil.success(SuccessCode.AGREED_TERM_READ_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.TERM_AGREE_SUCCESS);
     }
 
     // 약관 전체 조회(ADMIN)
@@ -49,7 +49,7 @@ public class TermController {
 
         List<TermResponseDto> termResponseDtoList= termService.findTermList();
 
-        return ResponseEntityUtil.success(SuccessCode.ALL_TERM_READ_SUCCESS, termResponseDtoList);
+        return ResponseEntityUtil.success(SuccessCode.ALL_TERM_FIND_SUCCESS, termResponseDtoList);
     }
 
     // 활성화된 약관 전체 조회(PermitAll)
@@ -58,7 +58,7 @@ public class TermController {
 
          TermResponseDto[] termResponseDtoArr = termService.findActiveTermList();
 
-        return ResponseEntityUtil.success(SuccessCode.ALL_ACTIVE_TERM_READ_SUCCESS, termResponseDtoArr);
+        return ResponseEntityUtil.success(SuccessCode.ALL_ACTIVE_TERM_FIND_SUCCESS, termResponseDtoArr);
     }
 
     // 동의 필요한 필수 약관 조회(ADMIN, USER, SERVICE_FORBIDDEN_USER)
@@ -68,7 +68,7 @@ public class TermController {
 
         List<TermResponseDto> notAgreedActiveTermList = termService.findNotAgreedActiveTermList(customPrincipal);
 
-        return ResponseEntityUtil.success(SuccessCode.NOT_AGREED_ACTIVE_TERM_READ_SUCCESS, notAgreedActiveTermList);
+        return ResponseEntityUtil.success(SuccessCode.NOT_AGREED_ACTIVE_TERM_FIND_SUCCESS, notAgreedActiveTermList);
     }
 
     // 동의한 약관 전체 조회(ADMIN, USER, SERVICE_FORBIDDEN_USER)
@@ -77,7 +77,7 @@ public class TermController {
 
         List<AgreedTermResponseDto> agreedTermList = termService.findAgreedTermList(customPrincipal);
 
-        return ResponseEntityUtil.success(SuccessCode.AGREED_TERM_READ_SUCCESS, agreedTermList);
+        return ResponseEntityUtil.success(SuccessCode.AGREED_TERM_FIND_SUCCESS, agreedTermList);
     }
 
     // 약관 활성화(ADMIN)

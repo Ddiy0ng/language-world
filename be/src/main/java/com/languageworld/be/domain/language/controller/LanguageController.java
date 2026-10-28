@@ -23,6 +23,6 @@ public class LanguageController {
 
         LanguageAndLevelResponseDto languageAndLevelResponseDto = languageService.findAllLanguageAndLevel();
 
-        return ResponseEntityUtil.success(SuccessCode.ALL_LANGUAGE_AND_LEVEL_READ_SUCCESS, languageAndLevelResponseDto);
+        return ResponseEntityUtil.success(SuccessCode.ALL_LANGUAGE_AND_LEVEL_FIND_SUCCESS, languageAndLevelResponseDto);
     }
 }

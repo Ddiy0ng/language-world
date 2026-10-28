@@ -28,21 +28,21 @@ public enum SuccessCode {
     TERM_CREATED(HttpStatus.CREATED,
             "TERM_201",
             "약관 등록을 완료했습니다."),
-    AGREE_TERM_SUCCESS(HttpStatus.OK,
+    TERM_AGREE_SUCCESS(HttpStatus.OK,
             "TERM_200",
             "약관 동의에 성공했습니다."),
-    ALL_TERM_READ_SUCCESS(HttpStatus.OK,
+    ALL_TERM_FIND_SUCCESS(HttpStatus.OK,
             "TERM_200",
             "약관 전체 조회에 성공했습니다."),
-    ALL_ACTIVE_TERM_READ_SUCCESS(
+    ALL_ACTIVE_TERM_FIND_SUCCESS(
             HttpStatus.OK,
             "TERM_200",
             "활성화된 약관 전체 조회에 성공했습니다."),
-    NOT_AGREED_ACTIVE_TERM_READ_SUCCESS(
+    NOT_AGREED_ACTIVE_TERM_FIND_SUCCESS(
             HttpStatus.OK,
             "TERM_200",
             "동의하지 않은 활성화 약관 조회에 성공했습니다."),
-    AGREED_TERM_READ_SUCCESS(
+    AGREED_TERM_FIND_SUCCESS(
             HttpStatus.OK,
             "TERM_200",
             "동의한 약관 조회에 성공했습니다."),
@@ -56,31 +56,31 @@ public enum SuccessCode {
             "약관 동의 철회에 성공했습니다."),
 
     // USER
-    AUTHENTICATED_USER_INFO_READ_SUCCESS(
+    AUTHENTICATED_USER_INFO_FIND_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "인증된 사용자 정보 조회에 성공했습니다."),
-    USER_INFO_READ_SUCCESS(
+    USER_INFO_FIND_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "사용자의 정보 조회에 성공했습니다."),
-    USER_INFO_SUMMARY_READ_SUCCESS(
+    USER_INFO_SUMMARY_FIND_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "사용자 정보 요약 조회에 성공했습니다."),
-    AUTHENTICATED_USER_INFO_UPDATE_SUCCESS(
+    AUTHENTICATED_USER_INFO_CHANGE_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "인증된 사용자 정보 수정에 성공했습니다."),
-    AUTHENTICATED_USER_LANGUAGE_INFO_UPDATE_SUCCESS(
+    AUTHENTICATED_USER_LANGUAGE_INFO_CHANGE_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "인증된 사용자 언어 정보 수정에 성공했습니다."),
-    AUTHENTICATED_USER_PASSWORD_UPDATE_SUCCESS(
+    AUTHENTICATED_USER_PASSWORD_CHANGE_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "인증된 사용자 비밀번호 수정에 성공했습니다."),
-    AUTHENTICATED_USER_PROFILE_UPDATE_SUCCESS(
+    AUTHENTICATED_USER_PROFILE_CHANGE_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "인증된 사용자  프로필 수정에 성공했습니다."),
@@ -90,53 +90,53 @@ public enum SuccessCode {
             "인증된 사용자 탈퇴에 성공했습니다."),
 
     // Language
-    ALL_LANGUAGE_AND_LEVEL_READ_SUCCESS(
+    ALL_LANGUAGE_AND_LEVEL_FIND_SUCCESS(
             HttpStatus.OK,
             "LANGUAGE_200",
             "지원하는 언어와 레벨 전체 조회에 성공했습니다."),
 
     // User
-    DELETE_SERVICE_ACCOUNT_SUCCESS(
+    SERVICE_ACCOUNT_REMOVE_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "서비스 계정 삭제에 성공했습니다."
     ),
-    DELETE_SOCIAL_ACCOUNT_SUCCESS(
+    SOCIAL_ACCOUNT_REMOVE_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "소셜 계정 삭제에 성공했습니다."
     ),
 
     // FRIEND
-    ADD_FRIEND_SUCCESS(
+    FRIEND_ADD_SUCCESS(
             HttpStatus.CREATED,
             "USER_200",
             "친구 요청에 성공했습니다."),
-    FIND_ALL_FRIEND_SUCCESS(
+    ALL_FRIEND_FIND_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "친구 조회에 성공했습니다."),
-    ACCEPT_FRIEND_REQUEST_SUCCESS(
+    FRIEND_REQUEST_ACCEPT_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "친구 요청 수락에 성공했습니다."),
-    REJECT_FRIEND_REQUEST_SUCCESS(
+    FRIEND_REQUEST_REJECT_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "친구 요청 거절에 성공했습니다."),
-    CANCEL_FRIEND_REQUEST_SUCCESS(
+    FRIEND_REQUEST_CANCEL_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "친구 요청 취소에 성공했습니다."),
-    REMOVE_FRIEND_SUCCESS(
+    FRIEND_REMOVE_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "친구 삭제에 성공했습니다."),
-    FIND_SENT_FRIEND_REQUEST_SUCCESS(
+    SENT_FRIEND_REQUEST_FIND_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "전송한 친구 요청 조회에 성공했습니다."),
-    FIND_RECEIVED_FRIEND_REQUEST(
+    RECEIVED_FRIEND_REQUEST_FIND_SUCCESS(
             HttpStatus.OK,
             "USER_200",
             "요청받은 친구 요청 조회에 성공했습니다.");

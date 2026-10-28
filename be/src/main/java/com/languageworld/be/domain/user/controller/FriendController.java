@@ -29,7 +29,7 @@ public class FriendController {
         // 사용자 존재 확인, 친구 여부 확인, 추가
         friendService.addFriend(customPrincipal, friendUuid);
 
-        return ResponseEntityUtil.success(SuccessCode.ADD_FRIEND_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.FRIEND_ADD_SUCCESS);
     }
 
     // TODO 내가 보낸 친구 요청 및 거절 내역 조회
@@ -38,7 +38,7 @@ public class FriendController {
 
         List<FriendRequestResponseDto> friendResponseDtoList = friendService.findSentFriendRequestList(customPrincipal);
 
-        return ResponseEntityUtil.success(SuccessCode.FIND_SENT_FRIEND_REQUEST_SUCCESS, friendResponseDtoList);
+        return ResponseEntityUtil.success(SuccessCode.SENT_FRIEND_REQUEST_FIND_SUCCESS, friendResponseDtoList);
     }
 
     // TODO 내가 받은 친구 요청 내역 조회
@@ -47,7 +47,7 @@ public class FriendController {
 
         List<FriendRequestResponseDto> friendResponseDtoList = friendService.findReceivedFriendRequestList(customPrincipal);
 
-        return ResponseEntityUtil.success(SuccessCode.FIND_RECEIVED_FRIEND_REQUEST, friendResponseDtoList);
+        return ResponseEntityUtil.success(SuccessCode.RECEIVED_FRIEND_REQUEST_FIND_SUCCESS, friendResponseDtoList);
     }
 
     // TODO 친구 조회
@@ -57,37 +57,37 @@ public class FriendController {
 
         List<FriendRequestResponseDto> friendResponseDtoList = friendService.searchFriendList(customPrincipal, keyword);
 
-        return ResponseEntityUtil.success(SuccessCode.FIND_ALL_FRIEND_SUCCESS, friendResponseDtoList);
+        return ResponseEntityUtil.success(SuccessCode.ALL_FRIEND_FIND_SUCCESS, friendResponseDtoList);
     }
 
     // TODO 수락
-    @PatchMapping("/request/{requestId}/accept")
+    @PatchMapping("/request/{friendId}/accept")
     public ResponseEntity<ApiResponse<Void>> acceptFriendRequest(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                 @PathVariable Long requestId) {
+                                                                 @PathVariable Long friendId) {
 
-        friendService.acceptFriendRequest(customPrincipal, requestId);
+        friendService.acceptFriendRequest(customPrincipal, friendId);
 
-        return ResponseEntityUtil.success(SuccessCode.ACCEPT_FRIEND_REQUEST_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.FRIEND_REQUEST_ACCEPT_SUCCESS);
     }
 
     // TODO 거절
-    @PatchMapping("/request/{requestId}/reject")
+    @PatchMapping("/request/{friendId}/reject")
     public ResponseEntity<ApiResponse<Void>> rejectFriendRequest(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                 @PathVariable Long requestId) {
+                                                                 @PathVariable Long friendId) {
 
-        friendService.rejectFriendRequest(customPrincipal, requestId);
+        friendService.rejectFriendRequest(customPrincipal, friendId);
 
-        return ResponseEntityUtil.success(SuccessCode.REJECT_FRIEND_REQUEST_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.FRIEND_REQUEST_REJECT_SUCCESS);
     }
 
     // TODO 친구 요청 취소
-    @DeleteMapping("/request/{requestId}")
+    @DeleteMapping("/request/{friendId}")
     public ResponseEntity<ApiResponse<Void>> cancelFriendRequest(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                 @PathVariable Long requestId) {
+                                                                 @PathVariable Long friendId) {
 
-        friendService.cancelFriendRequest(customPrincipal, requestId);
+        friendService.cancelFriendRequest(customPrincipal, friendId);
 
-        return ResponseEntityUtil.success(SuccessCode.CANCEL_FRIEND_REQUEST_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.FRIEND_REQUEST_CANCEL_SUCCESS);
     }
 
     // TODO 친구 삭제
@@ -96,6 +96,6 @@ public class FriendController {
 
         friendService.removeFriend(customPrincipal, friendUuid);
 
-        return ResponseEntityUtil.success(SuccessCode.REMOVE_FRIEND_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.FRIEND_REMOVE_SUCCESS);
     }
 }
