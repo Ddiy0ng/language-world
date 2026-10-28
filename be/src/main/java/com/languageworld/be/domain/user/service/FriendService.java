@@ -24,6 +24,7 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final UserUtil userUtil;
     private final FriendUtil friendUtil;
+    private final BlockedUserUtil blockedUserUtil;
 
     @Transactional
     public void addFriend(CustomPrincipal customPrincipal, UUID friendUuid) {
@@ -67,6 +68,7 @@ public class FriendService {
         }
 
         // TODO 차단 여부 확인
+        blockedUserUtil.blockedUserCheck(userUuid, friendUuid);
 
         // 추가
         Friend friend = Friend.of(authenticatedUser, requestedUser);
@@ -104,8 +106,9 @@ public class FriendService {
     @Transactional
     public List<FriendRequestResponseDto> searchFriendList(CustomPrincipal customPrincipal, String keyword) {
 
-        // Friend 테이블의 customPrincipal id,  friendStatus: ACCEPTED 기준 검색
+        // TODO 차단된 유저는 조회할 수 없도록
 
+        // Friend 테이블의 customPrincipal id,  friendStatus: ACCEPTED 기준 검색
         UUID uuid = customPrincipal.uuid();
         List<Friend> friendList = friendRepository.findAllFriendUsers(customPrincipal.uuid(), keyword, FriendStatusCode.ACCEPTED);
 
@@ -157,12 +160,26 @@ public class FriendService {
     }
 
     @Transactional
-    public void removeFriend(CustomPrincipal customPrincipal, UUID friendUuid) {
+    public void removeFriend(CustomPrincipal customPrincipal, Long friendId) {
 
         // 친구 삭제 => 수락 상태인 것만 삭제
         UUID uuid = customPrincipal.uuid();
 
-        Friend friend = friendUtil.getAcceptedFriendRequest(uuid, friendUuid);
+        Friend friend = friendUtil.getAcceptedFriendRequest(uuid, friendId);
+        if(!friend.getUser().getUuid().equals(uuid) && !friend.getFriend().getUuid().equals(uuid)) {
+
+            CustomLogger.warn(
+                    LogEventCode.USER,
+                    "FAIL",
+                    LogEventReasonCode.FORBIDDEN_FRIEND_REMOVE_REQUEST,
+                    LogEventReasonCode.FORBIDDEN_FRIEND_REMOVE_REQUEST.getMessage()
+                            + " - authenticatedUser uuid: " + uuid
+                            + " - requestId: " + friendId,
+                    uuid.toString()
+            );
+
+            throw new CustomException(CustomExceptionCode.FORBIDDEN_FRIEND_REMOVE_REQUEST);
+        }
 
         friendRepository.delete(friend);
     }

@@ -49,6 +49,15 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
                                 LIKE LOWER(CONCAT('%', :keyword, '%'))
                         )
                     )
+                    AND NOT EXISTS (
+                        SELECT blockedUser
+                        FROM BlockedUser blockedUser
+                        WHERE blockedUser.user.uuid = :uuid
+                            AND (
+                                (friend.user.uuid = :uuid AND blockedUser.blockedUser = friend.friend)
+                                OR (friend.friend.uuid = :uuid AND blockedUser.blockedUser = friend.user)
+                            )
+                    )
             """
     )
     List<Friend> findAllFriendUsers(
@@ -59,22 +68,6 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     Optional<Friend> findByIdAndFriend_Uuid(Long requestId, UUID authenticatedUserUuid);
 
     Optional<Friend> findByIdAndUser_Uuid(Long requestId, UUID authenticatedUserUuid);
-
-    @Query(
-        """
-            SELECT friend
-            FROM Friend friend
-            WHERE friend.friendStatus = :status
-                AND (
-                            (friend.user.uuid = :authenticatedUserUuid AND friend.friend.uuid = :friendUuid)
-                            OR (friend.user.uuid = :friendUuid AND friend.friend.uuid = :authenticatedUserUuid)
-                )
-        """
-    )
-    Optional<Friend> findByUserPariAndStatus(
-            UUID authenticatedUserUuid,
-            UUID friendUuid,
-            @Param("status") FriendStatusCode friendStatusCode);
 
     @Query(
         """
@@ -95,10 +88,17 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
                 FROM Friend friend
                 WHERE friend.friend.uuid = :uuid
                     AND friend.friendStatus = :status
+                    AND NOT EXISTS (
+                        SELECT blockedUser
+                        FROM BlockedUser blockedUser
+                        WHERE blockedUser.user = friend.friend AND blockedUser.blockedUser = friend.user
+                    )
                 ORDER BY friend.createdAt DESC
             """
     )
     List<Friend> findAllReceivedFriendRequest(
             UUID uuid,
             @Param("status") FriendStatusCode friendStatusCode);
+
+    Optional<Friend> findByIdAndFriendStatus(Long friendId, FriendStatusCode friendStatusCode);
 }
