@@ -1,6 +1,8 @@
 package com.languageworld.be.domain.user.entity;
 
 import com.languageworld.be.domain.game.entity.GameResult;
+import com.languageworld.be.domain.post.entity.Like;
+import com.languageworld.be.domain.post.entity.Post;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
 import com.languageworld.be.domain.user.dto.request.ChangeUserInfoRequestDto;
 import com.languageworld.be.domain.user.dto.request.ChangeUserLanguageInfoRequestDto;
@@ -71,6 +73,13 @@ public class User extends ChangeableEntity {
     @ManyToOne
     @JoinColumn(name = "learning_language_level_id", nullable = false)
     private Level learningLanguageLevel;
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private List<Post> postList = new ArrayList<>();
 
     @Column(name = "deleted_at")
      private LocalDateTime deletedAt;

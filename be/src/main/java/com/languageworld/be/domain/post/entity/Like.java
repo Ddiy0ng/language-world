@@ -3,11 +3,17 @@ package com.languageworld.be.domain.post.entity;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Table(name = "likes")
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class Like extends CreatableEntity {
 
