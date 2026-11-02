@@ -1,6 +1,7 @@
 package com.languageworld.be.domain.post.controller;
 
-import com.languageworld.be.domain.post.dto.request.CreateCommentRequestDto;
+import com.languageworld.be.domain.post.dto.request.CommentCreateRequestDto;
+import com.languageworld.be.domain.post.dto.request.CommentUpdateRequestDto;
 import com.languageworld.be.domain.post.dto.response.PostCommentResponseDto;
 import com.languageworld.be.domain.post.dto.response.UserCommentResponseDto;
 import com.languageworld.be.domain.post.service.CommentService;
@@ -8,6 +9,7 @@ import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import com.languageworld.be.global.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,40 +29,52 @@ public class CommentController {
     @PostMapping("/post/{postId}")
     public ResponseEntity<ApiResponse<Void>> createComment(@AuthenticationPrincipal CustomPrincipal customPrincipal,
                                                            @PathVariable Long postId,
-                                                           @RequestBody CreateCommentRequestDto createCommentRequestDto) {
+                                                           @Valid @RequestBody CommentCreateRequestDto commentCreateRequestDto) {
 
-        commentService.createComment(customPrincipal, postId, createCommentRequestDto);
+        commentService.createComment(customPrincipal, postId, commentCreateRequestDto);
 
         return ResponseEntityUtil.success(SuccessCode.COMMENT_CREATE_SUCCESS);
     }
 
     // TODO 인증된 사용자가 작성한 댓글 전체 조회(postId + 게시글 제목 + 댓글 요약 + 댓글 id)
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<List<UserCommentResponseDto>>> findAuthenticatedUserCommentList(@AuthenticationPrincipal CustomPrincipal customPrincipal) {
+    public ResponseEntity<ApiResponse<List<UserCommentResponseDto>>> findAuthenticatedUserCommentList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                                                                      @RequestParam(required = false) Long cursor) {
 
-        List<UserCommentResponseDto> userCommentResponseDtoList = commentService.findAuthenticatedUserCommentList(customPrincipal);
+        List<UserCommentResponseDto> userCommentResponseDtoList = commentService.findAuthenticatedUserCommentList(customPrincipal, cursor);
 
         return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_ALL_COMMENT_FIND_SUCCESS, userCommentResponseDtoList);
     }
 
     // TODO 특정 사용자가 작성한 댓글 전체 조회
     @GetMapping("/{userUuid}")
-    public ResponseEntity<ApiResponse<List<UserCommentResponseDto>>> findSpecificUserCommentList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                                                     @PathVariable UUID userUuid) {
+    public ResponseEntity<ApiResponse<List<UserCommentResponseDto>>> findSpecificUserCommentList(@PathVariable UUID userUuid,
+                                                                                                 @RequestParam(required = false) Long cursor) {
 
-        List<UserCommentResponseDto> userCommentResponseDtoList = commentService.findSpecificUserCommentList(customPrincipal, userUuid);
+        List<UserCommentResponseDto> userCommentResponseDtoList = commentService.findSpecificUserCommentList(userUuid, cursor);
 
         return ResponseEntityUtil.success(SuccessCode.SPECIFIC_USER_ALL_COMMENT_FIND_SUCCESS, userCommentResponseDtoList);
     }
 
     // TODO 해당 게시글 댓글 전체 조회(순수 댓글 + 댓글 단 사람 정보: 프로필 + 이름 + 댓글 id)
     @GetMapping("/post/{postId}")
-    public ResponseEntity<ApiResponse<List<PostCommentResponseDto>>> findPostCommentList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                                             @PathVariable Long postId) {
+    public ResponseEntity<ApiResponse<List<PostCommentResponseDto>>> findPostCommentList(@PathVariable Long postId,
+                                                                                         @RequestParam(required = false) Long cursor) {
 
-        List<PostCommentResponseDto> postCommentResponseDtoList = commentService.findPostCommentList(customPrincipal, postId);
+        List<PostCommentResponseDto> postCommentResponseDtoList = commentService.findPostCommentList(postId, cursor);
 
         return ResponseEntityUtil.success(SuccessCode.POST_ALL_COMMENT_FIND_SUCCESS, postCommentResponseDtoList);
+    }
+
+    // TODO 댓글 수정
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<ApiResponse<Void>> changeComment(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                           @PathVariable Long commentId,
+                                                           @Valid @RequestBody CommentUpdateRequestDto commentUpdateRequestDto) {
+
+        commentService.changeComment(customPrincipal, commentId, commentUpdateRequestDto);
+
+        return ResponseEntityUtil.success(SuccessCode.COMMENT_CHANGE_SUCCESS);
     }
 
     // TODO 댓글 삭제

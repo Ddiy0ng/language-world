@@ -85,16 +85,6 @@ public class Post extends ChangeableEntity {
         postImageList.remove(postImage);
     }
 
-    public void removeComment(Comment comment) {
-
-        commentList.remove(comment);
-    }
-
-    public void removeLike(Like like) {
-
-        likeList.remove(like);
-    }
-
     public void changePostTitle(String title) {
 
         if(title != null)

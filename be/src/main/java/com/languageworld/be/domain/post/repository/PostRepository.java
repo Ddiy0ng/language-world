@@ -24,12 +24,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                 WHERE (
                     :type IS NULL
                     OR post.postType = :type
-                )
-                AND (
-                    :keyword IS NULL
-                    OR LOWER(post.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                    OR LOWER(post.contentText) LIKE LOWER(CONCAT('%', :keyword, '%'))
-                )
+                    )
+                    AND (
+                        :keyword IS NULL
+                        OR LOWER(post.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                        OR LOWER(post.contentText) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                    )
                 ORDER BY post.createdAt DESC
             """
     )
