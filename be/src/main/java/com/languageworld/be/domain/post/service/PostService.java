@@ -170,8 +170,8 @@ public class PostService {
             //request image 개수 확인
             long requestImageCount = nullSafeMultipartFileList.size();
 
-            // 빈 슬롯, 요청 이미지 개수 일치 확인
-            if (emptySlotCount != requestImageCount) {
+            // 빈 슬롯 보다 요청 이미지가 많으면 예외
+            if (emptySlotCount < requestImageCount) {
 
                 CustomLogger.warn(
                         LogEventCode.POST,
@@ -213,22 +213,22 @@ public class PostService {
                         );
 
                         throw new CustomException(CustomExceptionCode.DUPLICATE_IMAGE_ID);
-                    };
+                    }
                 }
             }
 
-            // 삭제할 이미지 삭제(db에서 삭제 / 실제 삭제와 분리하여 이는 나중에 진행)
+            // 삭제할 이미지 리스트 - 커밋, 롤백 (db에서 삭제 / 실제 삭제와 분리하여 이는 나중에 진행)
             List<String> commitDeleteFilePathList = new ArrayList<>();
-            List<String> rollbackDeleteFilePath = new ArrayList<>();
+            List<String> rollbackDeleteFilePathList = new ArrayList<>();
 
-            fileUtil.registerCleanUp(userUuid, FilePurposeCode.POST, commitDeleteFilePathList, rollbackDeleteFilePath);
+            fileUtil.registerCleanUp(userUuid, FilePurposeCode.POST, commitDeleteFilePathList, rollbackDeleteFilePathList);
 
             for (PostImage postImage : new ArrayList<>(post.getPostImageList())) {
 
                 //postImageMap
                 if (!notDeleteImageIdSet.contains(postImage.getId())) {
 
-                    // 나중에 삭제 위해 경로 보관
+                    // 나중에 실제 삭제 위해 경로 보관(커밋 시)
                     commitDeleteFilePathList.add(postImage.getPostImageUrl());
 
                     // db에서 삭제
@@ -237,20 +237,34 @@ public class PostService {
             }
 
             // 이미지 업로드
-            int count = 0;
-            for (int i = 0; i < postImageStatusOrderDtoList.size(); i++) {
-                Long postImageId = postImageStatusOrderDtoList.get(i).imageId();
-                if (postImageId != null)
-                    oldPostImageMap.get(postImageId).changeOrder(i);
-                if (postImageId == null) {
-                    String filePath = fileUtil.uploadFile(nullSafeMultipartFileList.get(count), FilePurposeCode.POST);
+            int fileIndex = 0;
+            int order = 0;
+            for (PostImageStatusOrderDto postImageStatusOrderDto : postImageStatusOrderDtoList) {
 
-                    rollbackDeleteFilePath.add(filePath);
+                // 유지할 이미지 아이디
+                Long postImageId = postImageStatusOrderDto.imageId();
 
-                    PostImage postImage = PostImage.of(filePath, i, post);
+                // null 아님: 순서 변경
+                if (postImageId != null) {
+                    oldPostImageMap.get(postImageId).changeOrder(order++);
+                }
+                // null: 비우거나 새 이미지 삽입
+                else {
+
+                    // 다음 파일 인덱스(+1은 수) 요청받은 이미지 수와 돋일하거나 크면 더 이상 업로드x(넘김)
+                    if(fileIndex >= requestImageCount)
+                        continue;
+
+                    // 빈 슬롯만큼 요청 사진이 있을 때 업로드
+                    String filePath = fileUtil.uploadFile(nullSafeMultipartFileList.get(fileIndex), FilePurposeCode.POST);
+
+                    // 롤백 시 삭제할 리스트 추가(새로 업로드한 파일 경로 삭제)
+                    rollbackDeleteFilePathList.add(filePath);
+
+                    PostImage postImage = PostImage.of(filePath, order++, post);
                     post.addPostImage(postImage);
 
-                    count++;
+                    fileIndex++;
                 }
             }
         }
