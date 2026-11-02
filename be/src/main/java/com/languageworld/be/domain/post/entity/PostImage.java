@@ -19,7 +19,7 @@ public class PostImage {
     private String postImageUrl;
 
     @Column(nullable = false)
-    private int order;
+    private int imageOrder;
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
@@ -29,7 +29,7 @@ public class PostImage {
 
         PostImage postImage = PostImage.builder()
                 .postImageUrl(postImageUrl)
-                .order(order)
+                .imageOrder(order)
                 .post(post)
                 .build();
 
@@ -37,6 +37,6 @@ public class PostImage {
     }
 
     public void changeOrder(int order) {
-        this.order = order;
+        this.imageOrder = order;
     }
 }

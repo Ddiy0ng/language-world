@@ -2,10 +2,11 @@ package com.languageworld.be.domain.post.dto.request;
 
 import com.languageworld.be.domain.post.enumGroup.PostTypeCode;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record PostCreateRequestDto(
 
-        @NotBlank
+        @NotNull
         PostTypeCode postTypeCode,
 
         @NotBlank

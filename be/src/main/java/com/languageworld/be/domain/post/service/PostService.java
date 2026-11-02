@@ -5,9 +5,10 @@ import com.languageworld.be.domain.post.dto.request.PostImageStatusOrderDto;
 import com.languageworld.be.domain.post.dto.request.PostUpdateRequestDto;
 import com.languageworld.be.domain.post.dto.response.PostResponseDto;
 import com.languageworld.be.domain.post.dto.response.PostSummaryResponseDto;
+import com.languageworld.be.domain.post.dto.response.SummaryPostCursorResponseDto;
 import com.languageworld.be.domain.post.entity.Post;
 import com.languageworld.be.domain.post.entity.PostImage;
-import com.languageworld.be.domain.post.repository.PostImageRepository;
+import com.languageworld.be.domain.post.enumGroup.PostTypeCode;
 import com.languageworld.be.domain.post.repository.PostRepository;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.service.UserUtil;
@@ -21,6 +22,9 @@ import com.languageworld.be.global.multiPartFileUtil.FileUtil;
 import com.languageworld.be.global.multiPartFileUtil.enumGroup.FilePurposeCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,10 +36,12 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final PostImageRepository postImageRepository;
     private final UserUtil userUtil;
     private final FileUtil fileUtil;
     private final PostUtil postUtil;
+
+
+    private final int SIZE = 20;
 
     @Transactional
     public void createPost(CustomPrincipal customPrincipal, PostCreateRequestDto postCreateRequestDto, List<MultipartFile> multipartFileList) {
@@ -67,35 +73,123 @@ public class PostService {
         postRepository.save(post);
     }
 
+
+    // only for test(성능 확인을 위한 것으로 실제 적용x): 페이지네이션 없이 단순 전체 조회
+    // -------------------------------------------------------------------------------------------------------------
     @Transactional
-    public List<PostSummaryResponseDto> findAuthenticatedUserAllPost(CustomPrincipal customPrincipal) {
+    public List<PostSummaryResponseDto> findAllPostForTest(CustomPrincipal customPrincipal) {
 
         UUID userUuid = customPrincipal.uuid();
 
+        List<Post> postList = postRepository.findAllByAuthor_Uuid(userUuid);
+        List<PostSummaryResponseDto> postSummaryResponseDtoList = postList.stream()
+                .map(post -> PostSummaryResponseDto.from(
+                        post,
+                        post.getCommentList().size(),
+                        post.getLikeList().size()))
+                .toList();
+
+        return postSummaryResponseDtoList;
+    }
+    // -------------------------------------------------------------------------------------------------------------
+
+
+    // 전체, 일상, 헬프 + 본문 또는 제목 검색, 최신순 정렬, 페이지네이션 + 인덱싱): 사진1, 제목, 댓글 수, 좋아요 수
+    @Transactional
+    public SummaryPostCursorResponseDto findAuthenticatedUserAllPost(CustomPrincipal customPrincipal, PostTypeCode postTypeCode, String keyword, Long cursor) {
+
+        UUID userUuid = customPrincipal.uuid();
+
+        Slice<Post> postSlice = findPost(userUuid, postTypeCode, keyword, cursor);
+
+        List<PostSummaryResponseDto> postSummaryResponseDtoList = postSlice.getContent().stream()
+                .map(post -> PostSummaryResponseDto.from(
+                        post,
+                        post.getCommentList().size(),
+                        post.getLikeList().size()))
+                .toList();
+
+        boolean hasNext = postSlice.hasNext();
+
+        Long nextCursor = null;
+        // 다음 있을 때 커서 등록
+        if(hasNext && !postSlice.isEmpty()) {
+
+            // 마지막 요소의 인덱스를 다음 커서로
+            nextCursor = postSlice.getContent().get(postSlice.getNumberOfElements() - 1).getId();
+        }
+
+        return SummaryPostCursorResponseDto.from(nextCursor, hasNext, postSummaryResponseDtoList);
     }
 
     @Transactional
-    public List<PostSummaryResponseDto> findSpecificUserAllPost(CustomPrincipal customPrincipal, UUID userUuid) {
+    public SummaryPostCursorResponseDto findSpecificUserAllPost(CustomPrincipal customPrincipal, UUID authorUuid, PostTypeCode postTypeCode, String keyword, Long cursor) {
 
+        Slice<Post> postSlice = findPost(authorUuid, postTypeCode, keyword, cursor);
 
+        List<PostSummaryResponseDto> postSummaryResponseDtoList = postSlice.getContent().stream()
+                .map(post -> PostSummaryResponseDto.from(
+                        post,
+                        post.getCommentList().size(),
+                        post.getLikeList().size()))
+                .toList();
+
+        boolean hasNext = postSlice.hasNext();
+
+        Long nextCursor = null;
+        if(hasNext && !postSlice.isEmpty())
+            nextCursor = postSlice.getContent().get(postSlice.getNumberOfElements() - 1).getId();
+
+        return SummaryPostCursorResponseDto.from(nextCursor, hasNext, postSummaryResponseDtoList);
     }
 
     @Transactional
-    public List<PostSummaryResponseDto> searchPost(CustomPrincipal customPrincipal, String keyword) {
+    public SummaryPostCursorResponseDto searchPost(CustomPrincipal customPrincipal, PostTypeCode postTypeCode, String keyword, Long cursor) {
+
+        Slice<Post> postSlice = findPost(null, postTypeCode, keyword, cursor);
+
+        List<PostSummaryResponseDto> postSummaryResponseDtoList = postSlice.getContent().stream()
+                .map(post -> PostSummaryResponseDto.from(
+                        post,
+                        post.getCommentList().size(),
+                        post.getLikeList().size()))
+                .toList();
+
+        boolean hasNext = postSlice.hasNext();
+
+        Long nextCursor = null;
+        if(hasNext && !postSlice.isEmpty())
+            nextCursor = postSlice.getContent().get(postSlice.getNumberOfElements() - 1).getId();
 
 
+        return SummaryPostCursorResponseDto.from(nextCursor, hasNext, postSummaryResponseDtoList);
     }
 
     @Transactional
     public PostResponseDto findPostDetail(CustomPrincipal customPrincipal, Long postId) {
 
+        UUID userUuid = customPrincipal.uuid();
 
+        Post post = postUtil.getPostByPostId(userUuid, postId);
+
+        return PostResponseDto.from(post, post.getCommentList().size(), post.getLikeList().size());
     }
 
     @Transactional
     public void changePost(CustomPrincipal customPrincipal, Long postId, PostUpdateRequestDto postUpdateRequestDto, List<MultipartFile> multipartFileList) {
 
         UUID userUuid = customPrincipal.uuid();
+
+        /*
+             1. 게시글 조회 및 작성자 검증
+             2. 이미지 요청 정보 조회 및 null에 대한 처리: 이미지 요청 정보 null이지만 요청 이미지 있으면 예외
+             3. 이미지 DTO, 파일 유효성 및 개수 검증: 3개 이하, not null, 빈 슬롯 < 요청 이미지 불가
+             4. 기존 이미지 ID 검증 및 중복 확인: postImageId의 해당 포스트 존재 여부 확인, 중복 요청 확인(중복 불가)
+             5. 트랜잭션 커밋, 롤백 시 파일 삭제 리스트: 커밋 시 삭제 파일 경로 삭제, 롤백 시 업로드 파일 경로 삭제
+             6. 삭제 대상 이미지 제거 및 파일 경로 저장: db에서 경로 삭제, 커밋 리스트에 추가
+             7. 기존 이미지 순서 변경 및 신규 이미지 업로드: 빈 슬롯 다 채울 필요x - 건너뜀, 연속 저장, 롤백 리스트에 추가
+             8. 게시글 제목 및 내용 수정
+         */
 
         // 게시글 조회
         Post post = postUtil.getPostByPostId(userUuid, postId);
@@ -176,14 +270,14 @@ public class PostService {
                 CustomLogger.warn(
                         LogEventCode.POST,
                         "FAIL",
-                        LogEventReasonCode.EMPTY_SLOT_AND_NEW_IMG_SIZE_NOT_MATCH,
-                        LogEventReasonCode.EMPTY_SLOT_AND_NEW_IMG_SIZE_NOT_MATCH.getMessage()
+                        LogEventReasonCode.REQUESTED_IMG_LARGER_THAN_EMPTY_SLOT,
+                        LogEventReasonCode.REQUESTED_IMG_LARGER_THAN_EMPTY_SLOT.getMessage()
                                 + " - Empty slot count: " + emptySlotCount
                                 + " - requested img count: " + requestImageCount,
                         userUuid.toString()
                 );
 
-                throw new CustomException(CustomExceptionCode.EMPTY_SLOT_AND_NEW_IMG_SIZE_NOT_MATCH);
+                throw new CustomException(CustomExceptionCode.REQUESTED_IMG_LARGER_THAN_EMPTY_SLOT);
             }
 
             // 기존 이미지 리스트
@@ -200,7 +294,7 @@ public class PostService {
                     // 해당 게시글의 이미지인지 확인
                     postUtil.postImageExistCheck(userUuid, postImageId, postId);
 
-                    // 중복된 이미지 id 저장 불가
+                    // 중복된 이미지 id 지정 불가
                     if (!notDeleteImageIdSet.add(postImageId)) {
 
                         CustomLogger.warn(
@@ -276,6 +370,47 @@ public class PostService {
     @Transactional
     public void removePost(CustomPrincipal customPrincipal, Long postId) {
 
+        UUID userUuid = customPrincipal.uuid();
 
+        // 게시글 조회
+        Post post = postUtil.getPostByPostId(userUuid, postId);
+
+        // 작성자 검증
+        postUtil.validatePostAuthor(post, userUuid);
+
+        // 삭제 파일 경로
+        List<String> commitDeleteFilePathList = post.getPostImageList().stream()
+                        .map(PostImage::getPostImageUrl)
+                        .toList();
+
+        // 커밋 시 실제 삭제
+        fileUtil.registerCleanUp(userUuid, FilePurposeCode.POST, commitDeleteFilePathList, List.of());
+
+        postRepository.delete(post);
+    }
+
+    @Transactional
+    private Slice<Post> findPost(UUID userUuid, PostTypeCode postTypeCode, String keyword, Long cursor) {
+
+        Pageable pageable = PageRequest.of(0, SIZE);
+        Slice<Post> postSlice;
+
+        // 특정 사용자x
+        if(userUuid == null) {
+            if(cursor == null)
+                postSlice = postRepository.findFirstSlice(postTypeCode, keyword, pageable);
+            else
+                postSlice = postRepository.findNextSlice(postTypeCode, keyword, pageable, cursor);
+
+            return postSlice;
+        }
+
+        // 첫 조회: 커서x, 커서 있으면 커서 기준 조회
+        if(cursor == null)
+            postSlice = postRepository.findFirstSlice(userUuid, postTypeCode, keyword, pageable);
+        else
+            postSlice = postRepository.findNextSlice(userUuid, postTypeCode, keyword, pageable, cursor);
+
+        return postSlice;
     }
 }

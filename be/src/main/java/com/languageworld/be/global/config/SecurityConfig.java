@@ -44,7 +44,8 @@ public class SecurityConfig {
             "/term",
             "/term/agreed/**",
             "/user/**",
-            "/friend/**"
+            "/friend/**",
+            "/post/**"
     };
 
     //SecurityFilterChain Bean

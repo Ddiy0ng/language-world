@@ -153,7 +153,38 @@ public enum SuccessCode {
     BLOCK_CANCEL_SUCCESS(
             HttpStatus.OK,
             "USER_200",
-            "사용자 차단 취소에 성공했습니다.");
+            "사용자 차단 취소에 성공했습니다."),
+
+    // POST
+    POST_CREATE_SUCCESS(
+            HttpStatus.CREATED,
+            "POST_201",
+            "게시글 저장에 성공했습니다."),
+    AUTHENTICATED_USER_ALL_POST_FIND_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "인증된 사용자의 게시글 목록 조회에 성공했습니다."),
+    SPECIFIC_USER_ALL_POST_FIND_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "선택한 사용자의 게시글 목록 조회에 성공했습니다."),
+    POST_SEARCH_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "게시글 검색에 성공했습니다."),
+    POST_DETAIL_FIND_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "게시글 상세 조회에 성공했습니다."
+    ), POST_CHANGE_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "게시글 수정에 성공했습니다."
+    ), POST_REMOVE_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "게시글 삭제에 성공했습니다."
+    );
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

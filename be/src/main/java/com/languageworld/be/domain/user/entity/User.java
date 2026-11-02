@@ -75,7 +75,7 @@ public class User extends ChangeableEntity {
     private Level learningLanguageLevel;
 
     @OneToMany(
-            mappedBy = "user",
+            mappedBy = "author",
             cascade = CascadeType.REMOVE,
             orphanRemoval = true
     )

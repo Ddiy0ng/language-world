@@ -146,7 +146,7 @@ public class FileUtil {
                                     LogEventReasonCode.FILE_TRANSACTION_STATUS_UNKNOWN.getMessage()
                                             + " - Status: " + status
                                             + " - FilePurpose: " + filePurposeCode,
-                                    userUuid.toString()
+                                    null
                             );
 
                             return;

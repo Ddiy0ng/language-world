@@ -1,7 +1,6 @@
 package com.languageworld.be.domain.post.service;
 
 import com.languageworld.be.domain.post.entity.Post;
-import com.languageworld.be.domain.post.entity.PostImage;
 import com.languageworld.be.domain.post.repository.PostImageRepository;
 import com.languageworld.be.domain.post.repository.PostRepository;
 import com.languageworld.be.global.enumGroup.CustomExceptionCode;
@@ -11,9 +10,6 @@ import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

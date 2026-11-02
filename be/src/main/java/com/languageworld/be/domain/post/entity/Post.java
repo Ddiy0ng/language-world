@@ -34,14 +34,16 @@ public class Post extends ChangeableEntity {
     @Column(name = "content_text", nullable = false)
     private String contentText;
 
+    @Builder.Default
     @OneToMany(
             mappedBy = "post",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    @OrderBy("order ASC")
+    @OrderBy("imageOrder ASC")
     private List<PostImage> postImageList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(
             mappedBy = "post",
             cascade = CascadeType.REMOVE,
@@ -49,6 +51,7 @@ public class Post extends ChangeableEntity {
     )
     private List<Comment> commentList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(
             mappedBy = "post",
             cascade = CascadeType.REMOVE,
@@ -80,6 +83,16 @@ public class Post extends ChangeableEntity {
     public void removePostImage(PostImage postImage) {
 
         postImageList.remove(postImage);
+    }
+
+    public void removeComment(Comment comment) {
+
+        commentList.remove(comment);
+    }
+
+    public void removeLike(Like like) {
+
+        likeList.remove(like);
     }
 
     public void changePostTitle(String title) {

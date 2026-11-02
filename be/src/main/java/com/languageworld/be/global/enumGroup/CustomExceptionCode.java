@@ -105,8 +105,11 @@ public enum CustomExceptionCode {
     MULTIPART_FILE_DELETE_FAILED(
             HttpStatus.INTERNAL_SERVER_ERROR,
             "MULTIPART_FILE_500",
-            "파일 삭제에 실패했습니다."
-    ),
+            "파일 삭제에 실패했습니다."),
+    FILE_TRANSACTION_NOT_ACTIVE(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "MULTIPART_FILE_500",
+            "현재 실행 중인 스레드에 DB 트랜잭션이 활성화되어있지 않습니다."),
 
     // TERM
     TERM_NOT_FOUND(
@@ -212,7 +215,45 @@ public enum CustomExceptionCode {
     FORBIDDEN_BLOCK_REQUEST(
             HttpStatus.FORBIDDEN,
             "USER_403",
-            "해당 인증된 사용자가 취소할 수 있는 차단된 사용자가 아닙니다.");
+            "해당 인증된 사용자가 취소할 수 있는 차단된 사용자가 아닙니다."),
+
+    // POST
+    POST_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "POST_404",
+            "게시글을 찾을 수 없습니다."),
+    POST_IMAGE_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "POST_404",
+            "게시글 이미지을 찾을 수 없습니다."),
+    IMAGE_STATUS_ORDER_LIST_REQUIRED(
+            HttpStatus.BAD_REQUEST,
+            "POST_400",
+            "이미지 요청 정보 목록이 필요합니다."),
+    IMAGE_STATUS_ORDER_REQUIRED(
+            HttpStatus.BAD_REQUEST,
+            "POST_400",
+            "이미지 요청 정보가 필요합니다."),
+    CANT_UPLOAD_EMPTY_MULTIPART_FILE(
+            HttpStatus.BAD_REQUEST,
+            "POST_400",
+            "null이거나 empty 상태의 파일을 업로드할 수 없습니다."),
+    REQUESTED_IMG_LARGER_THAN_EMPTY_SLOT(
+            HttpStatus.BAD_REQUEST,
+            "POST_400",
+            "빈 슬롯보다 요청 이미지가 많습니다."),
+    DUPLICATE_IMAGE_ID(
+            HttpStatus.BAD_REQUEST,
+            "POST_400",
+            "동일한 이미지를 중복 지정할 수 없습니다."),
+    NOT_POST_AUTHOR(
+            HttpStatus.FORBIDDEN,
+            "POST_403",
+            "해당 게시글의 작성자가 아닙니다."),
+    MAXIMUM_COUNT_IS_THREE(
+            HttpStatus.BAD_REQUEST,
+            "POST_400",
+            "이미지를 최대 3장까지 첨부할 수 있습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드

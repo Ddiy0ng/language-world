@@ -43,10 +43,7 @@ file:
 
 logging:
   level:
-    root: INFO
-    com.languageworld.be: DEBUG
-    org.springframework.security: INFO
     org.hibernate.SQL: DEBUG
-    org.springframework.jdbc.datasource.init: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
   file:
     name: ${LOG_FILE_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/logs/application.log}
