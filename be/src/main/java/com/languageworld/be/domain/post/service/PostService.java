@@ -142,17 +142,20 @@ public class PostService {
             }
 
             // 빈 multipartFile 불가
-            if(nullSafeMultipartFileList.stream().anyMatch(multipartFile -> multipartFile == null || multipartFile.isEmpty())) {
+            for (MultipartFile multipartFile : nullSafeMultipartFileList) {
 
-                CustomLogger.warn(
-                        LogEventCode.POST,
-                        "FAIL",
-                        LogEventReasonCode.CANT_UPLOAD_EMPTY_MULTIPART_FILE,
-                        LogEventReasonCode.CANT_UPLOAD_EMPTY_MULTIPART_FILE.getMessage(),
-                        userUuid.toString()
-                );
+                if (multipartFile == null || multipartFile.isEmpty()) {
 
-                throw new CustomException(CustomExceptionCode.CANT_UPLOAD_EMPTY_MULTIPART_FILE);
+                    CustomLogger.warn(
+                            LogEventCode.POST,
+                            "FAIL",
+                            LogEventReasonCode.CANT_UPLOAD_EMPTY_MULTIPART_FILE,
+                            LogEventReasonCode.CANT_UPLOAD_EMPTY_MULTIPART_FILE.getMessage(),
+                            userUuid.toString()
+                    );
+
+                    throw new CustomException(CustomExceptionCode.CANT_UPLOAD_EMPTY_MULTIPART_FILE);
+                }
             }
 
             // 정보, 이미지 개수 3이하
