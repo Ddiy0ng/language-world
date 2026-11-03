@@ -3,7 +3,7 @@ package com.languageworld.be.domain.user.controller;
 import com.languageworld.be.domain.user.dto.response.BlockedUserResponseDto;
 import com.languageworld.be.domain.user.service.BlockedUserService;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
-import com.languageworld.be.global.enumGroup.SuccessCode;
+import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import lombok.RequiredArgsConstructor;

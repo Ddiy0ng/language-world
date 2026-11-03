@@ -2,7 +2,7 @@ package com.languageworld.be.domain.user.service;
 
 import com.languageworld.be.domain.user.entity.BlockedUser;
 import com.languageworld.be.domain.user.repository.BlockedUserRepository;
-import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;

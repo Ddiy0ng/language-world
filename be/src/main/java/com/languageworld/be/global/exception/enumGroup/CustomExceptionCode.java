@@ -1,4 +1,4 @@
-package com.languageworld.be.global.enumGroup;
+package com.languageworld.be.global.exception.enumGroup;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -2,14 +2,13 @@ package com.languageworld.be.domain.post.service;
 
 import com.languageworld.be.domain.post.dto.response.LikePostResponseDto;
 import com.languageworld.be.domain.post.dto.response.IsLikedResponseDto;
-import com.languageworld.be.domain.post.entity.Comment;
 import com.languageworld.be.domain.post.entity.Like;
 import com.languageworld.be.domain.post.entity.Post;
 import com.languageworld.be.domain.post.repository.LikeRepository;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.service.UserUtil;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
-import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;

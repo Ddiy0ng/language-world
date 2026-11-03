@@ -4,7 +4,7 @@ import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;
 import com.languageworld.be.domain.language.repository.LanguageRepository;
 import com.languageworld.be.domain.language.repository.LevelRepository;
-import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import com.languageworld.be.global.exception.CustomException;

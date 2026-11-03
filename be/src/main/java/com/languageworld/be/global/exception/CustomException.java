@@ -1,6 +1,6 @@
 package com.languageworld.be.global.exception;
 
-import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

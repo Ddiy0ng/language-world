@@ -6,7 +6,7 @@ import com.languageworld.be.domain.term.dto.response.AgreedTermResponseDto;
 import com.languageworld.be.domain.term.dto.response.TermResponseDto;
 import com.languageworld.be.domain.term.service.TermService;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
-import com.languageworld.be.global.enumGroup.SuccessCode;
+import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import jakarta.validation.Valid;

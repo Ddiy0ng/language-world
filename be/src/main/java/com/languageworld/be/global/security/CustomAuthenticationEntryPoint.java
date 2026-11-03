@@ -1,6 +1,6 @@
-package com.languageworld.be.global.config.authEndpoint;
+package com.languageworld.be.global.security;
 
-import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;

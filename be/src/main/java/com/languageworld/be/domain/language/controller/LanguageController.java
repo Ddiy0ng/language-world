@@ -2,7 +2,7 @@ package com.languageworld.be.domain.language.controller;
 
 import com.languageworld.be.domain.language.dto.LanguageAndLevelResponseDto;
 import com.languageworld.be.domain.language.service.LanguageService;
-import com.languageworld.be.global.enumGroup.SuccessCode;
+import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import lombok.RequiredArgsConstructor;

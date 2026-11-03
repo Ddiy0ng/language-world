@@ -1,9 +1,8 @@
-package com.languageworld.be.global.config.jwt;
+package com.languageworld.be.global.jwt;
 
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
-import com.languageworld.be.global.enumGroup.CustomExceptionCode;
-import com.languageworld.be.global.jwt.JwtUtil;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import com.languageworld.be.global.exception.CustomException;

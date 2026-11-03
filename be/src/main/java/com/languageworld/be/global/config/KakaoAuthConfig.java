@@ -1,4 +1,4 @@
-package com.languageworld.be.global.config.oauth2;
+package com.languageworld.be.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

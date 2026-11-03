@@ -4,7 +4,7 @@ import com.languageworld.be.global.auth.dto.*;
 import com.languageworld.be.global.auth.dto.social.SocialSignupRequestDto;
 import com.languageworld.be.global.auth.dto.social.SocialLoginRequestDto;
 import com.languageworld.be.global.auth.service.AuthService;
-import com.languageworld.be.global.enumGroup.SuccessCode;
+import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import jakarta.validation.Valid;

@@ -5,7 +5,7 @@ import com.languageworld.be.domain.user.dto.response.UserInfoResponseDto;
 import com.languageworld.be.domain.user.dto.response.UserSummaryResponseDto;
 import com.languageworld.be.domain.user.service.UserService;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
-import com.languageworld.be.global.enumGroup.SuccessCode;
+import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import lombok.RequiredArgsConstructor;

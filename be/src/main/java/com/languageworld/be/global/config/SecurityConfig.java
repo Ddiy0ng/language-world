@@ -1,9 +1,9 @@
 package com.languageworld.be.global.config;
 
-import com.languageworld.be.global.config.authEndpoint.CustomAccessDeniedHandler;
-import com.languageworld.be.global.config.authEndpoint.CustomAuthenticationEntryPoint;
-import com.languageworld.be.global.config.jwt.JwtExceptionHandleFilter;
-import com.languageworld.be.global.config.jwt.JwtFilter;
+import com.languageworld.be.global.security.CustomAccessDeniedHandler;
+import com.languageworld.be.global.security.CustomAuthenticationEntryPoint;
+import com.languageworld.be.global.jwt.JwtExceptionHandleFilter;
+import com.languageworld.be.global.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

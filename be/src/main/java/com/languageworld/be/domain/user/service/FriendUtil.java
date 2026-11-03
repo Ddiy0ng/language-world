@@ -3,7 +3,7 @@ package com.languageworld.be.domain.user.service;
 import com.languageworld.be.domain.user.entity.Friend;
 import com.languageworld.be.domain.user.enumGroup.FriendStatusCode;
 import com.languageworld.be.domain.user.repository.FriendRepository;
-import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;

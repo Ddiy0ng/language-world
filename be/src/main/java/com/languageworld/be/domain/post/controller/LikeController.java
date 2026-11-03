@@ -4,7 +4,7 @@ import com.languageworld.be.domain.post.dto.response.LikePostResponseDto;
 import com.languageworld.be.domain.post.dto.response.IsLikedResponseDto;
 import com.languageworld.be.domain.post.service.LikeService;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
-import com.languageworld.be.global.enumGroup.SuccessCode;
+import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import lombok.RequiredArgsConstructor;

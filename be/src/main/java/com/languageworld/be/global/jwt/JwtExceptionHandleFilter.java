@@ -1,4 +1,4 @@
-package com.languageworld.be.global.config.jwt;
+package com.languageworld.be.global.jwt;
 
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.response.ApiResponse;

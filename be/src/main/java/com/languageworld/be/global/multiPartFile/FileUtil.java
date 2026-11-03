@@ -1,13 +1,13 @@
-package com.languageworld.be.global.multiPartFileUtil;
+package com.languageworld.be.global.multiPartFile;
 
-import com.languageworld.be.global.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
-import com.languageworld.be.global.enumGroup.SuccessCode;
+import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.log.CustomLogger;
-import com.languageworld.be.global.multiPartFileUtil.enumGroup.FilePurposeCode;
-import com.languageworld.be.global.multiPartFileUtil.enumGroup.FileTypeCode;
+import com.languageworld.be.global.multiPartFile.enumGroup.FilePurposeCode;
+import com.languageworld.be.global.multiPartFile.enumGroup.FileTypeCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
