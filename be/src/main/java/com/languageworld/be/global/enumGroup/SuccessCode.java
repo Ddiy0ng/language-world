@@ -175,16 +175,41 @@ public enum SuccessCode {
     POST_DETAIL_FIND_SUCCESS(
             HttpStatus.OK,
             "POST_200",
-            "게시글 상세 조회에 성공했습니다."
-    ), POST_CHANGE_SUCCESS(
+            "게시글 상세 조회에 성공했습니다."),
+    POST_CHANGE_SUCCESS(
             HttpStatus.OK,
             "POST_200",
-            "게시글 수정에 성공했습니다."
-    ), POST_REMOVE_SUCCESS(
+            "게시글 수정에 성공했습니다."),
+    POST_REMOVE_SUCCESS(
             HttpStatus.OK,
             "POST_200",
-            "게시글 삭제에 성공했습니다."
-    );
+            "게시글 삭제에 성공했습니다."),
+
+    // COMMENT
+    COMMENT_CREATE_SUCCESS(
+            HttpStatus.CREATED,
+            "POST_201",
+            "댓글 생성에 성공했습니다."),
+    AUTHENTICATED_USER_ALL_COMMENT_FIND_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "인증된 사용자가 작성한 댓글 목록 조회에 성공했습니다."),
+    SPECIFIC_USER_ALL_COMMENT_FIND_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "선택한 사용자가 작성한 댓글 목록 조회에 성공했습니다."),
+    POST_ALL_COMMENT_FIND_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "해당 게시글의 댓글 목록 조회에 성공했습니다."),
+    COMMENT_CHANGE_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "댓글 수정에 성공했습니다."),
+    COMMENT_REMOVE_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "댓글 삭제에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

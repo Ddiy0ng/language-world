@@ -1,12 +1,10 @@
 package com.languageworld.be.domain.post.entity;
 
-import com.languageworld.be.domain.post.dto.request.CommentCreateRequestDto;
+import com.languageworld.be.domain.post.dto.request.CommentRequestDto;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.global.baseEntity.ChangeableEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Builder
 @Table(name = "comments")
@@ -31,10 +29,10 @@ public class Comment extends ChangeableEntity {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    public static Comment of(CommentCreateRequestDto commentCreateRequestDto, User author, Post post) {
+    public static Comment of(CommentRequestDto commentRequestDto, User author, Post post) {
 
         Comment comment = Comment.builder()
-                .contentText(commentCreateRequestDto.content())
+                .contentText(commentRequestDto.content())
                 .author(author).post(post)
                 .build();
 

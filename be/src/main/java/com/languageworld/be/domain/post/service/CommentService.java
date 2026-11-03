@@ -1,18 +1,15 @@
 package com.languageworld.be.domain.post.service;
 
-import com.languageworld.be.domain.post.dto.request.CommentCreateRequestDto;
-import com.languageworld.be.domain.post.dto.request.CommentUpdateRequestDto;
-import com.languageworld.be.domain.post.dto.response.PostCommentResponseDto;
-import com.languageworld.be.domain.post.dto.response.UserCommentResponseDto;
+import com.languageworld.be.domain.post.dto.request.CommentRequestDto;
+import com.languageworld.be.domain.post.dto.response.CommentPostResponseDto;
+import com.languageworld.be.domain.post.dto.response.CommentUserResponseDto;
 import com.languageworld.be.domain.post.entity.Comment;
 import com.languageworld.be.domain.post.entity.Post;
-import com.languageworld.be.domain.post.enumGroup.PostTypeCode;
 import com.languageworld.be.domain.post.repository.CommentRepository;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.service.UserUtil;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +31,7 @@ public class CommentService {
     private final int SIZE = 10;
 
     @Transactional
-    public void createComment(CustomPrincipal customPrincipal, Long postId, CommentCreateRequestDto commentCreateRequestDto) {
+    public void createComment(CustomPrincipal customPrincipal, Long postId, CommentRequestDto commentRequestDto) {
 
         UUID userUuid = customPrincipal.uuid();
 
@@ -42,47 +39,48 @@ public class CommentService {
 
         Post post = postUtil.getPostByPostId(userUuid, postId);
 
-        Comment comment = Comment.of(commentCreateRequestDto, author, post);
+        Comment comment = Comment.of(commentRequestDto, author, post);
 
         commentRepository.save(comment);
     }
 
     @Transactional
-    public List<UserCommentResponseDto> findAuthenticatedUserCommentList(CustomPrincipal customPrincipal, Long cursor) {
+    public List<CommentUserResponseDto> findAuthenticatedUserCommentList(CustomPrincipal customPrincipal, Long cursor) {
 
         UUID userUuid = customPrincipal.uuid();
 
         Slice<Comment> commentSlice = findComment(userUuid, null, cursor);
-        List<UserCommentResponseDto> userCommentResponseDtoList = commentSlice.getContent().stream()
-                .map(UserCommentResponseDto::from)
+        List<CommentUserResponseDto> commentUserResponseDtoList = commentSlice.getContent().stream()
+                .map(CommentUserResponseDto::from)
                 .toList();
 
-        return userCommentResponseDtoList;
+        return commentUserResponseDtoList;
     }
 
     @Transactional
-    public List<UserCommentResponseDto> findSpecificUserCommentList(UUID userUuid, Long cursor) {
+    public List<CommentUserResponseDto> findSpecificUserCommentList(UUID userUuid, Long cursor) {
 
         Slice<Comment> commentSlice = findComment(userUuid, null, cursor);
-        List<UserCommentResponseDto> userCommentResponseDtoList = commentSlice.getContent().stream()
-                .map(UserCommentResponseDto::from)
+        List<CommentUserResponseDto> commentUserResponseDtoList = commentSlice.getContent().stream()
+                .map(CommentUserResponseDto::from)
+                .toList();
+
+        return commentUserResponseDtoList;
+    }
+
+    @Transactional
+    public List<CommentPostResponseDto> findPostCommentList(Long postId, Long cursor) {
+
+        Slice<Comment> commentSlice = findComment(null, postId, cursor);
+        List<CommentPostResponseDto> userCommentResponseDtoList = commentSlice.getContent().stream()
+                .map(CommentPostResponseDto::from)
                 .toList();
 
         return userCommentResponseDtoList;
     }
 
     @Transactional
-    public List<PostCommentResponseDto> findPostCommentList(Long postId, Long cursor) {
-
-        Slice<Comment> commentSlice = findComment(null, postId, cursor);
-        List<PostCommentResponseDto> userCommentResponseDtoList = commentSlice.getContent().stream()
-                .map(PostCommentResponseDto::from)
-                .toList();
-
-        return userCommentResponseDtoList;
-    }
-
-    public void changeComment(CustomPrincipal customPrincipal, Long commentId, CommentUpdateRequestDto commentUpdateRequestDto) {
+    public void changeComment(CustomPrincipal customPrincipal, Long commentId, CommentRequestDto commentRequestDto) {
 
         UUID userUuid = customPrincipal.uuid();
 
@@ -92,7 +90,7 @@ public class CommentService {
         // 작성자 조회 및 검증
         commentUtil.validateCommentAuthor(comment, userUuid);
 
-        comment.changeContent(commentUpdateRequestDto.content());
+        comment.changeContent(commentRequestDto.content());
     }
 
     @Transactional

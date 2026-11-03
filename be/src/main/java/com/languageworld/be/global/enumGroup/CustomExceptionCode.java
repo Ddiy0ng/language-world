@@ -253,7 +253,17 @@ public enum CustomExceptionCode {
     MAXIMUM_COUNT_IS_THREE(
             HttpStatus.BAD_REQUEST,
             "POST_400",
-            "이미지를 최대 3장까지 첨부할 수 있습니다.");
+            "이미지를 최대 3장까지 첨부할 수 있습니다."),
+
+    // COMMENT
+    COMMENT_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "POST_404",
+            "댓글을 찾을 수 없습니다."),
+    NOT_COMMENT_AUTHOR(
+            HttpStatus.FORBIDDEN,
+            "POST_403",
+            "해당 댓글의 작성자가 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드

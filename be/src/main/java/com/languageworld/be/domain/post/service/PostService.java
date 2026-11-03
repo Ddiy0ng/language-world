@@ -5,7 +5,7 @@ import com.languageworld.be.domain.post.dto.request.PostImageStatusOrderDto;
 import com.languageworld.be.domain.post.dto.request.PostUpdateRequestDto;
 import com.languageworld.be.domain.post.dto.response.PostResponseDto;
 import com.languageworld.be.domain.post.dto.response.PostSummaryResponseDto;
-import com.languageworld.be.domain.post.dto.response.SummaryPostCursorResponseDto;
+import com.languageworld.be.domain.post.dto.response.PostSummaryCursorResponseDto;
 import com.languageworld.be.domain.post.entity.Post;
 import com.languageworld.be.domain.post.entity.PostImage;
 import com.languageworld.be.domain.post.enumGroup.PostTypeCode;
@@ -96,7 +96,7 @@ public class PostService {
 
     // 전체, 일상, 헬프 + 본문 또는 제목 검색, 최신순 정렬, 페이지네이션 + 인덱싱): 사진1, 제목, 댓글 수, 좋아요 수
     @Transactional
-    public SummaryPostCursorResponseDto findAuthenticatedUserAllPost(CustomPrincipal customPrincipal, PostTypeCode postTypeCode, String keyword, Long cursor) {
+    public PostSummaryCursorResponseDto findAuthenticatedUserAllPost(CustomPrincipal customPrincipal, PostTypeCode postTypeCode, String keyword, Long cursor) {
 
         UUID userUuid = customPrincipal.uuid();
 
@@ -119,11 +119,11 @@ public class PostService {
             nextCursor = postSlice.getContent().get(postSlice.getNumberOfElements() - 1).getId();
         }
 
-        return SummaryPostCursorResponseDto.from(nextCursor, hasNext, postSummaryResponseDtoList);
+        return PostSummaryCursorResponseDto.from(nextCursor, hasNext, postSummaryResponseDtoList);
     }
 
     @Transactional
-    public SummaryPostCursorResponseDto findSpecificUserAllPost(CustomPrincipal customPrincipal, UUID authorUuid, PostTypeCode postTypeCode, String keyword, Long cursor) {
+    public PostSummaryCursorResponseDto findSpecificUserAllPost(CustomPrincipal customPrincipal, UUID authorUuid, PostTypeCode postTypeCode, String keyword, Long cursor) {
 
         Slice<Post> postSlice = findPost(authorUuid, postTypeCode, keyword, cursor);
 
@@ -140,11 +140,11 @@ public class PostService {
         if(hasNext && !postSlice.isEmpty())
             nextCursor = postSlice.getContent().get(postSlice.getNumberOfElements() - 1).getId();
 
-        return SummaryPostCursorResponseDto.from(nextCursor, hasNext, postSummaryResponseDtoList);
+        return PostSummaryCursorResponseDto.from(nextCursor, hasNext, postSummaryResponseDtoList);
     }
 
     @Transactional
-    public SummaryPostCursorResponseDto searchPost(CustomPrincipal customPrincipal, PostTypeCode postTypeCode, String keyword, Long cursor) {
+    public PostSummaryCursorResponseDto searchPost(CustomPrincipal customPrincipal, PostTypeCode postTypeCode, String keyword, Long cursor) {
 
         Slice<Post> postSlice = findPost(null, postTypeCode, keyword, cursor);
 
@@ -162,7 +162,7 @@ public class PostService {
             nextCursor = postSlice.getContent().get(postSlice.getNumberOfElements() - 1).getId();
 
 
-        return SummaryPostCursorResponseDto.from(nextCursor, hasNext, postSummaryResponseDtoList);
+        return PostSummaryCursorResponseDto.from(nextCursor, hasNext, postSummaryResponseDtoList);
     }
 
     @Transactional

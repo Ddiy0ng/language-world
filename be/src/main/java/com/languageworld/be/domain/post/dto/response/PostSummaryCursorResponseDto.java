@@ -5,21 +5,21 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record SummaryPostCursorResponseDto(
+public record PostSummaryCursorResponseDto(
 
         Long nextCursor,
         boolean hasNext,
         List<PostSummaryResponseDto> postSummaryResponseDtoList
 ){
 
-    public static SummaryPostCursorResponseDto from(Long nextCursor, boolean hasNext, List<PostSummaryResponseDto> postSummaryResponseDtoList) {
+    public static PostSummaryCursorResponseDto from(Long nextCursor, boolean hasNext, List<PostSummaryResponseDto> postSummaryResponseDtoList) {
 
-        SummaryPostCursorResponseDto summaryPostCursorResponseDto = SummaryPostCursorResponseDto.builder()
+        PostSummaryCursorResponseDto postSummaryCursorResponseDto = PostSummaryCursorResponseDto.builder()
                 .nextCursor(nextCursor)
                 .hasNext(hasNext)
                 .postSummaryResponseDtoList(postSummaryResponseDtoList)
                 .build();
 
-        return summaryPostCursorResponseDto;
+        return postSummaryCursorResponseDto;
     }
 }

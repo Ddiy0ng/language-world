@@ -4,7 +4,7 @@ import com.languageworld.be.domain.post.dto.request.PostCreateRequestDto;
 import com.languageworld.be.domain.post.dto.request.PostUpdateRequestDto;
 import com.languageworld.be.domain.post.dto.response.PostResponseDto;
 import com.languageworld.be.domain.post.dto.response.PostSummaryResponseDto;
-import com.languageworld.be.domain.post.dto.response.SummaryPostCursorResponseDto;
+import com.languageworld.be.domain.post.dto.response.PostSummaryCursorResponseDto;
 import com.languageworld.be.domain.post.enumGroup.PostTypeCode;
 import com.languageworld.be.domain.post.service.PostService;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
@@ -51,37 +51,37 @@ public class PostController {
 
     // TODO 내 게시글 전체 조회
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<SummaryPostCursorResponseDto>> findAuthenticatedUserPostList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                                      @RequestParam(required = false) PostTypeCode postTypeCode,
-                                                                                      @RequestParam(required = false) String keyword,
-                                                                                      @RequestParam(required = false) Long cursor) {
+    public ResponseEntity<ApiResponse<PostSummaryCursorResponseDto>> findAuthenticatedUserPostList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                                                                   @RequestParam(required = false) PostTypeCode postTypeCode,
+                                                                                                   @RequestParam(required = false) String keyword,
+                                                                                                   @RequestParam(required = false) Long cursor) {
 
-        SummaryPostCursorResponseDto postSummaryResponseDtoList = postService.findAuthenticatedUserAllPost(customPrincipal, postTypeCode, keyword, cursor);
+        PostSummaryCursorResponseDto postSummaryResponseDtoList = postService.findAuthenticatedUserAllPost(customPrincipal, postTypeCode, keyword, cursor);
 
         return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_ALL_POST_FIND_SUCCESS, postSummaryResponseDtoList);
     }
 
     // TODO 특정 사용자의 게시글 조회
     @GetMapping("/{authorUuid}")
-    public ResponseEntity<ApiResponse<SummaryPostCursorResponseDto>> findSpecificUserPostList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+    public ResponseEntity<ApiResponse<PostSummaryCursorResponseDto>> findSpecificUserPostList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
                                                                                               @PathVariable UUID authorUuid,
                                                                                               @RequestParam(required = false) PostTypeCode postTypeCode,
                                                                                               @RequestParam(required = false) String keyword,
                                                                                               @RequestParam(required = false) Long cursor) {
 
-        SummaryPostCursorResponseDto postSummaryResponseDtoList = postService.findSpecificUserAllPost(customPrincipal, authorUuid, postTypeCode, keyword, cursor);
+        PostSummaryCursorResponseDto postSummaryResponseDtoList = postService.findSpecificUserAllPost(customPrincipal, authorUuid, postTypeCode, keyword, cursor);
 
         return ResponseEntityUtil.success(SuccessCode.SPECIFIC_USER_ALL_POST_FIND_SUCCESS, postSummaryResponseDtoList);
     }
 
     // TODO 게시글 요약 검색 V1(게시글 타입에 따른 필터링-전체, 일상, 헬프 + 본문 또는 제목 검색, 최신순 정렬, 페이지네이션 + 인덱싱): 사진1, 제목, 댓글 수, 좋아요 수
     @GetMapping
-    public ResponseEntity<ApiResponse<SummaryPostCursorResponseDto>> searchPost(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+    public ResponseEntity<ApiResponse<PostSummaryCursorResponseDto>> searchPost(@AuthenticationPrincipal CustomPrincipal customPrincipal,
                                                                                 @RequestParam(required = false) PostTypeCode postTypeCode,
                                                                                 @RequestParam(required = false) String keyword,
                                                                                 @RequestParam(required = false) Long cursor) {
 
-        SummaryPostCursorResponseDto postSummaryResponseDtoList = postService.searchPost(customPrincipal, postTypeCode, keyword, cursor);
+        PostSummaryCursorResponseDto postSummaryResponseDtoList = postService.searchPost(customPrincipal, postTypeCode, keyword, cursor);
 
         return ResponseEntityUtil.success(SuccessCode.POST_SEARCH_SUCCESS, postSummaryResponseDtoList);
     }
