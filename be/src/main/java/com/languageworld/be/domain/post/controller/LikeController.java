@@ -1,7 +1,7 @@
 package com.languageworld.be.domain.post.controller;
 
 import com.languageworld.be.domain.post.dto.response.LikePostResponseDto;
-import com.languageworld.be.domain.post.dto.response.PostSummaryResponseDto;
+import com.languageworld.be.domain.post.dto.response.IsLikedResponseDto;
 import com.languageworld.be.domain.post.service.LikeService;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import com.languageworld.be.global.enumGroup.SuccessCode;
@@ -23,7 +23,7 @@ public class LikeController {
     private final LikeService likeService;
 
     // TODO 좋아요 추가
-    @RequestMapping("/post/{postId}")
+    @PostMapping("/post/{postId}")
     public ResponseEntity<ApiResponse<Void>> createLike(@AuthenticationPrincipal CustomPrincipal customPrincipal,
                                                         @PathVariable Long postId) {
 
@@ -34,25 +34,36 @@ public class LikeController {
 
     // TODO 인증된 사용자가 좋아요 추가한 게시글 전체 조회(postId + 게시글 제목)
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<List<LikePostResponseDto>>> findAuthenticatedUserLikePostList(@AuthenticationPrincipal CustomPrincipal customPrincipal) {
+    public ResponseEntity<ApiResponse<List<LikePostResponseDto>>> findAuthenticatedUserLikePostList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                                                                    @RequestParam(required = false) Long cursor) {
 
-        List<LikePostResponseDto> likePostResponseDtoList = likeService.findAuthenticatedUserLikePostList(customPrincipal);
+        List<LikePostResponseDto> likePostResponseDtoList = likeService.findAuthenticatedUserLikePostList(customPrincipal, cursor);
 
         return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_ALL_LIKE_FIND_SUCCESS, likePostResponseDtoList);
     }
 
     // TODO 특정 사용자가 좋아요 추가한 게시글 전체 조회
     @GetMapping("/{userUuid}")
-    public ResponseEntity<ApiResponse<List<LikePostResponseDto>>> findSpecificUserLikePostList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                                                  @PathVariable UUID userUuid) {
+    public ResponseEntity<ApiResponse<List<LikePostResponseDto>>> findSpecificUserLikePostList(@PathVariable UUID userUuid,
+                                                                                               @RequestParam(required = false) Long cursor) {
 
-        List<LikePostResponseDto> likePostResponseDtoList = likeService.findSpecificUserLikePostList(customPrincipal, userUuid);
+        List<LikePostResponseDto> likePostResponseDtoList = likeService.findSpecificUserLikePostList(userUuid, cursor);
 
         return ResponseEntityUtil.success(SuccessCode.SPECIFIC_USER_ALL_LIKE_FIND_SUCCESS, likePostResponseDtoList);
     }
 
+    // TODO 인증된 사용자의 해당 게시글에 대한 좋아요 여부 조회
+    @GetMapping("/post/{postId}")
+    public ResponseEntity<ApiResponse<IsLikedResponseDto>> findIsLiked(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                                        @PathVariable Long postId) {
+
+        IsLikedResponseDto isLikedResponseDtoList = likeService.findIsLiked(customPrincipal, postId);
+
+        return ResponseEntityUtil.success(SuccessCode.SPECIFIC_USER_ALL_LIKE_FIND_SUCCESS, isLikedResponseDtoList);
+    }
+
     // TODO 좋아요 삭제
-    @DeleteMapping("/likeId")
+    @DeleteMapping("/{likeId}")
     public ResponseEntity<ApiResponse<Void>> removeLike(@AuthenticationPrincipal CustomPrincipal customPrincipal,
                                                         @PathVariable Long likeId) {
 

@@ -2,7 +2,7 @@ package com.languageworld.be.domain.post.controller;
 
 import com.languageworld.be.domain.post.dto.request.PostCreateRequestDto;
 import com.languageworld.be.domain.post.dto.request.PostUpdateRequestDto;
-import com.languageworld.be.domain.post.dto.response.PostResponseDto;
+import com.languageworld.be.domain.post.dto.response.PostDetailResponseDto;
 import com.languageworld.be.domain.post.dto.response.PostSummaryResponseDto;
 import com.languageworld.be.domain.post.dto.response.PostSummaryCursorResponseDto;
 import com.languageworld.be.domain.post.enumGroup.PostTypeCode;
@@ -88,12 +88,12 @@ public class PostController {
 
     // TODO 게시글 상세 조회: 게시글 + 인증 유저의 좋아요 여부 확인
     @GetMapping("/detail/{postId}")
-    public ResponseEntity<ApiResponse<PostResponseDto>> findPostDetail(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                       @PathVariable Long postId) {
+    public ResponseEntity<ApiResponse<PostDetailResponseDto>> findPostDetail(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                                             @PathVariable Long postId) {
 
-        PostResponseDto postResponseDto = postService.findPostDetail(customPrincipal, postId);
+        PostDetailResponseDto postDetailResponseDto = postService.findPostDetail(customPrincipal, postId);
 
-        return ResponseEntityUtil.success(SuccessCode.POST_DETAIL_FIND_SUCCESS, postResponseDto);
+        return ResponseEntityUtil.success(SuccessCode.POST_DETAIL_FIND_SUCCESS, postDetailResponseDto);
     }
 
     // TODO 게시글 수정

@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 public record CommentPostResponseDto(
 
         UserSummaryResponseDto userSummaryResponseDto,
-        String title,
         Long commentId,
         String content,
         LocalDateTime modifiedAt
@@ -20,7 +19,6 @@ public record CommentPostResponseDto(
 
         CommentPostResponseDto commentPostResponseDto = CommentPostResponseDto.builder()
                 .userSummaryResponseDto(UserSummaryResponseDto.from(comment.getAuthor()))
-                .title(comment.getPost().getTitle())
                 .commentId(comment.getId())
                 .content(comment.getContentText())
                 .modifiedAt(comment.getModifiedAt())

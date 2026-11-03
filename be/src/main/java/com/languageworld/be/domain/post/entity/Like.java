@@ -3,13 +3,11 @@ package com.languageworld.be.domain.post.entity;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Table(name = "likes")
 @Entity
 @NoArgsConstructor
@@ -28,4 +26,14 @@ public class Like extends CreatableEntity {
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
+
+    public static Like of(User author, Post post) {
+
+        Like like = Like.builder()
+                .author(author)
+                .post(post)
+                .build();
+
+        return like;
+    }
 }

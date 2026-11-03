@@ -92,9 +92,15 @@ public enum LogEventReasonCode {
     POST_IMAGE_NOT_FOUND("게시글 이미지을 찾을 수 없습니다."),
     NOT_POST_AUTHOR("해당 게시글의 작성자가 아닙니다."),
     MAXIMUM_COUNT_IS_THREE("이미지를 최대 3장까지 첨부할 수 있습니다."),
+
     // COMMENT
     COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다."),
-    NOT_COMMENT_AUTHOR("해당 댓글의 작성자가 아닙니다.");
+    NOT_COMMENT_AUTHOR("해당 댓글의 작성자가 아닙니다."),
+
+    // LIKE
+    ALREADY_LIKED_POST("이미 좋아요 된 게시글입니다."),
+    LIKE_NOT_FOUND("좋아요를 찾을 수 없습니다."),
+    NOT_LIKE_AUTHOR("해당 좋아요를 추가한 사용자가 아닙니다.");
 
 
     private final String message;

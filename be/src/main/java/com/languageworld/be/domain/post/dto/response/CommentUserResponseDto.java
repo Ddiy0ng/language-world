@@ -11,8 +11,7 @@ public record CommentUserResponseDto(
 
         // TODO 인증된 사용자가 작성한 댓글 전체 조회(postId + 게시글 제목 + 댓글 + 댓글 id)
         UserSummaryResponseDto userSummaryResponseDto,
-        Long postId,
-        String title,
+        PostResponseDto postResponseDto,
         Long commentId,
         String content,
         LocalDateTime modifiedAt
@@ -21,8 +20,7 @@ public record CommentUserResponseDto(
 
         CommentUserResponseDto commentUserResponseDto = CommentUserResponseDto.builder()
                 .userSummaryResponseDto(UserSummaryResponseDto.from(comment.getAuthor()))
-                .postId(comment.getPost().getId())
-                .title(comment.getPost().getTitle())
+                .postResponseDto(PostResponseDto.from(comment.getPost()))
                 .commentId(comment.getId())
                 .content(comment.getContentText())
                 .modifiedAt(comment.getModifiedAt())

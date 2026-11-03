@@ -15,14 +15,12 @@ import java.util.UUID;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findAllByAuthor_Uuid(UUID userUuid);
-
     @Query(
         """
             SELECT comment
             FROM Comment comment
             WHERE comment.author.uuid = :uuid
-            ORDER BY comment.modifiedAt DESC
+            ORDER BY comment.id DESC
         """
     )
     Slice<Comment> findFirstSlice(@Param("uuid") UUID userUuid, Pageable pageable);
@@ -32,7 +30,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                 SELECT comment
                 FROM Comment comment
                 WHERE comment.post.id = :id
-                ORDER BY comment.modifiedAt DESC
+                ORDER BY comment.id DESC
             """
     )
     Slice<Comment> findFirstSlice(@Param("id") Long postId, Pageable pageable);
@@ -43,7 +41,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                 FROM Comment comment
                 WHERE comment.author.uuid = :uuid
                     AND comment.id < :cursor
-                ORDER BY comment.modifiedAt DESC
+                ORDER BY comment.id DESC
             """
     )
     Slice<Comment> findNextSlice(@Param("uuid") UUID userUuid, Pageable pageable, Long cursor);
@@ -54,7 +52,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                 FROM Comment comment
                 WHERE comment.post.id = :id
                     AND comment.id < :cursor
-                ORDER BY comment.modifiedAt DESC
+                ORDER BY comment.id DESC
             """
     )
     Slice<Comment> findNextSlice(@Param("id") Long postId, Pageable pageable, Long cursor);

@@ -202,6 +202,8 @@ public enum SuccessCode {
             HttpStatus.OK,
             "POST_200",
             "해당 게시글의 댓글 목록 조회에 성공했습니다."),
+
+    //COMMENT
     COMMENT_CHANGE_SUCCESS(
             HttpStatus.OK,
             "POST_200",
@@ -209,7 +211,25 @@ public enum SuccessCode {
     COMMENT_REMOVE_SUCCESS(
             HttpStatus.OK,
             "POST_200",
-            "댓글 삭제에 성공했습니다.");
+            "댓글 삭제에 성공했습니다."),
+
+    // LIKE
+    LIKE_CREATE_SUCCESS(
+            HttpStatus.CREATED,
+            "POST_201",
+            "좋아요 추가에 성공했습니다."),
+    AUTHENTICATED_USER_ALL_LIKE_FIND_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "인증된 사용자가 추가한 좋아요 목록 조회에 성공했습니다."),
+    SPECIFIC_USER_ALL_LIKE_FIND_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "특정 사용자가 추가한 좋아요 목록 조회에 성공했습니다."),
+    LIKE_REMOVE_SUCCESS(
+            HttpStatus.OK,
+            "POST_200",
+            "좋아요 취소에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

@@ -3,7 +3,7 @@ package com.languageworld.be.domain.post.service;
 import com.languageworld.be.domain.post.dto.request.PostCreateRequestDto;
 import com.languageworld.be.domain.post.dto.request.PostImageStatusOrderDto;
 import com.languageworld.be.domain.post.dto.request.PostUpdateRequestDto;
-import com.languageworld.be.domain.post.dto.response.PostResponseDto;
+import com.languageworld.be.domain.post.dto.response.PostDetailResponseDto;
 import com.languageworld.be.domain.post.dto.response.PostSummaryResponseDto;
 import com.languageworld.be.domain.post.dto.response.PostSummaryCursorResponseDto;
 import com.languageworld.be.domain.post.entity.Post;
@@ -166,13 +166,13 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto findPostDetail(CustomPrincipal customPrincipal, Long postId) {
+    public PostDetailResponseDto findPostDetail(CustomPrincipal customPrincipal, Long postId) {
 
         UUID userUuid = customPrincipal.uuid();
 
         Post post = postUtil.getPostByPostId(userUuid, postId);
 
-        return PostResponseDto.from(post, post.getCommentList().size(), post.getLikeList().size());
+        return PostDetailResponseDto.from(post, post.getCommentList().size(), post.getLikeList().size());
     }
 
     @Transactional

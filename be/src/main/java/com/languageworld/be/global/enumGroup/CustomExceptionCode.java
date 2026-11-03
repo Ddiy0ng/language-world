@@ -263,7 +263,22 @@ public enum CustomExceptionCode {
     NOT_COMMENT_AUTHOR(
             HttpStatus.FORBIDDEN,
             "POST_403",
-            "해당 댓글의 작성자가 아닙니다.");
+            "해당 댓글의 작성자가 아닙니다."),
+
+    // LIKE
+    ALREADY_LIKED_POST(
+            HttpStatus.BAD_REQUEST,
+            "POST_400",
+            "이미 좋아요 된 게시글입니다."),
+    LIKE_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "POST_404",
+            "좋아요를 찾을 수 없습니다." ),
+    NOT_LIKE_AUTHOR(
+            HttpStatus.FORBIDDEN,
+            "POST_403",
+            "해당 좋아요를 추가한 사용자가 아닙니다."
+    );
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드

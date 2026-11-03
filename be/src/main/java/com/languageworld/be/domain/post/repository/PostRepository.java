@@ -30,7 +30,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                         OR LOWER(post.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
                         OR LOWER(post.contentText) LIKE LOWER(CONCAT('%', :keyword, '%'))
                     )
-                ORDER BY post.createdAt DESC
+                ORDER BY post.id DESC
             """
     )
     Slice<Post> findFirstSlice(@Param("type") PostTypeCode postTypeCode, String keyword, Pageable pageable);
@@ -49,7 +49,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                         OR LOWER(post.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
                         OR LOWER(post.contentText) LIKE LOWER(CONCAT('%', :keyword, '%'))
                     )
-                ORDER BY post.createdAt DESC
+                ORDER BY post.id DESC
             """
     )
     Slice<Post> findFirstSlice(@Param("uuid") UUID userUuid, @Param("type") PostTypeCode postTypeCode, String keyword, Pageable pageable);
@@ -68,7 +68,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                         OR LOWER(post.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
                         OR LOWER(post.contentText) LIKE LOWER(CONCAT('%', :keyword, '%'))
                     )
-                ORDER BY post.createdAt DESC
+                ORDER BY post.id DESC
             """
     )
     Slice<Post> findNextSlice(@Param("type") PostTypeCode postTypeCode, String keyword, Pageable pageable, Long cursor);
@@ -88,7 +88,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                         OR LOWER(post.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
                         OR LOWER(post.contentText) LIKE LOWER(CONCAT('%', :keyword, '%'))
                     )
-                ORDER BY post.createdAt DESC
+                ORDER BY post.id DESC
             """
     )
     Slice<Post> findNextSlice(@Param("uuid") UUID userUuid, @Param("type") PostTypeCode postTypeCode, String keyword, Pageable pageable, Long cursor);
