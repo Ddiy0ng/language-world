@@ -31,8 +31,7 @@ public class SecurityConfig {
             "/auth/signup/**",
             "/auth/login/**",
             "/language",    // 지원 언어, 레벨 조회
-            "/term/active",  // 활성화된(필수) 약관 조회
-            "/like/**"
+            "/term/active"  // 활성화된(필수) 약관 조회
     };
 
     private final String[] ADMIN_AUTH_URL = {
@@ -46,7 +45,8 @@ public class SecurityConfig {
             "/term/agreed/**",
             "/user/**",
             "/friend/**",
-            "/post/**"
+            "/post/**",
+            "/like/**"
     };
 
     //SecurityFilterChain Bean
