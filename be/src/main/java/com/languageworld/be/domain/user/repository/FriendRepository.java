@@ -1,6 +1,7 @@
 package com.languageworld.be.domain.user.repository;
 
 import com.languageworld.be.domain.user.entity.Friend;
+import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.enumGroup.FriendStatusCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -101,4 +102,6 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
             @Param("status") FriendStatusCode friendStatusCode);
 
     Optional<Friend> findByIdAndFriendStatus(Long friendId, FriendStatusCode friendStatusCode);
+
+    void deleteAllByUserOrFriend(User user, User friend);
 }

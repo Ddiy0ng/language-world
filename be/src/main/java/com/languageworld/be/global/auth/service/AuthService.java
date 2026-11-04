@@ -3,6 +3,9 @@ package com.languageworld.be.global.auth.service;
 import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;
 import com.languageworld.be.domain.language.service.LanguageUtil;
+import com.languageworld.be.domain.post.repository.CommentRepository;
+import com.languageworld.be.domain.post.repository.LikeRepository;
+import com.languageworld.be.domain.post.repository.PostRepository;
 import com.languageworld.be.domain.term.entity.AgreedTerm;
 import com.languageworld.be.domain.term.entity.Term;
 import com.languageworld.be.domain.term.enumGroup.TermPurposeCode;
@@ -11,25 +14,34 @@ import com.languageworld.be.domain.term.service.TermUtil;
 import com.languageworld.be.domain.user.entity.ServiceAccount;
 import com.languageworld.be.domain.user.entity.SocialAccount;
 import com.languageworld.be.domain.user.entity.User;
-import com.languageworld.be.domain.user.repository.ServiceAccountRepository;
-import com.languageworld.be.domain.user.repository.SocialAccountRepository;
-import com.languageworld.be.domain.user.repository.UserRepository;
-import com.languageworld.be.global.auth.dto.*;
-import com.languageworld.be.global.auth.dto.social.*;
+import com.languageworld.be.domain.user.repository.*;
+import com.languageworld.be.domain.user.service.UserUtil;
+import com.languageworld.be.global.auth.dto.request.*;
+import com.languageworld.be.global.auth.dto.response.LoginResponseDto;
+import com.languageworld.be.global.auth.dto.response.TokenReissueResponseDto;
+import com.languageworld.be.global.auth.entity.CustomPrincipal;
+import com.languageworld.be.global.auth.entity.RefreshToken;
 import com.languageworld.be.global.auth.entity.SocialAuthorizedUser;
 import com.languageworld.be.global.auth.enumGroup.SocialTypeCode;
 import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
+import com.languageworld.be.global.auth.repository.RefreshTokenRepository;
 import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.jwt.JwtUtil;
+import com.languageworld.be.global.multiPartFile.FileUtil;
+import com.languageworld.be.global.multiPartFile.enumGroup.FilePurposeCode;
 import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.jwt.JwtProvider;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
+import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +50,21 @@ public class AuthService {
     private final UserRepository userRepository;
     private final ServiceAccountRepository serviceAccountRepository;
     private final SocialAccountRepository socialAccountRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final AgreedTermRepository agreedTermRepository;
+    private final FriendRepository friendRepository;
+    private final BlockedUserRepository blockedUserRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
     private final LanguageUtil languageUtil;
     private final TermUtil termUtil;
     private final PasswordUtil passwordUtil;
-    private final GoogleUtil googleUtil;
-    private final KakaoUtil kakaoUtil;
+    private final JwtUtil jwtUtil;
+    private final AuthUtil authUtil;
+    private final UserUtil userUtil;
+    private final FileUtil fileUtil;
+    private final RefreshTokenUtil refreshTokenUtil;
     private final JwtProvider jwtProvider;
 
     // 서비스 자체 회원가입
@@ -152,11 +173,14 @@ public class AuthService {
         User user = serviceAccount.getUser();
 
         if(user.getUserRole() != UserRoleCode.ADMIN)
-            userRoleChangeAccordingToTerm(user);
+            authUtil.userRoleChangeAccordingToTerm(user);
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
         String refreshToken = jwtProvider.generateRefreshToken(user);
+        RefreshToken refreshTokenEntity = RefreshToken.of(jwtUtil.getValidateClaimsFromToken(JwtUtil.REFRESH, refreshToken), user);
+        refreshTokenRepository.save(refreshTokenEntity);
+
         LoginResponseDto loginResponseDto = LoginResponseDto.of(accessToken, refreshToken);
         CustomLogger.info(
                 LogEventCode.AUTH,
@@ -174,7 +198,7 @@ public class AuthService {
 
         SocialTypeCode type = SocialTypeCode.from(socialSignupType);
         String token = socialSignupRequestDto.token();
-        SocialAuthorizedUser socialAuthorizedUser = getSocialAuthorizedUserBySocialType(type, token);
+        SocialAuthorizedUser socialAuthorizedUser = authUtil.getSocialAuthorizedUserBySocialType(type, token);
 
         // 소셜 파트
         String sub = socialAuthorizedUser.sub();
@@ -182,7 +206,7 @@ public class AuthService {
 
         // spring 파트
         //회원가입 여부 확인;
-        validateUserExistForSignup(type, sub);
+        authUtil.validateUserExistForSignup(type, sub);
 
         // 참조 객체
         Language motherTongue = languageUtil.getLanguageById(socialSignupRequestDto.motherTongueId());
@@ -231,20 +255,23 @@ public class AuthService {
 
         SocialTypeCode type = SocialTypeCode.from(socialLoginType);
         String token = socialLoginRequestDto.token();
-        SocialAuthorizedUser socialAuthorizedUser = getSocialAuthorizedUserBySocialType(type, token);
+        SocialAuthorizedUser socialAuthorizedUser = authUtil.getSocialAuthorizedUserBySocialType(type, token);
 
         // 사용자 존재 확인
         String sub = socialAuthorizedUser.sub();
-        SocialAccount socialAccount = validateUserExistForLogin(type, sub);
+        SocialAccount socialAccount = authUtil.validateUserExistForLogin(type, sub);
         User user = socialAccount.getUser();
 
         // TODO 약관 동의 여부 확인(활성화된 약관)
         if(user.getUserRole() != UserRoleCode.ADMIN)
-            userRoleChangeAccordingToTerm(user);
+            authUtil.userRoleChangeAccordingToTerm(user);
 
         // 로그인
         String accessToken = jwtProvider.generateAccessToken(user);
         String refreshToken = jwtProvider.generateRefreshToken(user);
+        RefreshToken refreshTokenEntity = RefreshToken.of(jwtUtil.getValidateClaimsFromToken(JwtUtil.REFRESH, refreshToken), user);
+        refreshTokenRepository.save(refreshTokenEntity);
+
         LoginResponseDto loginResponseDto = LoginResponseDto.of(accessToken, refreshToken);
         CustomLogger.info(
                 LogEventCode.AUTH,
@@ -256,59 +283,161 @@ public class AuthService {
         return loginResponseDto;
     }
 
-    // 소셜 코드에 따라 인증 유저 가져오기
-    private SocialAuthorizedUser getSocialAuthorizedUserBySocialType(SocialTypeCode socialTypeCode, String token) {
+    // 토큰 재발급
+    @Transactional
+    public TokenReissueResponseDto reissueToken(RefreshTokenRequestDto refreshTokenRequestDto) {
 
-        return switch(socialTypeCode) {
-            case GOOGLE -> googleUtil.verifyGoogleIdToken(token);
-            case KAKAO -> kakaoUtil.getSocialAuthorizedUser(token);
-        };
+        Claims claims = jwtUtil.getValidateClaimsFromToken(JwtUtil.REFRESH, refreshTokenRequestDto.refreshToken());
+        String tokenId = claims.getId();
+
+        RefreshToken oldRefreshToken = refreshTokenUtil.getRefreshToken(tokenId);
+
+        // 토큰 소유자 검증: tokenId 기준 조회한 db에 저장된 토큰 소유자 vs jwt 내부 사용자
+        // user.getUuid: 요청 dto로 넘어온 token의 claims에서 추출한 id를 기준으로 db의 refresh token 찾아 추출한 소유자 user의 uuid
+        // uuid: 요청dto로 넘어온 token의 claims에서 추출한 uuid
+        User user = oldRefreshToken.getUser();
+        UUID uuid = UUID.fromString(jwtUtil.getUuid(claims));
+        if(!user.getUuid().equals(uuid)) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.TOKEN_SUB_DB_UUID_NOT_SAME,
+                    LogEventReasonCode.TOKEN_SUB_DB_UUID_NOT_SAME.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+        }
+
+        // 만료 검증
+        if(oldRefreshToken.getExpiredAt().before(new Date())) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.EXPIRED_TOKEN,
+                    LogEventReasonCode.EXPIRED_TOKEN.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+        }
+
+        // 토큰 소유자 탈퇴 여부
+        if(user.getDeletedAt() != null) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.DELETED_USER_TOKEN,
+                    LogEventReasonCode.DELETED_USER_TOKEN.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+        }
+
+        // 새 토큰 발급
+        String newAccessToken = jwtProvider.generateAccessToken(user);
+        String newRefreshToken = jwtProvider.generateRefreshToken(user);
+        Claims newRefreshTokenClaim = jwtUtil.getValidateClaimsFromToken(JwtUtil.REFRESH, newRefreshToken);
+
+        refreshTokenRepository.delete(oldRefreshToken);
+        RefreshToken refreshTokenEntity = RefreshToken.of(newRefreshTokenClaim, user);
+        refreshTokenRepository.save(refreshTokenEntity);
+
+        TokenReissueResponseDto tokenReissueResponseDto = TokenReissueResponseDto.of(newAccessToken, newRefreshToken);
+
+        return tokenReissueResponseDto;
     }
 
-    // 사용자 존재 여부 확인: signup type + sub
-    private void validateUserExistForSignup(SocialTypeCode socialTypeCode, String sub) {
+    public void logout(CustomPrincipal customPrincipal, RefreshTokenRequestDto refreshTokenRequestDto) {
 
-        Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findBySignupTypeAndSub(socialTypeCode, sub);
+        UUID userUuid = customPrincipal.uuid();
+
+        Claims claims = jwtUtil.getValidateClaimsFromToken(JwtUtil.REFRESH, refreshTokenRequestDto.refreshToken());
+        String tokenId = claims.getId();
+        UUID tokenClaimUuid = UUID.fromString(claims.getSubject());
+
+        RefreshToken refreshToken = refreshTokenUtil.getRefreshToken(tokenId);
+
+        refreshTokenUtil.refreshTokenOwnerCheck(userUuid, tokenClaimUuid, refreshToken.getUser().getUuid());
+
+        refreshTokenRepository.delete(refreshToken);
+    }
+
+    @Transactional
+    public void removeUser(CustomPrincipal customPrincipal) {
+
+        UUID uuid = customPrincipal.uuid();
+        User user = userUtil.getUserByUuid(uuid);
+        String profileImageUrl = user.getProfileImageUrl();
+
+        // 탈퇴 여부 확인
+        if(user.getDeletedAt() != null) {
+            CustomLogger.warn(
+                    LogEventCode.USER,
+                    "FAIL",
+                    LogEventReasonCode.DELETED_USER,
+                    LogEventReasonCode.DELETED_USER.getMessage(),
+                    uuid.toString()
+            );
+
+            throw new CustomException(CustomExceptionCode.DELETED_USER);
+        }
+
+        // TODO 리플레시 토큰 삭제
+        refreshTokenRepository.deleteAllByUser(user);
+
+        // 서비스 유저면 서비스 계정 삭제
+        Optional<ServiceAccount> optionalServiceAccount = serviceAccountRepository.findByUser_Uuid(uuid);
+        if(optionalServiceAccount.isPresent()) {
+
+            serviceAccountRepository.delete(optionalServiceAccount.get());
+
+            CustomLogger.info(
+                    LogEventCode.USER,
+                    "SUCCESS",
+                    SuccessCode.SERVICE_ACCOUNT_REMOVE_SUCCESS.getMessage(),
+                    uuid.toString()
+            );
+        }
+
+        // 소셜 유저면 소셜 계정 삭제
+        Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findByUser_Uuid(uuid);
         if(optionalSocialAccount.isPresent()) {
 
-            CustomLogger.warn(
-              LogEventCode.SOCIAL,
-                    "FAIL",
-                    LogEventReasonCode.SOCIAL_SUB_ALREADY_EXIST,
-                    LogEventReasonCode.SOCIAL_SUB_ALREADY_EXIST.getMessage() + " - type: " + socialTypeCode + ", sub: " + sub,
-                    null
+            socialAccountRepository.delete(optionalSocialAccount.get());
+
+            CustomLogger.info(
+                    LogEventCode.USER,
+                    "SUCCESS",
+                    SuccessCode.SOCIAL_ACCOUNT_REMOVE_SUCCESS.getMessage(),
+                    uuid.toString()
             );
-
-            throw new CustomException(CustomExceptionCode.ACCOUNT_ALREADY_EXIST);
-        }
-    }
-
-    // 사용자 존재 여부 확인: login type + sub
-    private SocialAccount validateUserExistForLogin(SocialTypeCode loginTypeCode, String sub) {
-
-        Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findBySignupTypeAndSub(loginTypeCode, sub);
-        if(optionalSocialAccount.isEmpty()) {
-
-            CustomLogger.warn(
-                    LogEventCode.SOCIAL,
-                    "FAIL",
-                    LogEventReasonCode.SOCIAL_SUB_NOT_EXIST,
-                    LogEventReasonCode.SOCIAL_SUB_NOT_EXIST.getMessage() + " - type: " + loginTypeCode +  " - sub: " + sub,
-                    null
-            );
-
-            throw new CustomException(CustomExceptionCode.ACCOUNT_NOT_EXIST);
         }
 
-        SocialAccount socialAccount = optionalSocialAccount.get();
+        // 동의 약관 삭제
+        agreedTermRepository.deleteAllByUser(user);
 
-        return socialAccount;
-    }
+        // TODO 친구 관계 삭제, 차단 관계 삭제
+        friendRepository.deleteAllByUserOrFriend(user,user);
+        blockedUserRepository.deleteAllByUserOrBlockedUser(user, user);
 
-    private void userRoleChangeAccordingToTerm(User user) {
+        // TODO 포스트, 좋아요, 댓글 삭제
+        likeRepository.deleteAllByAuthor(user);
+        commentRepository.deleteAllByAuthor(user);
+        postRepository.deleteAllByAuthor(user);
 
-        UserRoleCode userTypeCode = termUtil.validateTermCheck(agreedTermRepository.findAllByUser_Uuid(user.getUuid()));
+        // TODO 채팅 내역 삭제(모든 사용자 제거 시 또는 퇴장 시)
 
-        user.changeUserRole(userTypeCode);
+        // TODO 게임 기록 삭제
+
+        // 사용자 테이블의 식별 컬럼 null 처리
+        user.softDeleteUser(authUtil.calculateAgeGroup(user.getBirth()));
+
+        // TODO 유저 프로필 실제 삭제
+        fileUtil.deleteFile(FilePurposeCode.PROFILE, profileImageUrl);
     }
 }

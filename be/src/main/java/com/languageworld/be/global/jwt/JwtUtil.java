@@ -1,38 +1,42 @@
 package com.languageworld.be.global.jwt;
 
+import com.languageworld.be.global.auth.entity.CustomPrincipal;
+import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
-import com.languageworld.be.global.exception.CustomException;
-import com.languageworld.be.global.log.CustomLogger;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
 
-    private final static String JWT_PREFIX = "Bearer ";
-    private final SecretKey JWT_SECRET_KEY;
+    public final static String JWT_PREFIX = "Bearer ";
+    public final static String AUTHORIZATION = "Authorization";
+    public final static String ROLE = "userRole";
+    public final static String TYPE = "tokenType";
+    public final static String ACCESS = "ACCESS_TOKEN";
+    public final static String REFRESH = "REFRESH_TOKEN";
 
-    public JwtUtil(@Value("${jwt.secret}") String secretKey) {
-
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey); //base64로 인코딩된 문자열을 복호화
-        JWT_SECRET_KEY = Keys.hmacShaKeyFor(keyBytes); // HS256 같은 HMAC 서명에 사용할 수 있는 SecretKey 객체로 변환
-    }
+    private final SecretKey secretKey;
 
     // jwt 추출
     public String resolveToken(HttpServletRequest httpServletRequest) {
 
-        String authorizationHeader = httpServletRequest.getHeader("Authorization");
+        String authorizationHeader = httpServletRequest.getHeader(AUTHORIZATION);
 
         // auth header 검증
         if(authorizationHeader == null)
@@ -48,13 +52,13 @@ public class JwtUtil {
     }
 
     // Claim 추출
-    public Claims getClaims(String token) {
+    private Claims getClaims(String token) {
 
         Claims claims;
 
         try {
             claims = Jwts.parser()
-                    .verifyWith(JWT_SECRET_KEY)
+                    .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -83,6 +87,75 @@ public class JwtUtil {
         return claims;
     }
 
+    public Claims getValidateClaimsFromToken(String purpose, String token) {
+
+        if(purpose.equals(REFRESH)) {
+
+            if (token == null) {
+
+                CustomLogger.warn(
+                        LogEventCode.JWT,
+                        "FAIL",
+                        LogEventReasonCode.JWT_TOKEN_NULL,
+                        LogEventReasonCode.JWT_TOKEN_NULL.getMessage(),
+                        null
+                );
+
+                throw new CustomException(CustomExceptionCode.INVALID_TOKEN); //CustomException 처리: 토큰 공백
+            }
+        }
+
+        if (token.isBlank()) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.JWT_TOKEN_NULL,
+                    LogEventReasonCode.JWT_TOKEN_NULL.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN); //CustomException 처리: 토큰 공백
+        }
+
+        Claims claims = getClaims(token);
+
+        switch(purpose) {
+            case ACCESS -> {
+
+                if(!ACCESS.equals(getTokenType(claims)) || claims.getSubject() == null || claims.getSubject().isBlank()) {
+
+                    CustomLogger.warn(
+                            LogEventCode.JWT,
+                            "FAIL",
+                            LogEventReasonCode.ACCESS_TOKEN_REQUIRED,
+                            LogEventReasonCode.ACCESS_TOKEN_REQUIRED.getMessage() + " - Requested token type: " + getTokenType(claims),
+                            null
+                    );
+
+                    throw new CustomException(CustomExceptionCode.INVALID_TOKEN); // CustomException 처리: 액세스 토큰 필요
+                }
+            }
+            case REFRESH -> {
+
+                if(!REFRESH.equals(getTokenType(claims)) || claims.getId() == null || claims.getId().isBlank() || claims.getSubject() == null || claims.getSubject().isBlank()) {
+
+                    CustomLogger.warn(
+                            LogEventCode.JWT,
+                            "FAIL",
+                            LogEventReasonCode.ACCESS_TOKEN_REQUIRED,
+                            LogEventReasonCode.ACCESS_TOKEN_REQUIRED.getMessage() + " - Requested token type: " + getTokenType(claims),
+                            null
+                    );
+
+                    throw new CustomException(CustomExceptionCode.INVALID_TOKEN); // CustomException 처리: 액세스 토큰 필요
+                }
+            }
+        }
+
+        return claims;
+    }
+
     // userUuid 추출
     public String getUuid(Claims claims) {
 
@@ -94,7 +167,7 @@ public class JwtUtil {
     // userRole 추출
     public String getUserRole(Claims claims) {
 
-        String userRole = claims.get("userRole", String.class);
+        String userRole = claims.get(ROLE, String.class);
 
         return userRole;
     }
@@ -102,8 +175,26 @@ public class JwtUtil {
     // tokenType 추출
     public String getTokenType(Claims claims) {
 
-        String tokenType = claims.get("tokenType", String.class);
+        String tokenType = claims.get(TYPE, String.class);
 
         return tokenType;
     }
+
+    // Authentication 생성
+    public Authentication createAuthentication(Claims claims) {
+
+        String uuid = getUuid(claims);
+        String userRole = getUserRole(claims);
+
+        CustomPrincipal customPrincipal = CustomPrincipal.of(uuid, userRole);
+        Authentication authentication = UsernamePasswordAuthenticationToken
+                .authenticated(
+                        customPrincipal,
+                        null,
+                        List.of(new SimpleGrantedAuthority(getUserRole(claims)))
+                );
+
+        return authentication;
+    }
+
 }

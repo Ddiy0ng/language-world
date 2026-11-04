@@ -2,13 +2,12 @@ package com.languageworld.be.global.jwt;
 
 import com.languageworld.be.domain.user.entity.User;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtProvider {
@@ -18,13 +17,12 @@ public class JwtProvider {
     private final Long REFRESH_EXPIRATION;
 
     public JwtProvider(
-            @Value("${jwt.secret}") String secretKey,
+            SecretKey secretKey,
             @Value("${jwt.access-token-expiration}") Long accessExpiration,
             @Value("${jwt.refresh-token-expiration}") Long refreshExpiration
     ) {
 
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey); //base64로 인코딩된 문자열을 복호화
-        JWT_SECRET_KEY = Keys.hmacShaKeyFor(keyBytes); // HS256 같은 HMAC 서명에 사용할 수 있는 SecretKey 객체로 변환
+        JWT_SECRET_KEY = secretKey;
         ACCESS_EXPIRATION = accessExpiration;
         REFRESH_EXPIRATION = refreshExpiration;
     }
@@ -36,8 +34,8 @@ public class JwtProvider {
 
         String accessToken = Jwts.builder()
                 .subject(user.getUuid().toString())
-                .claim("userRole", user.getUserRole().name())
-                .claim("tokenType", "ACCESS_TOKEN")
+                .claim(JwtUtil.ROLE, user.getUserRole().name())
+                .claim(JwtUtil.TYPE, JwtUtil.ACCESS)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + ACCESS_EXPIRATION)) //만료 시각
                 .signWith(JWT_SECRET_KEY)
@@ -52,8 +50,9 @@ public class JwtProvider {
         Date now = new Date();
 
         String refreshToken = Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(user.getUuid().toString())
-                .claim("tokenType", "REFRESH_TOKEN")
+                .claim(JwtUtil.TYPE, JwtUtil.REFRESH)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + REFRESH_EXPIRATION)) //만료 시각
                 .signWith(JWT_SECRET_KEY)

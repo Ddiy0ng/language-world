@@ -140,42 +140,4 @@ public class UserService {
         // TODO 로컬 이미지 삭제
         fileUtil.deleteFile(FilePurposeCode.PROFILE, oldProfileImageUrl);
     }
-
-    @Transactional
-    public void removeUser(CustomPrincipal customPrincipal) {
-
-        UUID uuid = customPrincipal.uuid();
-        User user = userUtil.getUserByUuid(uuid);
-        String profileImageUrl = user.getProfileImageUrl();
-
-        // 탈퇴 여부 확인
-        if(user.getDeletedAt() != null) {
-            CustomLogger.warn(
-              LogEventCode.USER,
-              "FAIL",
-              LogEventReasonCode.DELETED_USER,
-              LogEventReasonCode.DELETED_USER.getMessage(),
-              uuid.toString()
-            );
-        }
-
-        // 서비스 유저면 서비스 계정 삭제
-        userUtil.deleteIfServiceAccountExist(uuid);
-
-        // 소셜 유저면 소셜 계정 삭제
-        userUtil.deleteIfSocialAccountExist(uuid);
-
-        // 동의 약관 삭제
-        termUtil.deleteAgreedTermList(uuid);
-
-        // TODO 포스트, 좋아요, 댓글 삭제
-
-        // TODO 게임 기록 삭제
-
-        // 사용자 테이블의 식별 컬럼 null 처리
-        user.softDeleteUser(userUtil.calculateAgeGroup(user.getBirth()));
-
-        // TODO 유저 프로필 실제 삭제
-        fileUtil.deleteFile(FilePurposeCode.PROFILE, profileImageUrl);
-    }
 }

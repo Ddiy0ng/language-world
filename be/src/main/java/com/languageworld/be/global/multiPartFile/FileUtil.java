@@ -118,7 +118,7 @@ public class FileUtil {
      }
     }
 
-    public void registerCleanUp(UUID userUuid, FilePurposeCode filePurposeCode, List<String> deleteOnCommit, List<String> deleteOnRollback) {
+    public void registerCleanUp(FilePurposeCode filePurposeCode, List<String> deleteOnCommit, List<String> deleteOnRollback) {
 
         if(!TransactionSynchronizationManager.isActualTransactionActive() || !TransactionSynchronizationManager.isSynchronizationActive()) {
 

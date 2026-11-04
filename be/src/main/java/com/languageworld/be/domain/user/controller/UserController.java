@@ -99,13 +99,4 @@ public class UserController {
         return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_PROFILE_CHANGE_SUCCESS);
     }
 
-    // TODO 인증된 사용자 회원 탈퇴(SoftDelete)
-    @DeleteMapping("/me")
-    public ResponseEntity<ApiResponse<Void>> removeUser(@AuthenticationPrincipal CustomPrincipal customPrincipal) {
-
-        userService.removeUser(customPrincipal);
-
-        return ResponseEntityUtil.success(SuccessCode.AUTHENTICATED_USER_REMOVE_SUCCESS);
-    }
-
 }

@@ -1,4 +1,4 @@
-package com.languageworld.be.global.auth.dto;
+package com.languageworld.be.global.auth.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

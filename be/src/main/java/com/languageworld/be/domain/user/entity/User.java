@@ -1,13 +1,8 @@
 package com.languageworld.be.domain.user.entity;
 
-import com.languageworld.be.domain.game.entity.GameResult;
-import com.languageworld.be.domain.post.entity.Like;
 import com.languageworld.be.domain.post.entity.Post;
-import com.languageworld.be.domain.term.entity.AgreedTerm;
-import com.languageworld.be.domain.user.dto.request.ChangeUserInfoRequestDto;
-import com.languageworld.be.domain.user.dto.request.ChangeUserLanguageInfoRequestDto;
-import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
-import com.languageworld.be.global.auth.dto.social.SocialSignupRequestDto;
+import com.languageworld.be.global.auth.dto.request.ServiceSignupRequestDto;
+import com.languageworld.be.global.auth.dto.request.SocialSignupRequestDto;
 import com.languageworld.be.global.auth.enumGroup.UserRoleCode;
 import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;

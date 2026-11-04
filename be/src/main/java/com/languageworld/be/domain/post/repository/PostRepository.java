@@ -2,6 +2,7 @@ package com.languageworld.be.domain.post.repository;
 
 import com.languageworld.be.domain.post.entity.Post;
 import com.languageworld.be.domain.post.enumGroup.PostTypeCode;
+import com.languageworld.be.domain.user.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -92,4 +93,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             """
     )
     Slice<Post> findNextSlice(@Param("uuid") UUID userUuid, @Param("type") PostTypeCode postTypeCode, String keyword, Pageable pageable, Long cursor);
+
+    void deleteAllByAuthor(User user);
 }

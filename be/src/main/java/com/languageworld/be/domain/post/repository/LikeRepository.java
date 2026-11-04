@@ -1,6 +1,7 @@
 package com.languageworld.be.domain.post.repository;
 
 import com.languageworld.be.domain.post.entity.Like;
+import com.languageworld.be.domain.user.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,4 +47,6 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Slice<Like> findNextSlice(@Param("uuid") UUID userUuid, Pageable pageable, Long cursor);
 
     boolean existsByAuthor_UuidAndPost_Id(UUID userUuid, Long postId);
+
+    void deleteAllByAuthor(User user);
 }
