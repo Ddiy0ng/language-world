@@ -1,4 +1,4 @@
-package com.languageworld.be.global.auth.dto.social;
+package com.languageworld.be.global.auth.dto.request;
 
 import com.languageworld.be.domain.user.enumGroup.NationCode;
 import jakarta.validation.constraints.*;

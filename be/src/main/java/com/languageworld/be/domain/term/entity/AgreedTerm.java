@@ -1,12 +1,9 @@
 package com.languageworld.be.domain.term.entity;
 
 import com.languageworld.be.domain.user.entity.User;
-import com.languageworld.be.global.auth.dto.ServiceSignupRequestDto;
 import com.languageworld.be.global.baseEntity.ChangeableEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Builder
 @Table(name = "agreed_terms")

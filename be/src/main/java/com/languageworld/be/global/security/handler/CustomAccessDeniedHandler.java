@@ -1,4 +1,4 @@
-package com.languageworld.be.global.security;
+package com.languageworld.be.global.security.handler;
 
 import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;

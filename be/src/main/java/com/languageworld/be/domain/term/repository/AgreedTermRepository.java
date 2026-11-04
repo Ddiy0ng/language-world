@@ -1,7 +1,7 @@
 package com.languageworld.be.domain.term.repository;
 
 import com.languageworld.be.domain.term.entity.AgreedTerm;
-import com.languageworld.be.domain.term.entity.Term;
+import com.languageworld.be.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +13,5 @@ public interface AgreedTermRepository extends JpaRepository<AgreedTerm, Long> {
 
     List<AgreedTerm> findAllByUser_Uuid(UUID uuid);
 
-    void deleteAllByUser_Uuid(UUID uuid);
+    void deleteAllByUser(User user);
 }

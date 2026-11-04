@@ -58,7 +58,7 @@ public class PostService {
 
             // 이미지 업로드
             List<String> rollbackDeleteFilePathList = new ArrayList<>();
-            fileUtil.registerCleanUp(userUuid, FilePurposeCode.POST, List.of(), rollbackDeleteFilePathList);
+            fileUtil.registerCleanUp(FilePurposeCode.POST, List.of(), rollbackDeleteFilePathList);
             for (int order = 0; order < multipartFileList.size(); order++) {
 
                 String filePath = fileUtil.uploadFile(multipartFileList.get(order), FilePurposeCode.POST);
@@ -315,7 +315,7 @@ public class PostService {
             List<String> commitDeleteFilePathList = new ArrayList<>();
             List<String> rollbackDeleteFilePathList = new ArrayList<>();
 
-            fileUtil.registerCleanUp(userUuid, FilePurposeCode.POST, commitDeleteFilePathList, rollbackDeleteFilePathList);
+            fileUtil.registerCleanUp(FilePurposeCode.POST, commitDeleteFilePathList, rollbackDeleteFilePathList);
 
             for (PostImage postImage : new ArrayList<>(post.getPostImageList())) {
 
@@ -384,7 +384,7 @@ public class PostService {
                         .toList();
 
         // 커밋 시 실제 삭제
-        fileUtil.registerCleanUp(userUuid, FilePurposeCode.POST, commitDeleteFilePathList, List.of());
+        fileUtil.registerCleanUp(FilePurposeCode.POST, commitDeleteFilePathList, List.of());
 
         postRepository.delete(post);
     }

@@ -1,21 +1,18 @@
 package com.languageworld.be.domain.user.service;
 
 import com.languageworld.be.domain.user.entity.ServiceAccount;
-import com.languageworld.be.domain.user.entity.SocialAccount;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.repository.ServiceAccountRepository;
 import com.languageworld.be.domain.user.repository.SocialAccountRepository;
 import com.languageworld.be.domain.user.repository.UserRepository;
-import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
-import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.exception.CustomException;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import java.time.LocalDate;
-import java.time.Period;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -65,49 +62,5 @@ public class UserUtil {
         ServiceAccount serviceAccount = optionalServiceAccount.get();
 
         return serviceAccount;
-    }
-
-    protected void deleteIfServiceAccountExist(UUID userUuid) {
-
-        Optional<ServiceAccount> optionalServiceAccount = serviceAccountRepository.findByUser_Uuid(userUuid);
-
-        if(optionalServiceAccount.isPresent()) {
-
-            serviceAccountRepository.delete(optionalServiceAccount.get());
-
-            CustomLogger.info(
-                    LogEventCode.USER,
-                    "SUCCESS",
-                    SuccessCode.SERVICE_ACCOUNT_REMOVE_SUCCESS.getMessage(),
-                    userUuid.toString()
-            );
-        }
-    }
-
-    protected void deleteIfSocialAccountExist(UUID userUuid) {
-
-        Optional<SocialAccount> optionalSocialAccount = socialAccountRepository.findByUser_Uuid(userUuid);
-
-        if(optionalSocialAccount.isPresent()) {
-
-            socialAccountRepository.delete(optionalSocialAccount.get());
-
-            CustomLogger.info(
-                    LogEventCode.USER,
-                    "SUCCESS",
-                    SuccessCode.SOCIAL_ACCOUNT_REMOVE_SUCCESS.getMessage(),
-                    userUuid.toString()
-            );
-        }
-    }
-
-    protected int calculateAgeGroup(LocalDate birth) {
-
-        LocalDate now = LocalDate.now();
-
-        int age = Period.between(birth, LocalDate.now()).getYears();
-        int ageGroup = (age / 10) * 10;
-
-        return ageGroup;
     }
 }

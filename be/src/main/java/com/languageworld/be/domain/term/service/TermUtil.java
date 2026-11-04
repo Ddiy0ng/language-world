@@ -159,9 +159,4 @@ public class TermUtil {
 
         return UserRoleCode.USER;
     }
-
-    public void deleteAgreedTermList(UUID uuid) {
-
-        agreedTermRepository.deleteAllByUser_Uuid(uuid);
-    }
 }

@@ -1,4 +1,4 @@
-package com.languageworld.be.global.auth.dto;
+package com.languageworld.be.global.auth.dto.response;
 
 import lombok.Builder;
 

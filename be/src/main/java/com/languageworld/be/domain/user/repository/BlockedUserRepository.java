@@ -1,10 +1,10 @@
 package com.languageworld.be.domain.user.repository;
 
 import com.languageworld.be.domain.user.entity.BlockedUser;
+import com.languageworld.be.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -23,4 +23,6 @@ public interface BlockedUserRepository extends JpaRepository<BlockedUser, Long> 
     boolean existsByUser_UuidAndBlockedUser_Uuid(UUID userUuid, UUID blockUuid);
 
     List<BlockedUser> findAllByUser_Uuid(UUID uuid);
+
+    void deleteAllByUserOrBlockedUser(User user, User blockedUser);
 }
