@@ -32,7 +32,7 @@ public class User extends ChangeableEntity {
     private Long id;
 
     @Column(unique = true, updatable = false, nullable = false)
-    private UUID uuid;  //
+    private UUID uuid;
 
     @Column(name = "user_role", nullable = false)
     @Enumerated(EnumType.STRING)

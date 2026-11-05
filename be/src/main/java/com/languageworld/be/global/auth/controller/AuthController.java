@@ -84,7 +84,7 @@ public class AuthController {
 
         authService.removeUser(customPrincipal);
 
-        return ResponseEntityUtil.success(SuccessCode.USER_DELETE_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.USER_REMOVE_SUCCESS);
     }
 
 }

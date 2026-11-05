@@ -3,6 +3,7 @@ package com.languageworld.be.domain.user.service;
 import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;
 import com.languageworld.be.domain.language.service.LanguageUtil;
+import com.languageworld.be.domain.post.entity.PostImage;
 import com.languageworld.be.domain.term.service.TermUtil;
 import com.languageworld.be.domain.user.dto.request.*;
 import com.languageworld.be.domain.user.dto.response.UserInfoResponseDto;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -129,15 +131,17 @@ public class UserService {
 
         User user = userUtil.getUserByUuid(customPrincipal.uuid());
 
-        String oldProfileImageUrl = user.getProfileImageUrl();
-        String newProfileImageUrl = fileUtil.uploadFile(
-                multipartFile,
-                FilePurposeCode.PROFILE
-        );
+        List<String> commitDeleteFilePathList = new ArrayList<>();
+        List<String> rollbackDeleteFilePathList = new ArrayList<>();
+        fileUtil.registerCleanUp(FilePurposeCode.POST, commitDeleteFilePathList, rollbackDeleteFilePathList);
 
+        String oldProfileImageUrl = user.getProfileImageUrl();
+        commitDeleteFilePathList.add(oldProfileImageUrl);
+
+        String newProfileImageUrl = fileUtil.uploadFile(multipartFile, FilePurposeCode.PROFILE);
+        rollbackDeleteFilePathList.add(newProfileImageUrl);
         user.changeUserProfileImageUrl(newProfileImageUrl);
 
-        // TODO 로컬 이미지 삭제
         fileUtil.deleteFile(FilePurposeCode.PROFILE, oldProfileImageUrl);
     }
 }

@@ -96,8 +96,8 @@ public class JwtUtil {
                 CustomLogger.warn(
                         LogEventCode.JWT,
                         "FAIL",
-                        LogEventReasonCode.JWT_TOKEN_NULL,
-                        LogEventReasonCode.JWT_TOKEN_NULL.getMessage(),
+                        LogEventReasonCode.TOKEN_IS_NULL,
+                        LogEventReasonCode.TOKEN_IS_NULL.getMessage(),
                         null
                 );
 
@@ -110,8 +110,8 @@ public class JwtUtil {
             CustomLogger.warn(
                     LogEventCode.JWT,
                     "FAIL",
-                    LogEventReasonCode.JWT_TOKEN_NULL,
-                    LogEventReasonCode.JWT_TOKEN_NULL.getMessage(),
+                    LogEventReasonCode.TOKEN_IS_BLANK,
+                    LogEventReasonCode.TOKEN_IS_BLANK.getMessage(),
                     null
             );
 
