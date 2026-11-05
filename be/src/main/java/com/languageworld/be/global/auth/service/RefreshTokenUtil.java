@@ -27,32 +27,33 @@ public class RefreshTokenUtil {
             CustomLogger.warn(
                     LogEventCode.JWT,
                     "FAIL",
-                    LogEventReasonCode.TOKEN_NOT_FOUND,
-                    LogEventReasonCode.TOKEN_NOT_FOUND.getMessage(),
+                    LogEventReasonCode.REFRESH_TOKEN_NOT_FOUND,
+                    LogEventReasonCode.REFRESH_TOKEN_NOT_FOUND.getMessage(),
                     null
             );
 
             throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
         }
-        RefreshToken refreshToken = optionalRefreshToken.get();
 
-        return refreshToken;
+        return optionalRefreshToken.get();
     }
 
     public void refreshTokenOwnerCheck(UUID userUuid, UUID tokenClaimUuid, UUID dbUuid) {
 
         // 인증 사용자 vs token sub
-        if(!userUuid.equals(ownerUuid)) {
+        if(!userUuid.equals(dbUuid)) {
 
             CustomLogger.warn(
                     LogEventCode.JWT,
                     "FAIL",
                     LogEventReasonCode.NOT_TOKEN_OWNER,
-                    LogEventReasonCode.NOT_TOKEN_OWNER.getMessage(),
+                    LogEventReasonCode.NOT_TOKEN_OWNER.getMessage()
+                            + " - authenticated userUuid: " + userUuid
+                            + " - db token user uuid: " + dbUuid,
                     userUuid.toString()
             );
 
-            throw new CustomException(CustomExceptionCode.NOT_TOKEN_EXCEPTION);
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
         }
 
         // token sub vs db에 저장된 토큰 소유자의 uuid
@@ -62,7 +63,26 @@ public class RefreshTokenUtil {
                     LogEventCode.JWT,
                     "FAIL",
                     LogEventReasonCode.TOKEN_SUB_DB_UUID_NOT_SAME,
-                    LogEventReasonCode.TOKEN_SUB_DB_UUID_NOT_SAME.getMessage(),
+                    LogEventReasonCode.TOKEN_SUB_DB_UUID_NOT_SAME.getMessage()
+                            + " - token sub uuid: " + tokenClaimUuid
+                            + " - db token user uuid: " + dbUuid,
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+        }
+    }
+
+    public void deletedRefreshTokenCheck(RefreshToken oldRefreshToken) {
+
+        // 리프리프레시 토큰 재사용 방지
+        if(oldRefreshToken.getDeletedAt() != null) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.DELETED_TOKEN,
+                    LogEventReasonCode.DELETED_TOKEN.getMessage(),
                     null
             );
 

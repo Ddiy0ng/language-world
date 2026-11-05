@@ -11,12 +11,24 @@ public enum SuccessCode {
     // AUTH
     SIGNUP_SUCCESS(
             HttpStatus.CREATED,
-            "USER_201",
+            "AUTH_201",
             "회원가입에 성공했습니다."),
     LOGIN_SUCCESS(
             HttpStatus.OK,
-            "USER_200",
+            "AUTH_200",
             "로그인에 성공했습니다."),
+    TOKEN_REISSUE_SUCCESS(
+            HttpStatus.CREATED,
+            "AUTH_201",
+            "토큰 재발급에 성공했습니다."),
+    LOGOUT_SUCCESS(
+            HttpStatus.OK,
+            "AUTH_200",
+            "로그아웃에 성공했습니다."),
+    USER_REMOVE_SUCCESS(
+            HttpStatus.OK,
+            "AUTH_200",
+            "인증된 사용자 탈퇴에 성공했습니다."),
 
     // MULTIPART_FILE
     FILE_UPLOAD_SUCCESS(
@@ -84,10 +96,6 @@ public enum SuccessCode {
             HttpStatus.OK,
             "USER_200",
             "인증된 사용자  프로필 수정에 성공했습니다."),
-    AUTHENTICATED_USER_REMOVE_SUCCESS(
-            HttpStatus.OK,
-            "USER_200",
-            "인증된 사용자 탈퇴에 성공했습니다."),
 
     // Language
     ALL_LANGUAGE_AND_LEVEL_FIND_SUCCESS(

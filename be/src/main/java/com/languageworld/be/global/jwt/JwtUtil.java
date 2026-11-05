@@ -46,9 +46,7 @@ public class JwtUtil {
         if(!authorizationHeader.startsWith(JWT_PREFIX))
             return null;
 
-        String token = authorizationHeader.substring(JWT_PREFIX.length());
-
-        return token;
+        return authorizationHeader.substring(JWT_PREFIX.length());
     }
 
     // Claim 추출
@@ -96,8 +94,8 @@ public class JwtUtil {
                 CustomLogger.warn(
                         LogEventCode.JWT,
                         "FAIL",
-                        LogEventReasonCode.JWT_TOKEN_NULL,
-                        LogEventReasonCode.JWT_TOKEN_NULL.getMessage(),
+                        LogEventReasonCode.TOKEN_IS_NULL,
+                        LogEventReasonCode.TOKEN_IS_NULL.getMessage(),
                         null
                 );
 
@@ -110,8 +108,8 @@ public class JwtUtil {
             CustomLogger.warn(
                     LogEventCode.JWT,
                     "FAIL",
-                    LogEventReasonCode.JWT_TOKEN_NULL,
-                    LogEventReasonCode.JWT_TOKEN_NULL.getMessage(),
+                    LogEventReasonCode.TOKEN_IS_BLANK,
+                    LogEventReasonCode.TOKEN_IS_BLANK.getMessage(),
                     null
             );
 
@@ -159,25 +157,19 @@ public class JwtUtil {
     // userUuid 추출
     public String getUuid(Claims claims) {
 
-        String uuid = claims.getSubject();
-
-        return uuid;
+        return claims.getSubject();
     }
 
     // userRole 추출
     public String getUserRole(Claims claims) {
 
-        String userRole = claims.get(ROLE, String.class);
-
-        return userRole;
+        return claims.get(ROLE, String.class);
     }
 
     // tokenType 추출
     public String getTokenType(Claims claims) {
 
-        String tokenType = claims.get(TYPE, String.class);
-
-        return tokenType;
+        return claims.get(TYPE, String.class);
     }
 
     // Authentication 생성
@@ -187,14 +179,12 @@ public class JwtUtil {
         String userRole = getUserRole(claims);
 
         CustomPrincipal customPrincipal = CustomPrincipal.of(uuid, userRole);
-        Authentication authentication = UsernamePasswordAuthenticationToken
+
+        return UsernamePasswordAuthenticationToken
                 .authenticated(
                         customPrincipal,
                         null,
                         List.of(new SimpleGrantedAuthority(getUserRole(claims)))
                 );
-
-        return authentication;
     }
-
 }

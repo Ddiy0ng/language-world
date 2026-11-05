@@ -17,10 +17,17 @@ public enum LogEventReasonCode {
     PASSWORD_MISMATCH("비밀번호가 일치하지 않습니다."),
     PASSWORD_REQUIRED("비밀번호를 입력해주세요."),
     INVALID_PASSWORD("영문, 숫자, 특수문자의 8~20자 이내의 비밀번호여야 합니다"),
+
+    // JWT
     EXPIRED_TOKEN("만료된 토큰입니다."),
     INVALID_TOKEN("유효하지 않은 토큰입니다."),
-    JWT_TOKEN_NULL("토큰이 null입니다."),
+    TOKEN_IS_NULL("토큰이 null입니다."),
+    TOKEN_IS_BLANK("토큰이 Blank입니다."),
     ACCESS_TOKEN_REQUIRED("액세스 토큰이 필요합니다."),
+    TOKEN_SUB_DB_UUID_NOT_SAME("토큰의 sub와 db에 저장된 토큰 소유자의 uuid가 일치하지 않습니다."),
+    REFRESH_TOKEN_NOT_FOUND("리프레시 토큰을 찾을 수 없습니다."),
+    NOT_TOKEN_OWNER("토큰의 소유주가 아닙니다."),
+    DELETED_TOKEN("삭제 처리된 토큰입니다."),
 
     // SOCIAL
     INVALID_SOCIAL_TOKEN("유효하지 않은 소셜 인증 토큰입니다."),

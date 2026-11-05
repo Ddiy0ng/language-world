@@ -39,9 +39,8 @@ import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -288,14 +287,15 @@ public class AuthService {
     public TokenReissueResponseDto reissueToken(RefreshTokenRequestDto refreshTokenRequestDto) {
 
         Claims claims = jwtUtil.getValidateClaimsFromToken(JwtUtil.REFRESH, refreshTokenRequestDto.refreshToken());
-        String tokenId = claims.getId();
 
-        RefreshToken oldRefreshToken = refreshTokenUtil.getRefreshToken(tokenId);
+        // 토큰 소유자 검증: jwt sub vs tokenId 기준 조회한 db에 저장된 토큰 소유자
 
-        // 토큰 소유자 검증: tokenId 기준 조회한 db에 저장된 토큰 소유자 vs jwt 내부 사용자
         // user.getUuid: 요청 dto로 넘어온 token의 claims에서 추출한 id를 기준으로 db의 refresh token 찾아 추출한 소유자 user의 uuid
-        // uuid: 요청dto로 넘어온 token의 claims에서 추출한 uuid
+        String tokenId = claims.getId();
+        RefreshToken oldRefreshToken = refreshTokenUtil.getRefreshToken(tokenId);
         User user = oldRefreshToken.getUser();
+
+        // uuid: 요청dto로 넘어온 token의 claims에서 추출한 uuid
         UUID uuid = UUID.fromString(jwtUtil.getUuid(claims));
         if(!user.getUuid().equals(uuid)) {
 
@@ -303,12 +303,17 @@ public class AuthService {
                     LogEventCode.JWT,
                     "FAIL",
                     LogEventReasonCode.TOKEN_SUB_DB_UUID_NOT_SAME,
-                    LogEventReasonCode.TOKEN_SUB_DB_UUID_NOT_SAME.getMessage(),
+                    LogEventReasonCode.TOKEN_SUB_DB_UUID_NOT_SAME.getMessage()
+                            + " - token sub uuid: " + uuid
+                            + " - db token user uuid: " + user.getUuid(),
                     null
             );
 
             throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
         }
+
+        // 리프리프레시 토큰 재사용 방지
+        refreshTokenUtil.deletedRefreshTokenCheck(oldRefreshToken);
 
         // 만료 검증
         if(oldRefreshToken.getExpiredAt().before(new Date())) {
@@ -328,10 +333,11 @@ public class AuthService {
         if(user.getDeletedAt() != null) {
 
             CustomLogger.warn(
-                    LogEventCode.JWT,
+                    LogEventCode.AUTH,
                     "FAIL",
-                    LogEventReasonCode.DELETED_USER_TOKEN,
-                    LogEventReasonCode.DELETED_USER_TOKEN.getMessage(),
+                    LogEventReasonCode.DELETED_USER,
+                    LogEventReasonCode.DELETED_USER.getMessage()
+                            + " - DeletedUser Uuid: " + user.getUuid(),
                     null
             );
 
@@ -343,15 +349,15 @@ public class AuthService {
         String newRefreshToken = jwtProvider.generateRefreshToken(user);
         Claims newRefreshTokenClaim = jwtUtil.getValidateClaimsFromToken(JwtUtil.REFRESH, newRefreshToken);
 
-        refreshTokenRepository.delete(oldRefreshToken);
+        oldRefreshToken.removeToken();
+
         RefreshToken refreshTokenEntity = RefreshToken.of(newRefreshTokenClaim, user);
         refreshTokenRepository.save(refreshTokenEntity);
 
-        TokenReissueResponseDto tokenReissueResponseDto = TokenReissueResponseDto.of(newAccessToken, newRefreshToken);
-
-        return tokenReissueResponseDto;
+        return TokenReissueResponseDto.of(newAccessToken, newRefreshToken);
     }
 
+    @Transactional
     public void logout(CustomPrincipal customPrincipal, RefreshTokenRequestDto refreshTokenRequestDto) {
 
         UUID userUuid = customPrincipal.uuid();
@@ -361,10 +367,11 @@ public class AuthService {
         UUID tokenClaimUuid = UUID.fromString(claims.getSubject());
 
         RefreshToken refreshToken = refreshTokenUtil.getRefreshToken(tokenId);
+        refreshTokenUtil.deletedRefreshTokenCheck(refreshToken);
 
         refreshTokenUtil.refreshTokenOwnerCheck(userUuid, tokenClaimUuid, refreshToken.getUser().getUuid());
 
-        refreshTokenRepository.delete(refreshToken);
+        refreshToken.removeToken();
     }
 
     @Transactional
@@ -372,7 +379,12 @@ public class AuthService {
 
         UUID uuid = customPrincipal.uuid();
         User user = userUtil.getUserByUuid(uuid);
+
+        // 삭제할 경로 사라지기 전 먼저 커밋 시 삭제할 파일 리스트에 저장
+        List<String> commitDeleteFilePathList = new ArrayList<>();
+        fileUtil.registerCleanUp(FilePurposeCode.POST, commitDeleteFilePathList, List.of());
         String profileImageUrl = user.getProfileImageUrl();
+        commitDeleteFilePathList.add(profileImageUrl);
 
         // 탈퇴 여부 확인
         if(user.getDeletedAt() != null) {
@@ -387,8 +399,8 @@ public class AuthService {
             throw new CustomException(CustomExceptionCode.DELETED_USER);
         }
 
-        // TODO 리플레시 토큰 삭제
-        refreshTokenRepository.deleteAllByUser(user);
+        // TODO 리프레시 토큰 삭제
+        refreshTokenRepository.findAllByUser(user).forEach(RefreshToken::removeToken);
 
         // 서비스 유저면 서비스 계정 삭제
         Optional<ServiceAccount> optionalServiceAccount = serviceAccountRepository.findByUser_Uuid(uuid);

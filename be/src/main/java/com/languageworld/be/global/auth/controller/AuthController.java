@@ -60,7 +60,7 @@ public class AuthController {
 
     // TODO 액세스 토큰 재발급: 액세스 만료 시 리프레시 검증 후 액세스 재발급(토큰 검증, 계정 검증, 액세스 발급, 리프레시는 경우 따라 재발급, 토큰 반환), 이전 리프레시 삭제
     @PostMapping("/reissue")
-    public ResponseEntity<ApiResponse<TokenReissueResponseDto>> reissueToken(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
+    public ResponseEntity<ApiResponse<TokenReissueResponseDto>> reissueToken(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
 
         TokenReissueResponseDto tokenReissueResponseDto = authService.reissueToken(refreshTokenRequestDto);
 
@@ -70,7 +70,7 @@ public class AuthController {
     // TODO 로그아웃: 리프레시 삭제
     @DeleteMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                    @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
+                                                    @Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
 
         authService.logout(customPrincipal, refreshTokenRequestDto);
 
@@ -84,7 +84,7 @@ public class AuthController {
 
         authService.removeUser(customPrincipal);
 
-        return ResponseEntityUtil.success(SuccessCode.USER_DELETE_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.USER_REMOVE_SUCCESS);
     }
 
 }

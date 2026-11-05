@@ -32,7 +32,7 @@ public class User extends ChangeableEntity {
     private Long id;
 
     @Column(unique = true, updatable = false, nullable = false)
-    private UUID uuid;  //
+    private UUID uuid;
 
     @Column(name = "user_role", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -84,7 +84,7 @@ public class User extends ChangeableEntity {
                           Language learningLanguage,
                           Level learningLanguageLevel) {
 
-        User user = User.builder()
+        return User.builder()
                 .uuid(UUID.randomUUID())
                 .userRole(UserRoleCode.USER)
                 .name(serviceSignupRequestDto.name())
@@ -94,8 +94,6 @@ public class User extends ChangeableEntity {
                 .learningLanguage(learningLanguage)
                 .learningLanguageLevel(learningLanguageLevel)
                 .build();
-
-        return user;
     }
 
     public static User of(SocialSignupRequestDto socialSignupRequestDto,
@@ -104,7 +102,7 @@ public class User extends ChangeableEntity {
                           Language learningLanguage,
                           Level learningLanguageLevel) {
 
-        User user = User.builder()
+        return User.builder()
                 .uuid(UUID.randomUUID())
                 .userRole(UserRoleCode.USER)
                 .name(socialSignupRequestDto.name())
@@ -115,8 +113,6 @@ public class User extends ChangeableEntity {
                 .learningLanguage(learningLanguage)
                 .learningLanguageLevel(learningLanguageLevel)
                 .build();
-
-        return user;
 
     }
 
