@@ -30,6 +30,7 @@ public class SecurityConfig {
             "/",
             "/auth/signup/**",
             "/auth/login/**",
+            "/auth/reissue",
             "/language",    // 지원 언어, 레벨 조회
             "/term/active"  // 활성화된(필수) 약관 조회
     };
@@ -44,9 +45,6 @@ public class SecurityConfig {
             "/term",
             "/term/agreed/**",
             "/user/**",
-            "/friend/**",
-            "/post/**",
-            "/like/**"
     };
 
     //SecurityFilterChain Bean

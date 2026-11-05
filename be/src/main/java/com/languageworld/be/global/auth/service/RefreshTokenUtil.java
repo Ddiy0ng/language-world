@@ -34,9 +34,8 @@ public class RefreshTokenUtil {
 
             throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
         }
-        RefreshToken refreshToken = optionalRefreshToken.get();
 
-        return refreshToken;
+        return optionalRefreshToken.get();
     }
 
     public void refreshTokenOwnerCheck(UUID userUuid, UUID tokenClaimUuid, UUID dbUuid) {
@@ -67,6 +66,23 @@ public class RefreshTokenUtil {
                     LogEventReasonCode.TOKEN_SUB_DB_UUID_NOT_SAME.getMessage()
                             + " - token sub uuid: " + tokenClaimUuid
                             + " - db token user uuid: " + dbUuid,
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+        }
+    }
+
+    public void deletedRefreshTokenCheck(RefreshToken oldRefreshToken) {
+
+        // 리프리프레시 토큰 재사용 방지
+        if(oldRefreshToken.getDeletedAt() != null) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.DELETED_TOKEN,
+                    LogEventReasonCode.DELETED_TOKEN.getMessage(),
                     null
             );
 

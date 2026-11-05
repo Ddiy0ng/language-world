@@ -37,13 +37,15 @@ public class RefreshToken {
 
     public static RefreshToken of(Claims claims, User user) {
 
-        RefreshToken refreshToken = RefreshToken.builder()
+        return RefreshToken.builder()
                 .tokenId(claims.getId())
                 .issuedAt(claims.getIssuedAt())
                 .expiredAt(claims.getExpiration())
                 .user(user)
                 .build();
+    }
 
-        return refreshToken;
+    public void removeToken() {
+        deletedAt = new Date();
     }
 }

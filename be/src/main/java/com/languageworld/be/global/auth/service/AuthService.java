@@ -312,6 +312,9 @@ public class AuthService {
             throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
         }
 
+        // 리프리프레시 토큰 재사용 방지
+        refreshTokenUtil.deletedRefreshTokenCheck(oldRefreshToken);
+
         // 만료 검증
         if(oldRefreshToken.getExpiredAt().before(new Date())) {
 
@@ -346,15 +349,15 @@ public class AuthService {
         String newRefreshToken = jwtProvider.generateRefreshToken(user);
         Claims newRefreshTokenClaim = jwtUtil.getValidateClaimsFromToken(JwtUtil.REFRESH, newRefreshToken);
 
-        refreshTokenRepository.delete(oldRefreshToken);
+        oldRefreshToken.removeToken();
+
         RefreshToken refreshTokenEntity = RefreshToken.of(newRefreshTokenClaim, user);
         refreshTokenRepository.save(refreshTokenEntity);
 
-        TokenReissueResponseDto tokenReissueResponseDto = TokenReissueResponseDto.of(newAccessToken, newRefreshToken);
-
-        return tokenReissueResponseDto;
+        return TokenReissueResponseDto.of(newAccessToken, newRefreshToken);
     }
 
+    @Transactional
     public void logout(CustomPrincipal customPrincipal, RefreshTokenRequestDto refreshTokenRequestDto) {
 
         UUID userUuid = customPrincipal.uuid();
@@ -364,10 +367,11 @@ public class AuthService {
         UUID tokenClaimUuid = UUID.fromString(claims.getSubject());
 
         RefreshToken refreshToken = refreshTokenUtil.getRefreshToken(tokenId);
+        refreshTokenUtil.deletedRefreshTokenCheck(refreshToken);
 
         refreshTokenUtil.refreshTokenOwnerCheck(userUuid, tokenClaimUuid, refreshToken.getUser().getUuid());
 
-        refreshTokenRepository.delete(refreshToken);
+        refreshToken.removeToken();
     }
 
     @Transactional
@@ -395,8 +399,8 @@ public class AuthService {
             throw new CustomException(CustomExceptionCode.DELETED_USER);
         }
 
-        // TODO 리플레시 토큰 삭제
-        refreshTokenRepository.deleteAllByUser(user);
+        // TODO 리프레시 토큰 삭제
+        refreshTokenRepository.findAllByUser(user).forEach(RefreshToken::removeToken);
 
         // 서비스 유저면 서비스 계정 삭제
         Optional<ServiceAccount> optionalServiceAccount = serviceAccountRepository.findByUser_Uuid(uuid);
