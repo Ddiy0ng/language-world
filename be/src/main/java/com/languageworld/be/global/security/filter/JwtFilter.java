@@ -23,8 +23,10 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        String authorizationHeader = request.getHeader(JwtUtil.AUTHORIZATION);
+
         // jwt 추출
-        String token = jwtUtil.resolveToken(request);
+        String token = jwtUtil.resolveToken(authorizationHeader);
 
         if (token == null) {
             filterChain.doFilter(request, response); // null인 경우 다음 필터로 넘김
