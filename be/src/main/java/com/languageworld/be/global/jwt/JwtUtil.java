@@ -34,76 +34,32 @@ public class JwtUtil {
     private final SecretKey secretKey;
 
     // jwt 추출
-    public String resolveToken(HttpServletRequest httpServletRequest) {
-
-        String authorizationHeader = httpServletRequest.getHeader(AUTHORIZATION);
+    public String resolveToken(String authorizationHeader) {
 
         // auth header 검증
         if(authorizationHeader == null)
             return null;
 
-        // "Bearer 확인 및 제거
-        if(!authorizationHeader.startsWith(JWT_PREFIX))
-            return null;
+        // "Bearer 확인 및 제거(Bearer 아니면 예외)
+        if(!authorizationHeader.startsWith(JWT_PREFIX)) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.NOT_VALID_TOKEN_PREFIX,
+                    LogEventReasonCode.NOT_VALID_TOKEN_PREFIX.getMessage(),
+                    null
+            );
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
+        }
 
         return authorizationHeader.substring(JWT_PREFIX.length());
     }
 
-    // Claim 추출
-    private Claims getClaims(String token) {
-
-        Claims claims;
-
-        try {
-            claims = Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (ExpiredJwtException expiredJwtException) {
-
-            CustomLogger.warn(
-                    LogEventCode.JWT,
-                    "FAIL",
-                    LogEventReasonCode.EXPIRED_TOKEN,
-                    LogEventReasonCode.EXPIRED_TOKEN.getMessage(),
-                    null
-            );
-            throw new CustomException(CustomExceptionCode.EXPIRED_TOKEN); // CustomException 처리: 만료된 토큰 처리
-        } catch (JwtException | IllegalArgumentException e) {
-
-            CustomLogger.warn(
-                    LogEventCode.JWT,
-                    "FAIL",
-                    LogEventReasonCode.INVALID_TOKEN,
-                    LogEventReasonCode.INVALID_TOKEN.getMessage() + "JwtException | IllegalArgumentException while parsing jwt to get claims",
-                    null
-            );
-            throw new CustomException(CustomExceptionCode.INVALID_TOKEN); // CustomException 처리: 유효하지 않은 토큰 처리
-        }
-
-        return claims;
-    }
-
+    // claim get
     public Claims getValidateClaimsFromToken(String purpose, String token) {
 
-        if(purpose.equals(REFRESH)) {
-
-            if (token == null) {
-
-                CustomLogger.warn(
-                        LogEventCode.JWT,
-                        "FAIL",
-                        LogEventReasonCode.TOKEN_IS_NULL,
-                        LogEventReasonCode.TOKEN_IS_NULL.getMessage(),
-                        null
-                );
-
-                throw new CustomException(CustomExceptionCode.INVALID_TOKEN); //CustomException 처리: 토큰 공백
-            }
-        }
-
-        if (token.isBlank()) {
+        if (token == null || token.isBlank()) {
 
             CustomLogger.warn(
                     LogEventCode.JWT,
@@ -186,5 +142,41 @@ public class JwtUtil {
                         null,
                         List.of(new SimpleGrantedAuthority(getUserRole(claims)))
                 );
+    }
+
+    // Claim 추출
+    private Claims getClaims(String token) {
+
+        Claims claims;
+
+        try {
+            claims = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException expiredJwtException) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.EXPIRED_TOKEN,
+                    LogEventReasonCode.EXPIRED_TOKEN.getMessage(),
+                    null
+            );
+            throw new CustomException(CustomExceptionCode.EXPIRED_TOKEN); // CustomException 처리: 만료된 토큰 처리
+        } catch (JwtException | IllegalArgumentException e) {
+
+            CustomLogger.warn(
+                    LogEventCode.JWT,
+                    "FAIL",
+                    LogEventReasonCode.INVALID_TOKEN,
+                    LogEventReasonCode.INVALID_TOKEN.getMessage() + "JwtException | IllegalArgumentException while parsing jwt to get claims",
+                    null
+            );
+            throw new CustomException(CustomExceptionCode.INVALID_TOKEN); // CustomException 처리: 유효하지 않은 토큰 처리
+        }
+
+        return claims;
     }
 }
