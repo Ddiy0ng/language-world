@@ -14,12 +14,10 @@ public record PostSummaryCursorResponseDto(
 
     public static PostSummaryCursorResponseDto from(Long nextCursor, boolean hasNext, List<PostSummaryResponseDto> postSummaryResponseDtoList) {
 
-        PostSummaryCursorResponseDto postSummaryCursorResponseDto = PostSummaryCursorResponseDto.builder()
+        return PostSummaryCursorResponseDto.builder()
                 .nextCursor(nextCursor)
                 .hasNext(hasNext)
                 .postSummaryResponseDtoList(postSummaryResponseDtoList)
                 .build();
-
-        return postSummaryCursorResponseDto;
     }
 }

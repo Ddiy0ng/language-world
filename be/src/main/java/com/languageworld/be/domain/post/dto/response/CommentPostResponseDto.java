@@ -17,13 +17,11 @@ public record CommentPostResponseDto(
 
     public static CommentPostResponseDto from(Comment comment) {
 
-        CommentPostResponseDto commentPostResponseDto = CommentPostResponseDto.builder()
+        return CommentPostResponseDto.builder()
                 .userSummaryResponseDto(UserSummaryResponseDto.from(comment.getAuthor()))
                 .commentId(comment.getId())
                 .content(comment.getContentText())
                 .modifiedAt(comment.getModifiedAt())
                 .build();
-
-        return commentPostResponseDto;
     }
 }

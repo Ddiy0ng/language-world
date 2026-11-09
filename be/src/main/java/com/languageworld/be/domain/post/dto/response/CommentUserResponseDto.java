@@ -18,14 +18,12 @@ public record CommentUserResponseDto(
 ) {
     public static CommentUserResponseDto from(Comment comment) {
 
-        CommentUserResponseDto commentUserResponseDto = CommentUserResponseDto.builder()
+        return CommentUserResponseDto.builder()
                 .userSummaryResponseDto(UserSummaryResponseDto.from(comment.getAuthor()))
                 .postResponseDto(PostResponseDto.from(comment.getPost()))
                 .commentId(comment.getId())
                 .content(comment.getContentText())
                 .modifiedAt(comment.getModifiedAt())
                 .build();
-
-        return commentUserResponseDto;
     }
 }
