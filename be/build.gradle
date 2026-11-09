@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
 
-    // REST API + Spring MVC + Servlet
+    // REST API + Spring MVC + Servlet + jackson 포함
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     //Spring Security(인증, 인가)
@@ -56,6 +56,9 @@ dependencies {
 
     //MySQL Driver
     runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // WS
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     //Test
     testImplementation 'org.springframework.boot:spring-boot-starter-batch-jdbc-test'

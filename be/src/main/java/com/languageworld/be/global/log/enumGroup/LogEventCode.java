@@ -10,4 +10,6 @@ public enum LogEventCode {
     MULTIPART_FILE,
     LANGUAGE,
     POST,
+    WEBSOCKET,
+    CHAT,
 }

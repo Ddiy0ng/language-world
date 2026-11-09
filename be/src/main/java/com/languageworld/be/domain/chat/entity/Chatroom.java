@@ -30,7 +30,7 @@ public class Chatroom extends CreatableEntity {
     @Column(name = "chatroom_size", nullable = false)
     private int chatroomSize;
 
-    @Column(name = "chatroom_title", length = 30, nullable = false)
+    @Column(name = "chatroom_title", length = 30)
     private String chatroomTitle;
 
     @ManyToOne
@@ -61,5 +61,10 @@ public class Chatroom extends CreatableEntity {
                 .chatroomTitle(chatroomTitle)
                 .host(host)
                 .build();
+    }
+
+    public void changeHost(User newHost) {
+
+        host = newHost;
     }
 }

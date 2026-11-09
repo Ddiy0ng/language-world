@@ -17,6 +17,8 @@ public class Chat extends CreatableEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String chatMessage;
+
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
@@ -25,4 +27,13 @@ public class Chat extends CreatableEntity {
     @JoinColumn(name = "chatroom_id", nullable = false)
     private Chatroom chatroom;
 
+
+    public static Chat of(String chatMessage, User sender, Chatroom chatroom) {
+
+        return Chat.builder()
+                .chatMessage(chatMessage)
+                .sender(sender)
+                .chatroom(chatroom)
+                .build();
+    }
 }

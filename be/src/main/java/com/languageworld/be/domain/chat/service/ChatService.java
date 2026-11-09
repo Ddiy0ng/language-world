@@ -1,20 +1,28 @@
 package com.languageworld.be.domain.chat.service;
 
 import com.languageworld.be.domain.chat.dto.request.ChatSaveRequestDto;
-import com.languageworld.be.domain.chat.dto.response.ChatResponseDto;
-import com.languageworld.be.domain.chat.dto.response.FriendChatroomEnterResponseDto;
-import com.languageworld.be.domain.chat.dto.response.ChatroomResponseDto;
+import com.languageworld.be.domain.chat.dto.response.*;
+import com.languageworld.be.domain.chat.entity.Chat;
 import com.languageworld.be.domain.chat.entity.Chatroom;
 import com.languageworld.be.domain.chat.entity.ChatroomUser;
 import com.languageworld.be.domain.chat.enumGroup.ChatroomTypeCode;
 import com.languageworld.be.domain.chat.repository.ChatRepository;
 import com.languageworld.be.domain.chat.repository.ChatroomRepository;
 import com.languageworld.be.domain.chat.repository.ChatroomUserRepository;
+import com.languageworld.be.domain.user.dto.response.UserSummaryResponseDto;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.service.UserUtil;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
+import com.languageworld.be.global.exception.CustomException;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.log.CustomLogger;
+import com.languageworld.be.global.log.enumGroup.LogEventCode;
+import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +38,7 @@ public class ChatService {
     private final ChatroomUserRepository chatroomUserRepository;
     private final UserUtil userUtil;
     private final ChatroomUserUtil chatroomUserUtil;
+    private final ChatroomUtil chatroomUtil;
 
     // 친구창 통해 채팅방 입장(dm)
     @Transactional
@@ -73,25 +82,138 @@ public class ChatService {
     }
 
     @Transactional
-    public void saveChat(CustomPrincipal customPrincipal, ChatSaveRequestDto chatSaveRequestDto) {
+    public void saveChat(CustomPrincipal customPrincipal, Long chatroomId, ChatSaveRequestDto chatSaveRequestDto) {
 
+        UUID userUuid = customPrincipal.uuid();
 
+        chatroomUserUtil.chatroomUserCheck(chatroomId, userUuid);
+
+        User sender = userUtil.getUserByUuid(userUuid);
+
+        Chatroom chatroom = chatroomUtil.getChatroomById(chatroomId, userUuid);
+
+        Chat chat = Chat.of(chatSaveRequestDto.chatMessage(),sender, chatroom);
+
+        chatRepository.save(chat);
     }
 
     @Transactional
-    public List<ChatResponseDto> findChatList(CustomPrincipal customPrincipal, Long chatroomId) {
+    public ChatCursorResponseDto findChatList(CustomPrincipal customPrincipal, Long chatroomId, Long cursor) {
+
+        UUID userUuid = customPrincipal.uuid();
+
+        // 채팅방 멤버 여부 확인
+        ChatroomUser chatroomUser = chatroomUserUtil.getChatroomUserByChatroomIdAndUserUuid(chatroomId, userUuid);
+
+        // 채팅방 에시지 히스토리 조회
+        Slice<Chat> chatSlice = findChat(chatroomId, userUuid, cursor);
+
+        List<ChatResponseDto> chatResponseDtoList = chatSlice.getContent().stream()
+                .map(chat -> ChatResponseDto.from(chat, UserSummaryResponseDto.from(chat.getSender()), chat.getChatroom().getId()))
+                .toList();
+
+        boolean hasNext = chatSlice.hasNext();
+
+        Long nextCursor = null;
+        // 다음 있을 때 커서 등록
+        if(hasNext && !chatSlice.isEmpty()) {
+
+            // 마지막 요소의 인덱스를 다음 커서로
+            nextCursor = chatSlice.getContent().get(chatSlice.getNumberOfElements() - 1).getId();
+        }
+
+        return ChatCursorResponseDto.from(nextCursor, hasNext, chatResponseDtoList);
     }
 
     @Transactional
-    public List<ChatroomResponseDto> findChatroomList(CustomPrincipal customPrincipal) {
+    public ChatroomCursorResponseDto findChatroomList(CustomPrincipal customPrincipal, String keyword, Long cursor) {
+
+        UUID userUuid = customPrincipal.uuid();
+
+        Slice<Chatroom> chatroomSlice = findChatroom(userUuid, keyword, cursor);
+
+        List<ChatroomResponseDto> chatroomResponseDtoList = chatroomSlice.getContent().stream()
+                .map(ChatroomResponseDto::from)
+                .toList();
+
+        boolean hasNext = chatroomSlice.hasNext();
+
+        Long nextCursor = null;
+        // 다음 있을 때 커서 등록
+        if(hasNext && !chatroomSlice.isEmpty()) {
+
+            // 마지막 요소의 인덱스를 다음 커서로
+            nextCursor = chatroomSlice.getContent().get(chatroomSlice.getNumberOfElements() - 1).getId();
+        }
+
+        return ChatroomCursorResponseDto.from(nextCursor, hasNext, chatroomResponseDtoList);
     }
 
     @Transactional
-    public void quitChatroom(CustomPrincipal customPrincipal, Long chatRoomId) {
+    public void quitChatroom(CustomPrincipal customPrincipal, Long chatroomId) {
 
-        if()
+        UUID userUuid = customPrincipal.uuid();
+
+        // 멤버
+        ChatroomUser chatroomUser = chatroomUserUtil.getChatroomUserByChatroomIdAndUserUuid(chatroomId, userUuid);
+
+        // 채팅방 조회
+        Chatroom chatroom = chatroomUtil.getChatroomById(chatroomId, userUuid);
+
+        if(chatroom.getChatroomUserList().stream().filter(member -> member.getQuitAt()== null).count() <= 1)
+            chatroomRepository.delete(chatroom);
+        else {
+
+            //이미 퇴장했는지 확인
+            if(chatroomUser.getQuitAt() != null) {
+
+                CustomLogger.warn(LogEventCode.CHAT,
+                        "FAIL",
+                        LogEventReasonCode.QUIT_CHATROOM_USER,
+                        LogEventReasonCode.QUIT_CHATROOM_USER.getMessage()
+                                + " - chatroomId: " + chatroomId
+                                + " - chatroomUserId: " + chatroomUser.getId(),
+                        userUuid.toString()
+                );
+
+                throw new CustomException(CustomExceptionCode.QUIT_CHATROOM_USER);
+            }
+
+            // quitAt 기록
+            chatroomUser.quitChatroom();
+
+            // 방장이면 방장 계승
+            if(chatroom.getHost().getUuid().equals(userUuid)) {
+
+                ChatroomUser newHost = chatroomUserUtil.getOldestChatroomUser(chatroomId, userUuid);
+                chatroom.changeHost(newHost.getUser());
+            }
+        }
+
         // 퇴장하는 본인이 마지막 멤버가 아님: quitAt만 기록
         // 퇴장하는 본인이 마지막 멤버: 퇴장 후 해당 채팅방 및 채팅 내역도 함께 삭제
-        // 채팅방 퇴장 => 입장 이력이 가장 최근인 사람으로 HOST 갱신
+        // 방장 채팅방 퇴장 => 입장 이력이 가장 최근인 사람으로 HOST 갱신
+    }
+
+    private Slice<Chat> findChat(Long chatroomId, UUID userUuid, Long cursor) {
+
+        int size = 30;
+        Pageable pageable = PageRequest.of(0, size);
+        Slice<Chat> chatSlice;
+
+        chatSlice = chatRepository.findSlice(chatroomId, userUuid, pageable, cursor);
+
+        return chatSlice;
+    }
+
+    private Slice<Chatroom> findChatroom(UUID  userUuid, String keyword, Long cursor) {
+
+        int size = 20;
+        Pageable pageable = PageRequest.of(0, size);
+        Slice<Chatroom> chatroomSlice;
+
+        chatroomSlice = chatroomRepository.findSlice(userUuid, keyword, pageable, cursor);
+
+        return chatroomSlice;
     }
 }

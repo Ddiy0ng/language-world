@@ -20,8 +20,8 @@ public enum CustomExceptionCode {
             "인증되지 않은 사용자입니다."),
     UNSUPPORTED_USER_ROLE_TYPE(
             HttpStatus.BAD_REQUEST,
-            "AUTH_401",
-            "지원하지 않는 권한입니다."),
+            "AUTH_400",
+            "지원하지 않는 권한 타입입니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN,
             "AUTH_403",
             "권한이 없습니다."),
@@ -56,6 +56,8 @@ public enum CustomExceptionCode {
     ACCOUNT_NOT_EXIST(
             HttpStatus.BAD_REQUEST,
             "AUTH_400", "존재하지 않는 계정입니다."),
+
+    // TOKEN
     EXPIRED_TOKEN(
             HttpStatus.UNAUTHORIZED,
             "AUTH_401",
@@ -277,8 +279,27 @@ public enum CustomExceptionCode {
     NOT_LIKE_AUTHOR(
             HttpStatus.FORBIDDEN,
             "POST_403",
-            "해당 좋아요를 추가한 사용자가 아닙니다."
-    );
+            "해당 좋아요를 추가한 사용자가 아닙니다."),
+
+    // WEBSOCKET
+    STOMP_COMMAND_IS_NULL(
+            HttpStatus.BAD_REQUEST,
+            "WEBSOCKET_400",
+            "STOMP COMMAND가 비어있습니다."),
+
+    // CHAT
+    QUIT_CHATROOM_USER(
+            HttpStatus.BAD_REQUEST,
+            "CHAT_400",
+            "이미 퇴장한 멤버입니다."),
+    CHATROOM_USER_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "CHAT_404",
+            "채팅방 유저를 찾을 수 없습니다."),
+    CHATROOM_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "CHAT_404",
+            "채팅방을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드

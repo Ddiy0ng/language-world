@@ -1,15 +1,11 @@
 package com.languageworld.be.domain.chat.controller;
 
-import com.languageworld.be.domain.chat.dto.request.ChatSaveRequestDto;
-import com.languageworld.be.domain.chat.dto.response.ChatResponseDto;
-import com.languageworld.be.domain.chat.dto.response.FriendChatroomEnterResponseDto;
-import com.languageworld.be.domain.chat.dto.response.ChatroomResponseDto;
+import com.languageworld.be.domain.chat.dto.response.*;
 import com.languageworld.be.domain.chat.service.ChatService;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import com.languageworld.be.global.response.enumGroup.SuccessCode;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,37 +31,41 @@ public class ChatController {
         return ResponseEntityUtil.success(SuccessCode.CHATROOM_CREATE_SUCCESS, friendChatroomEnterResponseDto);
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<Void>> saveChat(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                      @Valid @RequestBody ChatSaveRequestDto chatSaveRequestDto) {
-
-        chatService.saveChat(customPrincipal, chatSaveRequestDto);
-
-        return ResponseEntityUtil.success(SuccessCode.CHAT_SAVE_SUCCESS);
-    }
+//    @PostMapping("/{chatroomId}")
+//    public ResponseEntity<ApiResponse<Void>> saveChat(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+//                                                      @PathVariable Long chatroomId,
+//                                                      @Valid @RequestBody ChatSaveRequestDto chatSaveRequestDto) {
+//
+//        chatService.saveChat(customPrincipal, chatroomId, chatSaveRequestDto);
+//
+//        return ResponseEntityUtil.success(SuccessCode.CHAT_SAVE_SUCCESS);
+//    }
 
     @GetMapping("/{chatroomId}")
-    public ResponseEntity<ApiResponse<List<ChatResponseDto>>> findChatList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                                           @PathVariable Long chatroomId) {
+    public ResponseEntity<ApiResponse<ChatCursorResponseDto>> findChatList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                                           @PathVariable Long chatroomId,
+                                                                           @RequestParam(required = false) Long cursor) {
 
-        List<ChatResponseDto> chatResponseDtoList = chatService.findChatList(customPrincipal, chatroomId);
+        ChatCursorResponseDto chatCursorResponseDto = chatService.findChatList(customPrincipal, chatroomId, cursor);
 
-        return ResponseEntityUtil.success(SuccessCode.CHAT_LIST_FIND_SUCCESS, chatResponseDtoList);
+        return ResponseEntityUtil.success(SuccessCode.CHAT_LIST_FIND_SUCCESS, chatCursorResponseDto);
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ChatroomResponseDto>>> findChatroomList(@AuthenticationPrincipal CustomPrincipal customPrincipal) {
+    public ResponseEntity<ApiResponse<ChatroomCursorResponseDto>> findChatroomList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                                                   @RequestParam(required = false) String keyword,
+                                                                                   @RequestParam(required = false) Long cursor) {
 
-        List<ChatroomResponseDto> chatroomResponseDtoList = chatService.findChatroomList(customPrincipal);
+        ChatroomCursorResponseDto chatroomCursorResponseDto = chatService.findChatroomList(customPrincipal, keyword, cursor);
 
-        return ResponseEntityUtil.success(SuccessCode.CHATROOM_LIST_FIND_SUCCESS, chatroomResponseDtoList);
+        return ResponseEntityUtil.success(SuccessCode.CHATROOM_LIST_FIND_SUCCESS, chatroomCursorResponseDto);
     }
 
     @DeleteMapping("/{chatroomId}")
     public ResponseEntity<ApiResponse<Void>> quitChatroom(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                          @PathVariable Long chatRoomId) {
+                                                          @PathVariable Long chatroomId) {
 
-        chatService.quitChatroom(customPrincipal, chatRoomId);
+        chatService.quitChatroom(customPrincipal, chatroomId);
 
         return ResponseEntityUtil.success(SuccessCode.CHATROOM_QUIT_SUCCESS);
     }

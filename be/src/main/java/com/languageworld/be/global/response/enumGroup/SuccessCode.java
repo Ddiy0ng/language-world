@@ -237,7 +237,25 @@ public enum SuccessCode {
     LIKE_REMOVE_SUCCESS(
             HttpStatus.OK,
             "POST_200",
-            "좋아요 취소에 성공했습니다.");
+            "좋아요 취소에 성공했습니다."),
+
+    // CHAT
+    CHATROOM_CREATE_SUCCESS(
+            HttpStatus.CREATED,
+            "CHAT_201",
+            "채팅방 입장에 성공했습니다.."),
+    CHAT_LIST_FIND_SUCCESS(
+            HttpStatus.OK,
+            "CHAT_200",
+            "채팅 내역 조회에 성공했습니다.."),
+    CHATROOM_LIST_FIND_SUCCESS(
+            HttpStatus.OK,
+            "CHAT_200",
+            "채팅방 조회에 성공했습니다."),
+    CHATROOM_QUIT_SUCCESS(
+            HttpStatus.OK,
+            "CHAT_200",
+            "채팅방 퇴장에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

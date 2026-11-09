@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum LogEventReasonCode {
 
     // AUTH
+    AUTH_HEADER_IS_NULL("Authorization Header가 비었습니다."),
     UNAUTHORIZED("인증되지 않은 사용자입니다."),
     UNSUPPORTED_USER_ROLE_TYPE("지원하지 않는 권한입니다."),
     ADMIN_ACCESS_REQUIRED("관리자 권한이 필요합니다."),
@@ -28,6 +29,8 @@ public enum LogEventReasonCode {
     REFRESH_TOKEN_NOT_FOUND("리프레시 토큰을 찾을 수 없습니다."),
     NOT_TOKEN_OWNER("토큰의 소유주가 아닙니다."),
     DELETED_TOKEN("삭제 처리된 토큰입니다."),
+    NOT_VALID_TOKEN_PREFIX("토큰 prefix가 Bearer로 시작하지 않습니다."),
+
 
     // SOCIAL
     INVALID_SOCIAL_TOKEN("유효하지 않은 소셜 인증 토큰입니다."),
@@ -107,7 +110,12 @@ public enum LogEventReasonCode {
     // LIKE
     ALREADY_LIKED_POST("이미 좋아요 된 게시글입니다."),
     LIKE_NOT_FOUND("좋아요를 찾을 수 없습니다."),
-    NOT_LIKE_AUTHOR("해당 좋아요를 추가한 사용자가 아닙니다.");
+    NOT_LIKE_AUTHOR("해당 좋아요를 추가한 사용자가 아닙니다."),
+
+    // CHAT
+    QUIT_CHATROOM_USER("이미 퇴장한 멤버입니다."),
+    CHATROOM_USER_NOT_FOUND("채팅방 유저를 찾을 수 없습니다.."),
+    CHATROOM_NOT_FOUND("채팅방을 찾을 수 없습니다.");
 
 
     private final String message;
