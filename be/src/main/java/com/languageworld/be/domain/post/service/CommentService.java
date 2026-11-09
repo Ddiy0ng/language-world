@@ -1,8 +1,7 @@
 package com.languageworld.be.domain.post.service;
 
 import com.languageworld.be.domain.post.dto.request.CommentRequestDto;
-import com.languageworld.be.domain.post.dto.response.CommentPostResponseDto;
-import com.languageworld.be.domain.post.dto.response.CommentUserResponseDto;
+import com.languageworld.be.domain.post.dto.response.*;
 import com.languageworld.be.domain.post.entity.Comment;
 import com.languageworld.be.domain.post.entity.Post;
 import com.languageworld.be.domain.post.repository.CommentRepository;
@@ -28,8 +27,6 @@ public class CommentService {
     private final PostUtil postUtil;
     private final CommentUtil commentUtil;
 
-    private final int SIZE = 10;
-
     @Transactional
     public void createComment(CustomPrincipal customPrincipal, Long postId, CommentRequestDto commentRequestDto) {
 
@@ -45,38 +42,71 @@ public class CommentService {
     }
 
     @Transactional
-    public List<CommentUserResponseDto> findAuthenticatedUserCommentList(CustomPrincipal customPrincipal, Long cursor) {
+    public CommentUserCursorResponseDto findAuthenticatedUserCommentList(CustomPrincipal customPrincipal, Long cursor) {
 
         UUID userUuid = customPrincipal.uuid();
 
         Slice<Comment> commentSlice = findComment(userUuid, null, cursor);
+
         List<CommentUserResponseDto> commentUserResponseDtoList = commentSlice.getContent().stream()
                 .map(CommentUserResponseDto::from)
                 .toList();
 
-        return commentUserResponseDtoList;
+        boolean hasNext = commentSlice.hasNext();
+
+        Long nextCursor = null;
+        // 다음 있을 때 커서 등록
+        if(hasNext && !commentSlice.isEmpty()) {
+
+            // 마지막 요소의 인덱스를 다음 커서로
+            nextCursor = commentSlice.getContent().get(commentSlice.getNumberOfElements() - 1).getId();
+        }
+
+        return CommentUserCursorResponseDto.from(nextCursor, hasNext, commentUserResponseDtoList);
     }
 
     @Transactional
-    public List<CommentUserResponseDto> findSpecificUserCommentList(UUID userUuid, Long cursor) {
+    public CommentUserCursorResponseDto findSpecificUserCommentList(UUID userUuid, Long cursor) {
 
         Slice<Comment> commentSlice = findComment(userUuid, null, cursor);
+
         List<CommentUserResponseDto> commentUserResponseDtoList = commentSlice.getContent().stream()
                 .map(CommentUserResponseDto::from)
                 .toList();
 
-        return commentUserResponseDtoList;
+        boolean hasNext = commentSlice.hasNext();
+
+        Long nextCursor = null;
+        // 다음 있을 때 커서 등록
+        if(hasNext && !commentSlice.isEmpty()) {
+
+            // 마지막 요소의 인덱스를 다음 커서로
+            nextCursor = commentSlice.getContent().get(commentSlice.getNumberOfElements() - 1).getId();
+        }
+
+        return CommentUserCursorResponseDto.from(nextCursor, hasNext, commentUserResponseDtoList);
     }
 
     @Transactional
-    public List<CommentPostResponseDto> findPostCommentList(Long postId, Long cursor) {
+    public CommentPostCursorResponseDto findPostCommentList(Long postId, Long cursor) {
 
         Slice<Comment> commentSlice = findComment(null, postId, cursor);
-        List<CommentPostResponseDto> userCommentResponseDtoList = commentSlice.getContent().stream()
+
+        List<CommentPostResponseDto> commentPostResponseDtoList = commentSlice.getContent().stream()
                 .map(CommentPostResponseDto::from)
                 .toList();
 
-        return userCommentResponseDtoList;
+        boolean hasNext = commentSlice.hasNext();
+
+        Long nextCursor = null;
+        // 다음 있을 때 커서 등록
+        if(hasNext && !commentSlice.isEmpty()) {
+
+            // 마지막 요소의 인덱스를 다음 커서로
+            nextCursor = commentSlice.getContent().get(commentSlice.getNumberOfElements() - 1).getId();
+        }
+
+        return CommentPostCursorResponseDto.from(nextCursor, hasNext, commentPostResponseDtoList);
     }
 
     @Transactional
@@ -110,6 +140,7 @@ public class CommentService {
     @Transactional
     private Slice<Comment> findComment(UUID userUuid, Long postId, Long cursor) {
 
+        int SIZE = 10;
         Pageable pageable = PageRequest.of(0, SIZE);
         Slice<Comment> commentSlice;
 

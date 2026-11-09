@@ -15,13 +15,11 @@ public record PostSummaryResponseDto (
 
     public static PostSummaryResponseDto from(Post post, long commentSize, long likeSize) {
 
-        PostSummaryResponseDto postSummaryResponseDto = PostSummaryResponseDto.builder()
+        return PostSummaryResponseDto.builder()
                 .userSummaryResponseDto(UserSummaryResponseDto.from(post.getAuthor()))
                 .postResponseDto(PostResponseDto.from(post))
                 .commentSize(commentSize)
                 .likeSize(likeSize)
                 .build();
-
-        return postSummaryResponseDto;
     }
 }
