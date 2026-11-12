@@ -32,7 +32,7 @@ public class JwtProvider {
 
         Date now = new Date();
 
-        String accessToken = Jwts.builder()
+        return Jwts.builder()
                 .subject(user.getUuid().toString())
                 .claim(JwtUtil.ROLE, user.getUserRole().name())
                 .claim(JwtUtil.TYPE, JwtUtil.ACCESS)
@@ -40,8 +40,6 @@ public class JwtProvider {
                 .expiration(new Date(now.getTime() + ACCESS_EXPIRATION)) //만료 시각
                 .signWith(JWT_SECRET_KEY)
                 .compact();
-
-        return accessToken;
     }
 
     // 리프레시 토큰 생성
@@ -49,7 +47,7 @@ public class JwtProvider {
 
         Date now = new Date();
 
-        String refreshToken = Jwts.builder()
+        return Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .subject(user.getUuid().toString())
                 .claim(JwtUtil.TYPE, JwtUtil.REFRESH)
@@ -57,7 +55,5 @@ public class JwtProvider {
                 .expiration(new Date(now.getTime() + REFRESH_EXPIRATION)) //만료 시각
                 .signWith(JWT_SECRET_KEY)
                 .compact();
-
-        return refreshToken;
     }
 }

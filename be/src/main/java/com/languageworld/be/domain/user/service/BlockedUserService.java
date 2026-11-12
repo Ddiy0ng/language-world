@@ -78,11 +78,9 @@ public class BlockedUserService {
         UUID uuid = customPrincipal.uuid();
         List<BlockedUser> blockedUserList = blockedUserRepository.findAllByUser_Uuid(uuid);
 
-        List<BlockedUserResponseDto> blockedUserResponseDtoList = blockedUserList.stream()
+        return blockedUserList.stream()
                 .map(BlockedUserResponseDto::from)
                 .toList();
-
-        return blockedUserResponseDtoList;
     }
 
     @Transactional

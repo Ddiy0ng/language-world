@@ -18,6 +18,7 @@ import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -86,7 +87,7 @@ public class ChatService {
 
         UUID userUuid = customPrincipal.uuid();
 
-        chatroomUserUtil.chatroomUserCheck(chatroomId, userUuid);
+        chatroomUserUtil.getValidChatroomUser(chatroomId, userUuid);
 
         User sender = userUtil.getUserByUuid(userUuid);
 
@@ -95,6 +96,12 @@ public class ChatService {
         Chat chat = Chat.of(chatSaveRequestDto.chatMessage(),sender, chatroom);
 
         chatRepository.save(chat);
+        CustomLogger.info(
+                LogEventCode.CHAT,
+                "SUCCESS",
+                SuccessCode.CHAT_SAVE_SUCCESS.getMessage(),
+                customPrincipal.uuid().toString()
+        );
     }
 
     @Transactional

@@ -41,7 +41,7 @@ public class BlockedUserUtil {
         return optionalBlockedUser.get();
     }
 
-    protected void blockedUserCheck(UUID authenticatedUserUuid, UUID requestUuid) {
+    public void blockedUserCheck(UUID authenticatedUserUuid, UUID requestUuid) {
 
         if(blockedUserRepository.existsByUser_UuidAndBlockedUser_Uuid(authenticatedUserUuid, requestUuid)) {
 

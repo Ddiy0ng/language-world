@@ -330,19 +330,7 @@ public class AuthService {
         }
 
         // 토큰 소유자 탈퇴 여부
-        if(user.getDeletedAt() != null) {
-
-            CustomLogger.warn(
-                    LogEventCode.AUTH,
-                    "FAIL",
-                    LogEventReasonCode.DELETED_USER,
-                    LogEventReasonCode.DELETED_USER.getMessage()
-                            + " - DeletedUser Uuid: " + user.getUuid(),
-                    null
-            );
-
-            throw new CustomException(CustomExceptionCode.INVALID_TOKEN);
-        }
+        userUtil.deletedUserCheckByUserUuid(user.getUuid());
 
         // 새 토큰 발급
         String newAccessToken = jwtProvider.generateAccessToken(user);

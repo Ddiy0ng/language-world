@@ -255,7 +255,15 @@ public enum SuccessCode {
     CHATROOM_QUIT_SUCCESS(
             HttpStatus.OK,
             "CHAT_200",
-            "채팅방 퇴장에 성공했습니다.");
+            "채팅방 퇴장에 성공했습니다."),
+    CHAT_SAVE_SUCCESS(
+            HttpStatus.CREATED,
+            "CHAT_201",
+            "채팅 저장에 성공했습니다."),
+    CHAT_SEND_SUCCESS(
+            HttpStatus.OK,
+            "CHAT_200",
+            "채팅 전송에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

@@ -29,11 +29,9 @@ public class BlockedUser extends CreatableEntity {
 
     public static BlockedUser of(User user, User requestedUser) {
 
-        BlockedUser blockedUser = BlockedUser.builder()
+        return BlockedUser.builder()
                 .user(user)
                 .blockedUser(requestedUser)
                 .build();
-
-        return blockedUser;
     }
 }

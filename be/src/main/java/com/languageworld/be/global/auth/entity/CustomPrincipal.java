@@ -13,11 +13,9 @@ public record CustomPrincipal (
 
     public static CustomPrincipal of(String uuidStr, String userRoleStr) {
 
-        CustomPrincipal customPrincipal = CustomPrincipal.builder()
+        return CustomPrincipal.builder()
                 .uuid(UUID.fromString(uuidStr))
                 .userRole(UserRoleCode.from(userRoleStr))
                 .build();
-
-        return customPrincipal;
     }
 }

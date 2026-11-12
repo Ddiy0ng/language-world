@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum LogEventReasonCode {
 
     // AUTH
-    AUTH_HEADER_IS_NULL("Authorization Header가 비었습니다."),
+    AUTH_HEADER_IS_NULL_OR_BLANK("Authorization Header가 비었습니다."),
     UNAUTHORIZED("인증되지 않은 사용자입니다."),
     UNSUPPORTED_USER_ROLE_TYPE("지원하지 않는 권한입니다."),
     ADMIN_ACCESS_REQUIRED("관리자 권한이 필요합니다."),
@@ -115,8 +115,18 @@ public enum LogEventReasonCode {
     // CHAT
     QUIT_CHATROOM_USER("이미 퇴장한 멤버입니다."),
     CHATROOM_USER_NOT_FOUND("채팅방 유저를 찾을 수 없습니다.."),
-    CHATROOM_NOT_FOUND("채팅방을 찾을 수 없습니다.");
+    CHATROOM_NOT_FOUND("채팅방을 찾을 수 없습니다."),
 
+    // WEBSOCKET + STOMP
+    STOMP_HEADER_ACCESSOR_IS_NULL("STOMP 헤더가 비었습니다."),
+    STOMP_COMMAND_IS_NULL("STOMP COMMAND가 비었습니다."),
+    UNSUPPORTED_STOMP_COMMAND("지원하지 않는 STOMP COMMAND입니다."),
+    DUPLICATE_WEBSOCKET_SESSION("중복된 WebSocket session입니다."),
+    NOT_REGISTERED_WEBSOCKET_SESSION("등록되지 않은 WebSocket session입니다."),
+    WEBSOCKET_SESSION_IS_NULL_OR_BLANK("WebSocket Session이 비었습니다."),
+    STOMP_HEADER_ACCESSOR_DESTINATION_IS_NULL_OR_BLANK("STOMP Header의 destination이 비었습니다."),
+    STOMP_COMMAND_NOT_REQUIRED_EXTRACT_ROOMID_METHOD("해당 STOMP COMMAND는 roomId추출이 필요하지 않습니다."),
+    DESTINATION_NOT_MATCH_WITH_PATTERN("Destination이 Pattern과 일치하지 않습니다.");
 
     private final String message;
 }

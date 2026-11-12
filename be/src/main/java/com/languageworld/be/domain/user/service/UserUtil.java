@@ -3,7 +3,6 @@ package com.languageworld.be.domain.user.service;
 import com.languageworld.be.domain.user.entity.ServiceAccount;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.domain.user.repository.ServiceAccountRepository;
-import com.languageworld.be.domain.user.repository.SocialAccountRepository;
 import com.languageworld.be.domain.user.repository.UserRepository;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
@@ -22,7 +21,6 @@ public class UserUtil {
 
     private final UserRepository userRepository;
     private final ServiceAccountRepository serviceAccountRepository;
-    private final SocialAccountRepository socialAccountRepository;
 
     // USER
     public User getUserByUuid(UUID uuid) {
@@ -62,5 +60,23 @@ public class UserUtil {
         ServiceAccount serviceAccount = optionalServiceAccount.get();
 
         return serviceAccount;
+    }
+
+    public void deletedUserCheckByUserUuid(UUID userUuid) {
+
+        User user = getUserByUuid(userUuid);
+        if(user.getDeletedAt() != null) {
+
+            CustomLogger.warn(
+                    LogEventCode.AUTH,
+                    "FAIL",
+                    LogEventReasonCode.DELETED_USER,
+                    LogEventReasonCode.DELETED_USER.getMessage()
+                            + " - DeletedUser Uuid: " + user.getUuid(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.DELETED_USER);
+        }
     }
 }

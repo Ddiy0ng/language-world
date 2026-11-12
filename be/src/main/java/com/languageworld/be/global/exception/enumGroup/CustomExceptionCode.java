@@ -282,6 +282,9 @@ public enum CustomExceptionCode {
             "해당 좋아요를 추가한 사용자가 아닙니다."),
 
     // WEBSOCKET
+    WEBSOCKET_BAD_REQUEST(HttpStatus.BAD_REQUEST,
+            "WEBSOCKET_400",
+            "잘못된 요청입니다."),
     STOMP_COMMAND_IS_NULL(
             HttpStatus.BAD_REQUEST,
             "WEBSOCKET_400",

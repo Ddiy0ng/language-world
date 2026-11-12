@@ -12,7 +12,7 @@ public interface ChatroomUserRepository extends JpaRepository<ChatroomUser, Long
 
     Optional<ChatroomUser> findByChatroom_IdAndUser_Uuid(Long chatroomId, UUID userUuid);
 
-    boolean existsByChatroom_IdAndUser_Uuid(Long chatroomId, UUID userUuid);
-
     Optional<ChatroomUser> findFirstByChatroom_IdAndUser_UuidNotAndQuitAtIsNullOrderByEnteredAtAsc(Long chatroomId, UUID userUuid);
+
+    Optional<ChatroomUser> findByChatroom_IdAndUser_UuidNot(Long chatroomId, UUID userUuid);
 }
