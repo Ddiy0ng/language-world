@@ -92,7 +92,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
                 chatroomUtil.getChatroomById(chatroomId, userUuid);
 
                 // 유효한 사용자: 채팅방 멤버 + 회원 탈퇴x + 퇴장 상태x + PERSONAL일 경우 차단 X
-                chatroomUserUtil.getValidChatroomUser(chatroomId, userUuid);
+                chatroomUserUtil.ValidChatroomUserCheck(chatroomId, userUuid);
             }
             case SEND-> {
 
@@ -106,7 +106,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
                 chatroomUtil.getChatroomById(chatroomId, userUuid);
 
                 // 유효한 사용자
-                chatroomUserUtil.getValidChatroomUser(chatroomId, userUuid);
+                chatroomUserUtil.ValidChatroomUserCheck(chatroomId, userUuid);
             }
             case UNSUBSCRIBE -> {}
             case DISCONNECT -> {

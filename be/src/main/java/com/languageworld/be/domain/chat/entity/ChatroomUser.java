@@ -1,7 +1,6 @@
 package com.languageworld.be.domain.chat.entity;
 
 import com.languageworld.be.domain.user.entity.User;
-import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

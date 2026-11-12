@@ -27,7 +27,7 @@ public class ChatroomUserUtil {
     private final BlockedUserUtil blockedUserUtil;
 
     //채팅방 멤버 + 회원 탈퇴x + 퇴장 상태x + PERSONAL일 경우 차단 X
-    public void getValidChatroomUser(Long chatroomId, UUID userUuid) {
+    public void ValidChatroomUserCheck(Long chatroomId, UUID userUuid) {
 
         ChatroomUser chatroomUser = getChatroomUserByChatroomIdAndUserUuid(chatroomId, userUuid);
 

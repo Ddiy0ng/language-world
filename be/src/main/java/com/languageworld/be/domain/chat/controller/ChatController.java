@@ -31,16 +31,6 @@ public class ChatController {
         return ResponseEntityUtil.success(SuccessCode.CHATROOM_CREATE_SUCCESS, friendChatroomEnterResponseDto);
     }
 
-//    @PostMapping("/{chatroomId}")
-//    public ResponseEntity<ApiResponse<Void>> saveChat(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-//                                                      @PathVariable Long chatroomId,
-//                                                      @Valid @RequestBody ChatSaveRequestDto chatSaveRequestDto) {
-//
-//        chatService.saveChat(customPrincipal, chatroomId, chatSaveRequestDto);
-//
-//        return ResponseEntityUtil.success(SuccessCode.CHAT_SAVE_SUCCESS);
-//    }
-
     @GetMapping("/{chatroomId}")
     public ResponseEntity<ApiResponse<ChatCursorResponseDto>> findChatList(@AuthenticationPrincipal CustomPrincipal customPrincipal,
                                                                            @PathVariable Long chatroomId,

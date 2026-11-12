@@ -1,6 +1,5 @@
 package com.languageworld.be.domain.chat.service;
 
-import com.languageworld.be.domain.chat.dto.request.ChatSaveRequestDto;
 import com.languageworld.be.domain.chat.dto.response.*;
 import com.languageworld.be.domain.chat.entity.Chat;
 import com.languageworld.be.domain.chat.entity.Chatroom;
@@ -18,7 +17,6 @@ import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
-import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -83,34 +81,12 @@ public class ChatService {
     }
 
     @Transactional
-    public void saveChat(CustomPrincipal customPrincipal, Long chatroomId, ChatSaveRequestDto chatSaveRequestDto) {
-
-        UUID userUuid = customPrincipal.uuid();
-
-        chatroomUserUtil.getValidChatroomUser(chatroomId, userUuid);
-
-        User sender = userUtil.getUserByUuid(userUuid);
-
-        Chatroom chatroom = chatroomUtil.getChatroomById(chatroomId, userUuid);
-
-        Chat chat = Chat.of(chatSaveRequestDto.chatMessage(),sender, chatroom);
-
-        chatRepository.save(chat);
-        CustomLogger.info(
-                LogEventCode.CHAT,
-                "SUCCESS",
-                SuccessCode.CHAT_SAVE_SUCCESS.getMessage(),
-                customPrincipal.uuid().toString()
-        );
-    }
-
-    @Transactional
     public ChatCursorResponseDto findChatList(CustomPrincipal customPrincipal, Long chatroomId, Long cursor) {
 
         UUID userUuid = customPrincipal.uuid();
 
         // 채팅방 멤버 여부 확인
-        ChatroomUser chatroomUser = chatroomUserUtil.getChatroomUserByChatroomIdAndUserUuid(chatroomId, userUuid);
+        chatroomUserUtil.getChatroomUserByChatroomIdAndUserUuid(chatroomId, userUuid);
 
         // 채팅방 에시지 히스토리 조회
         Slice<Chat> chatSlice = findChat(chatroomId, userUuid, cursor);
