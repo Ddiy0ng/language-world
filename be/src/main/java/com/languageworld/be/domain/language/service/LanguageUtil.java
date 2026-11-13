@@ -36,9 +36,8 @@ public class LanguageUtil {
 
             throw new CustomException(CustomExceptionCode.UNSUPPORTED_LANGUAGE);
         }
-        Language language = optionalLanguage.get();
 
-        return language;
+        return optionalLanguage.get();
     }
 
     public Level getLevelById(Long levelId) {
@@ -54,9 +53,8 @@ public class LanguageUtil {
 
             throw new CustomException(CustomExceptionCode.LEVEL_NOT_FOUND);
         }
-        Level level = optionalLevel.get();
 
-        return level;
+        return optionalLevel.get();
     }
 
 }

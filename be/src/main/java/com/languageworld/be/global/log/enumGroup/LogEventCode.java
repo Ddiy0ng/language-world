@@ -12,4 +12,5 @@ public enum LogEventCode {
     POST,
     WEBSOCKET,
     CHAT,
+    VOCAB,
 }
