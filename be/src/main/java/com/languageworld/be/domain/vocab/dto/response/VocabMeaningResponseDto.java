@@ -4,25 +4,23 @@ import com.languageworld.be.domain.vocab.entity.VocabMeaning;
 import lombok.Builder;
 
 @Builder
-public record VocabResponseDto(
+public record VocabMeaningResponseDto(
 
         Long vocabId,
         Long vocabMeaningId,
         String learningLanguage,
         String level,
-        String learningLanguageMeaning,
-        String motherTongueMeaning
+        String learningLanguageMeaning
 ) {
 
-    public static VocabResponseDto from(VocabMeaning vocabMeaning, String motherTongueMeaning) {
+    public static VocabMeaningResponseDto from(VocabMeaning vocabMeaning) {
 
-        return VocabResponseDto.builder()
+        return VocabMeaningResponseDto.builder()
                 .vocabId(vocabMeaning.getVocab().getId())
                 .vocabMeaningId(vocabMeaning.getId())
                 .learningLanguage(vocabMeaning.getLanguage().getType())
                 .level(vocabMeaning.getLevel().getLevel())
                 .learningLanguageMeaning(vocabMeaning.getMeaning())
-                .motherTongueMeaning(motherTongueMeaning)
                 .build();
     }
 }

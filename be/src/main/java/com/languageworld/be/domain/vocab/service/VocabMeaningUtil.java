@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -18,17 +19,16 @@ public class VocabMeaningUtil {
 
     private final VocabMeaningRepository vocabMeaningRepository;
 
-    public VocabMeaning getMotherTongueVocabMeaningByVocabIdAndMotherTongueType(Long vocabId, String motherTongueType) {
+    public VocabMeaning getVocabMeaningByVocabMeaningId(UUID userUuid, Long vocabMeaningId) {
 
-        Optional<VocabMeaning> optionalVocabMeaning = vocabMeaningRepository.findByVocab_IdAndLanguage_Type(vocabId, motherTongueType);
+        Optional<VocabMeaning> optionalVocabMeaning = vocabMeaningRepository.findById(vocabMeaningId);
         if(optionalVocabMeaning.isEmpty()) {
             CustomLogger.warn(LogEventCode.VOCAB,
                     "FAIL",
                     LogEventReasonCode.VOCAB_MEANING_NOT_FOUND,
                     LogEventReasonCode.VOCAB_MEANING_NOT_FOUND.getMessage()
-                            + " - vocabId: " + vocabId
-                            + " - motherTongueType: " + motherTongueType,
-                    null
+                            + " - vocabMeaningId: " + vocabMeaningId,
+                    userUuid.toString()
             );
 
             throw new CustomException(CustomExceptionCode.VOCAB_MEANING_NOT_FOUND);

@@ -3,13 +3,11 @@ package com.languageworld.be.domain.vocab.entity;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.global.baseEntity.ChangeableEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Table(name = "saved_vocabs")
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -31,4 +29,15 @@ public class SavedVocab extends ChangeableEntity {
     @ManyToOne
     @JoinColumn(name = "vocab_meaning_id", nullable = false)
     private VocabMeaning vocabMeaning;
+
+    public static SavedVocab of(String memo, User user, VocabMeaning vocabMeaning) {
+
+        return SavedVocab.builder()
+                .memo(memo)
+                .user(user)
+                .vocabMeaning(vocabMeaning)
+                .build();
+    }
+
+    public void changeMemo(String memo) {this.memo = memo;}
 }

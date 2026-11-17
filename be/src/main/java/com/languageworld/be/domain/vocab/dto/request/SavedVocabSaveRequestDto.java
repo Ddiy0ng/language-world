@@ -1,12 +1,14 @@
 package com.languageworld.be.domain.vocab.dto.request;
 
-import lombok.Builder;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
-@Builder
-public record SavedVocabSaveRequestDto (
+public record SavedVocabSaveRequestDto(
+
+        @NotNull
+        Long vocabMeaningId,
 
         @Length(max = 300)
         String memo
-){
+) {
 }

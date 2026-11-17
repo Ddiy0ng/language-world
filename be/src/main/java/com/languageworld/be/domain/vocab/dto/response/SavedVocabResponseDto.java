@@ -7,16 +7,16 @@ import lombok.Builder;
 public record SavedVocabResponseDto(
 
         Long savedVocabId,
-        VocabResponseDto vocabResponseDto,
+        VocabMeaningResponseDto vocabMeaningResponseDto,
         String memo
 ) {
 
-    public static SavedVocabResponseDto from(SavedVocab savedVocab, String motherTongueMeaning, String memo) {
+    public static SavedVocabResponseDto from(SavedVocab savedVocab) {
 
         return SavedVocabResponseDto.builder()
                 .savedVocabId(savedVocab.getId())
-                .vocabResponseDto(VocabResponseDto.from(savedVocab.getVocabMeaning(), motherTongueMeaning))
-                .memo(memo)
+                .vocabMeaningResponseDto(VocabMeaningResponseDto.from(savedVocab.getVocabMeaning()))
+                .memo(savedVocab.getMemo())
                 .build();
     }
 }
