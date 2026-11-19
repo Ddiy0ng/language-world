@@ -263,7 +263,25 @@ public enum SuccessCode {
     CHAT_SEND_SUCCESS(
             HttpStatus.OK,
             "CHAT_200",
-            "채팅 전송에 성공했습니다.");
+            "채팅 전송에 성공했습니다."),
+
+    // VOCAB
+    SAVED_VOCAB_SAVE_SUCCESS(
+            HttpStatus.CREATED,
+            "VOCAB_201",
+            "개인 어휘 저장에 성공했습니다."),
+    SAVED_VOCAB_SEARCH_SUCCESS(
+            HttpStatus.OK,
+            "VOCAB_200",
+            "저장된 어휘 조회에 성공했습니다."),
+    SAVED_VOCAB_MEMO_CHANGE_SUCCESS(
+            HttpStatus.OK,
+            "CHAT_200",
+            "저장된 어휘의 메모 변경에 성공했습니다."),
+    SAVED_VOCAB_DELETE_SUCCESS(
+            HttpStatus.OK,
+            "VOCAB_200",
+            "저장된 어휘 삭제에 성공했습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

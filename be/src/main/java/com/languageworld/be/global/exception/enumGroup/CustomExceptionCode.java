@@ -282,7 +282,8 @@ public enum CustomExceptionCode {
             "해당 좋아요를 추가한 사용자가 아닙니다."),
 
     // WEBSOCKET
-    WEBSOCKET_BAD_REQUEST(HttpStatus.BAD_REQUEST,
+    WEBSOCKET_BAD_REQUEST(
+            HttpStatus.BAD_REQUEST,
             "WEBSOCKET_400",
             "잘못된 요청입니다."),
     STOMP_COMMAND_IS_NULL(
@@ -302,7 +303,21 @@ public enum CustomExceptionCode {
     CHATROOM_NOT_FOUND(
             HttpStatus.NOT_FOUND,
             "CHAT_404",
-            "채팅방을 찾을 수 없습니다.");
+            "채팅방을 찾을 수 없습니다."),
+
+    // VCOAB
+    SAVED_VOCAB_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "VOCAB_404",
+            "저장된 어휘를 찾을 수 없습니다."),
+    FORBIDDEN_SAVED_VOCAB_REQUEST(
+            HttpStatus.FORBIDDEN,
+            "VOCAB_403",
+            "해당 사용자가 저장한 어휘가 아닙니다."),
+    VOCAB_MEANING_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "VOCAB_404",
+            "어휘의 의미를 조회할 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드

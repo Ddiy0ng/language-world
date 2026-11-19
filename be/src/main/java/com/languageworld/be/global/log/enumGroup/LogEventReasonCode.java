@@ -125,8 +125,13 @@ public enum LogEventReasonCode {
     NOT_REGISTERED_WEBSOCKET_SESSION("등록되지 않은 WebSocket session입니다."),
     WEBSOCKET_SESSION_IS_NULL_OR_BLANK("WebSocket Session이 비었습니다."),
     STOMP_HEADER_ACCESSOR_DESTINATION_IS_NULL_OR_BLANK("STOMP Header의 destination이 비었습니다."),
-    STOMP_COMMAND_NOT_REQUIRED_EXTRACT_ROOMID_METHOD("해당 STOMP COMMAND는 roomId추출이 필요하지 않습니다."),
-    DESTINATION_NOT_MATCH_WITH_PATTERN("Destination이 Pattern과 일치하지 않습니다.");
+    STOMP_COMMAND_NOT_REQUIRED_EXTRACT_ROOM_ID_METHOD("해당 STOMP COMMAND는 roomId추출이 필요하지 않습니다."),
+    DESTINATION_NOT_MATCH_WITH_PATTERN("Destination이 Pattern과 일치하지 않습니다."),
+
+    // VOCAB
+    SAVED_VOCAB_NOT_FOUND("저장된 어휘를 찾을 수 없습니다."),
+    NOT_SAVED_VOCAB_OWNER("해당 사용자가 저장한 어휘가 아닙니다."),
+    VOCAB_MEANING_NOT_FOUND("어휘의 의미를 조회할 수 없습니다.");
 
     private final String message;
 }

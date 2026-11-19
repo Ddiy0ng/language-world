@@ -51,8 +51,8 @@ public class WebSocketUtil {
                 CustomLogger.warn(
                         LogEventCode.WEBSOCKET,
                         "FAIL",
-                        LogEventReasonCode.STOMP_COMMAND_NOT_REQUIRED_EXTRACT_ROOMID_METHOD,
-                        LogEventReasonCode.STOMP_COMMAND_NOT_REQUIRED_EXTRACT_ROOMID_METHOD.getMessage(),
+                        LogEventReasonCode.STOMP_COMMAND_NOT_REQUIRED_EXTRACT_ROOM_ID_METHOD,
+                        LogEventReasonCode.STOMP_COMMAND_NOT_REQUIRED_EXTRACT_ROOM_ID_METHOD.getMessage(),
                         null
                 );
 
