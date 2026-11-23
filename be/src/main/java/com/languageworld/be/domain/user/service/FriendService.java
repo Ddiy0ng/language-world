@@ -68,7 +68,7 @@ public class FriendService {
         }
 
         // TODO 차단 여부 확인
-        blockedUserUtil.blockedUserCheck(userUuid, friendUuid);
+        blockedUserUtil.blockedEachOtherCheck(userUuid, friendUuid);
 
         // 추가
         Friend friend = Friend.of(authenticatedUser, requestedUser);
@@ -83,11 +83,9 @@ public class FriendService {
         List<FriendStatusCode> friendStatusCodeList= List.of(FriendStatusCode.REQUESTED, FriendStatusCode.REJECTED);
         List<Friend> sentFriendRequestList = friendRepository.findAllSentFriendRequest(uuid, friendStatusCodeList);
 
-        List<FriendRequestResponseDto> friendRequestResponseDtoList = sentFriendRequestList.stream()
+        return sentFriendRequestList.stream()
                 .map(FriendRequestResponseDto::fromSent)
                 .toList();
-
-        return friendRequestResponseDtoList;
     }
 
     @Transactional
@@ -96,11 +94,9 @@ public class FriendService {
         UUID uuid = customPrincipal.uuid();
         List<Friend> sentFriendRequestList = friendRepository.findAllReceivedFriendRequest(uuid, FriendStatusCode.REQUESTED);
 
-        List<FriendRequestResponseDto> friendRequestResponseDtoList = sentFriendRequestList.stream()
+        return sentFriendRequestList.stream()
                 .map(FriendRequestResponseDto::fromReceived)
                 .toList();
-
-        return friendRequestResponseDtoList;
     }
 
     @Transactional
@@ -112,11 +108,9 @@ public class FriendService {
         UUID uuid = customPrincipal.uuid();
         List<Friend> friendList = friendRepository.findAllFriendUsers(customPrincipal.uuid(), keyword, FriendStatusCode.ACCEPTED);
 
-        List<FriendRequestResponseDto> friendRequestResponseDtoList = friendList.stream()
+        return friendList.stream()
                 .map(friend -> FriendRequestResponseDto.from(uuid, friend))
                 .toList();
-
-        return friendRequestResponseDtoList;
     }
 
     @Transactional
