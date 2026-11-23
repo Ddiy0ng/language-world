@@ -85,6 +85,8 @@ public enum LogEventReasonCode {
     NOT_PROPER_STATUS_FOR_THE_REQUEST("요청에 적합한 친구 요청 상태가 아닙니다."),
     CANT_CANCEL_ACCEPTED_REQUEST("친구 요청을 수락한 상태일 때만 취소가 가능합니다."),
     FORBIDDEN_FRIEND_REMOVE_REQUEST("해당 인증된 사용자가 삭제할 수 있는 친구가 아닙니다."),
+    NOT_FRIEND("친구 관계가 아닌 사용자입니다."),
+    CANT_CHAT_WITH_SELF("자기 자신과 채팅할 수 없습니다."),
     // BLOCKED USER
     CANT_BLOCK_SELF("스스로를 차단할 수 없습니다."),
     ALREADY_BLOCKED("이미 차단된 사용자입니다."),

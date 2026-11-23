@@ -128,7 +128,7 @@ public class FriendService {
         Friend friend = friendUtil.getReceivedFriendRequest(uuid, requestId);
 
         // 요청 상태인지 확인
-        friendUtil.validateFriendStatus(friend, FriendStatusCode.REQUESTED, uuid);
+        friendUtil.validateFriendStatus(friend, uuid);
 
         friend.acceptFriendRequest();
     }
@@ -142,7 +142,7 @@ public class FriendService {
         Friend friend = friendUtil.getReceivedFriendRequest(uuid, requestId);
 
         // 요청 상태인지 확인
-        friendUtil.validateFriendStatus(friend, FriendStatusCode.REQUESTED, uuid);
+        friendUtil.validateFriendStatus(friend, uuid);
 
         friend.rejectFriendRequest();
     }

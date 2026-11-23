@@ -196,6 +196,10 @@ public enum CustomExceptionCode {
             HttpStatus.FORBIDDEN,
             "USER_403",
             "해당 인증된 사용자가 삭제할 수 있는 친구가 아닙니다."),
+    NOT_FRIEND(
+            HttpStatus.FORBIDDEN,
+            "USER_403",
+            "친구 관계가 아닌 사용자입니다."),
 
     // BLOCKED USER
     CANT_BLOCK_SELF(
@@ -304,7 +308,11 @@ public enum CustomExceptionCode {
             HttpStatus.NOT_FOUND,
             "CHAT_404",
             "채팅방을 찾을 수 없습니다."),
-
+    CANT_CHAT_WITH_SELF(
+            HttpStatus.BAD_REQUEST,
+            "CHAT_400",
+            "자기 자신과 채팅할 수 없습니다."),
+    
     // VCOAB
     SAVED_VOCAB_NOT_FOUND(
             HttpStatus.NOT_FOUND,

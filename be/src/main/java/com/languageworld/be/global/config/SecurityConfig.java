@@ -28,6 +28,7 @@ public class SecurityConfig {
 
     private final String[] WHITE_LIST_URL = {
             "/",
+            "/ws",
             "/auth/signup/**",
             "/auth/login/**",
             "/auth/reissue",

@@ -25,7 +25,6 @@ public class ChatController {
     public ResponseEntity<ApiResponse<FriendChatroomEnterResponseDto>> enterFriendChatroom(@AuthenticationPrincipal CustomPrincipal customPrincipal,
                                                                                            @PathVariable UUID userUuid) {
 
-        // 친구창 통해 채팅방 입장(생성): dm
         FriendChatroomEnterResponseDto friendChatroomEnterResponseDto = chatService.enterFriendChatroom(customPrincipal, userUuid);
 
         return ResponseEntityUtil.success(SuccessCode.CHATROOM_CREATE_SUCCESS, friendChatroomEnterResponseDto);

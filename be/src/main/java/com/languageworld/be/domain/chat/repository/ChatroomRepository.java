@@ -15,26 +15,7 @@ import java.util.UUID;
 @Repository
 public interface ChatroomRepository extends JpaRepository<Chatroom, Long> {
 
-    @Query(
-            """
-                SELECT chatroom
-                FROM Chatroom chatroom
-                WHERE chatroom.chatroomType = :type
-                    AND EXISTS (
-                        SELECT 1
-                        FROM ChatroomUser chatroomUserAuth
-                        WHERE chatroomUserAuth.chatroom = chatroom
-                            AND chatroomUserAuth.user.uuid = :authUuid
-                    )
-                    AND EXISTS (
-                        SELECT 1
-                        FROM ChatroomUser chatroomUserFriend
-                        WHERE chatroomUserFriend.chatroom = chatroom
-                            AND chatroomUserFriend.user.uuid = :userUuid
-                    )
-            """
-    )
-    Optional<Chatroom> findByChatroomTypeCodeAndHostAndChatroomUser(@Param("type") ChatroomTypeCode chatroomType, @Param("authUuid")UUID authenticatedUserUuid, @Param("userUuid") UUID userUuid);
+    Optional<Chatroom> findByPersonalKey(String personalKey);
 
     @Query(
             """

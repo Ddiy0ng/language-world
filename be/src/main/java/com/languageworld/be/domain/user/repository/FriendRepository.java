@@ -18,6 +18,19 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
             """
                 SELECT CASE WHEN COUNT(friend) > 0 THEN true ELSE false END
                 FROM Friend friend
+                WHERE friend.friendStatus = :status
+                    AND (
+                        (friend.user.uuid = :userUuid AND friend.friend.uuid = :friendUuid)
+                        OR (friend.user.uuid = :friendUuid AND friend.friend.uuid = :userUuid)
+                    )
+            """
+    )
+    boolean existsFriendByStatus(@Param("userUuid") UUID userUuid, @Param("friendUuid") UUID friendUuid, @Param("status") FriendStatusCode friendStatusCode);
+
+    @Query(
+            """
+                SELECT CASE WHEN COUNT(friend) > 0 THEN true ELSE false END
+                FROM Friend friend
                 WHERE (
                         (friend.user.uuid = :userUuid AND friend.friend.uuid = :friendUuid)
                         OR friend.user.uuid = :friendUuid AND friend.friend.uuid = :userUuid

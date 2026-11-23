@@ -86,16 +86,16 @@ public class FriendUtil {
         return optionalFriend.get();
     }
 
-    protected void validateFriendStatus(Friend friend, FriendStatusCode requiredFriendStatusCode, UUID authenticatedUserUuid) {
+    protected void validateFriendStatus(Friend friend, UUID authenticatedUserUuid) {
 
-        if(friend.getFriendStatus() != requiredFriendStatusCode) {
+        if(friend.getFriendStatus() != FriendStatusCode.REQUESTED) {
 
             CustomLogger.warn(
                     LogEventCode.USER,
                     "FAIL",
                     LogEventReasonCode.NOT_PROPER_STATUS_FOR_THE_REQUEST,
                     LogEventReasonCode.NOT_PROPER_STATUS_FOR_THE_REQUEST.getMessage()
-                            + " - requiredStatus: " + requiredFriendStatusCode
+                            + " - requiredStatus: " + FriendStatusCode.REQUESTED
                             + " - actualStatus: " + friend.getFriendStatus(),
                     authenticatedUserUuid.toString()
             );
@@ -119,6 +119,25 @@ public class FriendUtil {
             );
 
             throw new CustomException(CustomExceptionCode.NOT_PROPER_STATUS_FOR_THE_REQUEST);
+        }
+    }
+
+    // 두 사용자가 수락된 친구 관계인지 확인
+    public void acceptedFriendCheck(UUID authenticatedUserUuid, UUID friendUuid) {
+
+        if(!friendRepository.existsFriendByStatus(authenticatedUserUuid, friendUuid, FriendStatusCode.ACCEPTED)) {
+
+            CustomLogger.warn(
+                    LogEventCode.USER,
+                    "FAIL",
+                    LogEventReasonCode.NOT_FRIEND,
+                    LogEventReasonCode.NOT_FRIEND.getMessage()
+                            + " - userUuid: " + authenticatedUserUuid
+                            + " - friendUuid: " + friendUuid,
+                    authenticatedUserUuid.toString()
+            );
+
+            throw new CustomException(CustomExceptionCode.NOT_FRIEND);
         }
     }
 }

@@ -41,7 +41,7 @@ public class BlockedUserUtil {
         return optionalBlockedUser.get();
     }
 
-    public void blockedUserCheck(UUID authenticatedUserUuid, UUID requestUuid) {
+    private void blockedUserCheck(UUID authenticatedUserUuid, UUID requestUuid) {
 
         if(blockedUserRepository.existsByUser_UuidAndBlockedUser_Uuid(authenticatedUserUuid, requestUuid)) {
 
@@ -57,5 +57,15 @@ public class BlockedUserUtil {
 
             throw new CustomException(CustomExceptionCode.REQUEST_FORBIDDEN_FOR_BLOCKED_USER);
         }
+    }
+
+    // 둘 중 누구라도 상대를 차단했으면 예외
+    public void blockedEachOtherCheck(UUID authenticatedUserUuid, UUID opponentUuid) {
+
+        // 나 -> 상대
+        blockedUserCheck(authenticatedUserUuid, opponentUuid);
+
+        // 상대 -> 나
+        blockedUserCheck(opponentUuid, authenticatedUserUuid);
     }
 }

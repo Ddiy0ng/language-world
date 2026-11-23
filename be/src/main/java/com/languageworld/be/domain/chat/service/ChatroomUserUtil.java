@@ -55,7 +55,7 @@ public class ChatroomUserUtil {
             }
 
             ChatroomUser opposite = optionalOpposite.get();
-            blockedUserUtil.blockedUserCheck(userUuid, opposite.getUser().getUuid());
+            blockedUserUtil.blockedEachOtherCheck(userUuid, opposite.getUser().getUuid());
         }
     }
 
@@ -115,4 +115,6 @@ public class ChatroomUserUtil {
 
         return optionalChatroomUser.get();
     }
+
+
 }
