@@ -13,4 +13,5 @@ public enum LogEventCode {
     WEBSOCKET,
     CHAT,
     VOCAB,
+    GAME
 }

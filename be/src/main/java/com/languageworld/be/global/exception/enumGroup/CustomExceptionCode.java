@@ -312,7 +312,7 @@ public enum CustomExceptionCode {
             HttpStatus.BAD_REQUEST,
             "CHAT_400",
             "자기 자신과 채팅할 수 없습니다."),
-    
+
     // VCOAB
     SAVED_VOCAB_NOT_FOUND(
             HttpStatus.NOT_FOUND,
@@ -325,7 +325,55 @@ public enum CustomExceptionCode {
     VOCAB_MEANING_NOT_FOUND(
             HttpStatus.NOT_FOUND,
             "VOCAB_404",
-            "어휘의 의미를 조회할 수 없습니다.");
+            "어휘의 의미를 조회할 수 없습니다."),
+
+    // GAME
+    GAMEROOM_NOT_FOUND(
+            HttpStatus.NOT_FOUND,
+            "GAME_404",
+            "게임방을 찾을 수 없습니다."),
+    GAMEROOM_FULL(
+            HttpStatus.CONFLICT,
+            "GAME_409",
+            "게임방 인원이 가득 찼습니다."),
+    GAME_ALREADY_STARTED(
+            HttpStatus.CONFLICT,
+            "GAME_409",
+            "이미 게임이 진행 중입니다."),
+    ALREADY_IN_GAMEROOM(
+            HttpStatus.CONFLICT,
+            "GAME_409",
+            "이미 다른 게임방에 참여 중입니다."),
+    NOT_GAMEROOM_MEMBER(
+            HttpStatus.FORBIDDEN,
+            "GAME_403",
+            "게임방 참가자가 아닙니다."),
+    NOT_GAMEROOM_HOST(
+            HttpStatus.FORBIDDEN,
+            "GAME_403",
+            "방장만 할 수 있습니다."),
+    NOT_ENOUGH_GAME_PLAYER(
+            HttpStatus.BAD_REQUEST,
+            "GAME_400",
+            "게임을 시작하려면 2명 이상이 필요합니다."),
+    NOT_ENOUGH_GAME_QUIZ(
+            HttpStatus.BAD_REQUEST,
+            "GAME_400",
+            "출제할 단어가 부족합니다."),
+    GAMEROOM_PASSWORD_REQUIRED(
+            HttpStatus.BAD_REQUEST,
+            "GAME_400",
+            "잠긴 방은 비밀번호가 필요합니다."),
+    GAMEROOM_PASSWORD_MISMATCH(
+            HttpStatus.FORBIDDEN,
+            "GAME_403",
+            "게임방 비밀번호가 일치하지 않습니다."),
+    GAMEROOM_LEVEL_LANGUAGE_MISMATCH(
+            HttpStatus.BAD_REQUEST,
+            "GAME_400",
+            "선택한 학습 언어의 레벨이 아닙니다."),
+
+    ;
 
     private final HttpStatus httpStatus;
     private final String customCode; // 도메인명 + 상태코드

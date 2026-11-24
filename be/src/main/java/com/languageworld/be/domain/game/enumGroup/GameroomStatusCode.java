@@ -1,8 +1,8 @@
 package com.languageworld.be.domain.game.enumGroup;
 
-public enum GameRoomStatusCode {
+public enum GameroomStatusCode {
 
     WAIT,
     STARTED,
-    FULL
+    CLOSED
 }
