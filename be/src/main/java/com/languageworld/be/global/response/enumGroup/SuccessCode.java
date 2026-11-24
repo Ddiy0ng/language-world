@@ -281,7 +281,30 @@ public enum SuccessCode {
     SAVED_VOCAB_DELETE_SUCCESS(
             HttpStatus.OK,
             "VOCAB_200",
-            "저장된 어휘 삭제에 성공했습니다.");
+            "저장된 어휘 삭제에 성공했습니다."),
+
+    // GAME
+    GAMEROOM_CREATE_SUCCESS(
+            HttpStatus.CREATED,
+            "GAME_201",
+            "게임방 생성에 성공했습니다."),
+    GAMEROOM_LIST_FIND_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "게임방 목록 조회에 성공했습니다."),
+    GAMEROOM_ENTER_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "게임방 입장에 성공했습니다."),
+    GAMEROOM_QUIT_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "게임방 퇴장에 성공했습니다."),
+    GAME_START_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "게임 시작에 성공했습니다."),
+    ;
 
     private final HttpStatus httpStatus;
     private final String customCode; //도메인명 + 상태코드

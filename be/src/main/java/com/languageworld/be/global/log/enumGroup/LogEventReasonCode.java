@@ -133,7 +133,17 @@ public enum LogEventReasonCode {
     // VOCAB
     SAVED_VOCAB_NOT_FOUND("저장된 어휘를 찾을 수 없습니다."),
     NOT_SAVED_VOCAB_OWNER("해당 사용자가 저장한 어휘가 아닙니다."),
-    VOCAB_MEANING_NOT_FOUND("어휘의 의미를 조회할 수 없습니다.");
+    VOCAB_MEANING_NOT_FOUND("어휘의 의미를 조회할 수 없습니다."),
+
+    // GAME
+    GAMEROOM_NOT_FOUND("게임방을 찾을 수 없습니다."),
+    GAMEROOM_FULL("게임방 인원이 가득 찼습니다."),
+    ALREADY_IN_GAMEROOM("이미 다른 게임방에 참여 중입니다."),
+    NOT_GAMEROOM_MEMBER("게임방 참가자가 아닙니다."),
+    NOT_GAMEROOM_HOST("방장이 아닙니다."),
+    GAMEROOM_PASSWORD_REQUIRED("잠긴 방은 비밀번호가 필요합니다."),
+    GAMEROOM_PASSWORD_MISMATCH("게임방 비밀번호가 일치하지 않습니다."),
+    GAMEROOM_LEVEL_LANGUAGE_MISMATCH("학습 언어와 레벨이 일치하지 않습니다.");
 
     private final String message;
 }

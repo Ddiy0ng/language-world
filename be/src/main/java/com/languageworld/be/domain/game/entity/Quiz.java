@@ -1,11 +1,32 @@
 package com.languageworld.be.domain.game.entity;
 
-import lombok.Getter;
+import java.text.Normalizer;
 
-@Getter
-public class Quiz {
+public record Quiz (
 
-    private Long vocabMeaningId;
+        Long vocabMeaningId,
 
-    private int weight;
+        String answer,
+
+        int score
+){
+
+    public boolean matches(String input) {
+
+        if(input == null)
+            return false;
+
+        String normalizedInput = normalize(input);
+
+        if(normalizedInput == null)
+            return false;
+
+        return normalizedInput.equalsIgnoreCase(normalize(answer));
+    }
+
+    private String normalize(String input) {
+
+        // 공백 제거, 정규화
+        return Normalizer.normalize(input.strip(), Normalizer.Form.NFC);
+    }
 }
