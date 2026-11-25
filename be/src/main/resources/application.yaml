@@ -24,6 +24,11 @@ spring:
       max-file-size: 10MB
       max-request-size: 11MB
 
+  #정적 자원들
+  web:
+    resources:
+      static-locations: classpath:/static/, file:${PUBLIC_FILE_ROOT:C:/Users/USER/personal/portfolio/language-world/public/}
+
 google:
   oauth:
     client-id: ${GOOGLE_OAUTH_CLIENT_ID}
@@ -37,9 +42,9 @@ jwt:
 #파일 업로드 경로 설정
 file:
   upload-dir:
-    profile: ${PROFILE_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/profile}
-    post: ${POST_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/post}
-    term: ${TERM_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/uploads/term}
+    profile: ${PROFILE_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/public/uploads/profile}
+    post: ${POST_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/public/uploads/post}
+    term: ${TERM_UPLOAD_PATH:C:/Users/USER/personal/portfolio/language-world/public/uploads/term}
 
 logging:
   level:

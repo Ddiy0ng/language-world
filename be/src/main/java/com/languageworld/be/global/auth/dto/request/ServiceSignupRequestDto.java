@@ -15,11 +15,15 @@ public record ServiceSignupRequestDto (
         String password,
 
         @NotBlank
+        @Size(min = 8, max = 20)
+        String checkPassword,
+
+        @NotBlank
         @Size(min = 1, max = 50)
         String name,
 
         @NotNull
-        @Past
+        @Past(message = "생년월일은 오늘 이전 날짜여야 합니다.")
         LocalDate birth,
 
         @NotNull

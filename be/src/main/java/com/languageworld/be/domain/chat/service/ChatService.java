@@ -4,6 +4,7 @@ import com.languageworld.be.domain.chat.dto.response.*;
 import com.languageworld.be.domain.chat.entity.Chat;
 import com.languageworld.be.domain.chat.entity.Chatroom;
 import com.languageworld.be.domain.chat.entity.ChatroomUser;
+import com.languageworld.be.domain.chat.enumGroup.ChatroomTypeCode;
 import com.languageworld.be.domain.chat.repository.ChatRepository;
 import com.languageworld.be.domain.chat.repository.ChatroomRepository;
 import com.languageworld.be.domain.chat.repository.ChatroomUserRepository;
@@ -136,9 +137,15 @@ public class ChatService {
         UUID userUuid = customPrincipal.uuid();
 
         Slice<Chatroom> chatroomSlice = findChatroom(userUuid, keyword, cursor);
-
         List<ChatroomResponseDto> chatroomResponseDtoList = chatroomSlice.getContent().stream()
-                .map(ChatroomResponseDto::from)
+                .map(chatroom ->
+                        ChatroomResponseDto.from(
+                                chatroom,
+                                chatroom.getChatroomType() == ChatroomTypeCode.PERSONAL
+                                        ? chatroomUserUtil.getPersonalChatroomOpposite(chatroom.getId(), userUuid).getUser()
+                                        : null,
+                                findLastChat(chatroom.getId(), userUuid)
+                        ))
                 .toList();
 
         boolean hasNext = chatroomSlice.hasNext();
@@ -202,25 +209,25 @@ public class ChatService {
         // 방장 채팅방 퇴장 => 입장 이력이 가장 과거인 사람으로 HOST 갱신
     }
 
+    private Chat findLastChat(Long chatroomId, UUID userUuid) {
+
+        Slice<Chat> chatSlice = chatRepository.findSlice(chatroomId, userUuid, PageRequest.of(0, 1), null);
+        return chatSlice.isEmpty() ? null : chatSlice.getContent().get(0);
+    }
+
     private Slice<Chat> findChat(Long chatroomId, UUID userUuid, Long cursor) {
 
         int size = 30;
         Pageable pageable = PageRequest.of(0, size);
-        Slice<Chat> chatSlice;
 
-        chatSlice = chatRepository.findSlice(chatroomId, userUuid, pageable, cursor);
-
-        return chatSlice;
+        return chatRepository.findSlice(chatroomId, userUuid, pageable, cursor);
     }
 
     private Slice<Chatroom> findChatroom(UUID  userUuid, String keyword, Long cursor) {
 
         int size = 20;
         Pageable pageable = PageRequest.of(0, size);
-        Slice<Chatroom> chatroomSlice;
 
-        chatroomSlice = chatroomRepository.findSlice(userUuid, keyword, pageable, cursor);
-
-        return chatroomSlice;
+        return chatroomRepository.findSlice(userUuid, keyword, pageable, cursor);
     }
 }

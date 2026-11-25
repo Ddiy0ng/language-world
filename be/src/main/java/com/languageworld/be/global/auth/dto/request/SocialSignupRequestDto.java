@@ -14,7 +14,7 @@ public record SocialSignupRequestDto(
         String name,
 
         @NotNull
-        @Past
+        @Past(message = "생년월일은 오늘 이전 날짜여야 합니다.")
         LocalDate birth,
 
         @NotNull

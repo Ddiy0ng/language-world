@@ -33,7 +33,10 @@ public class SecurityConfig {
             "/auth/login/**",
             "/auth/reissue",
             "/language",    // 지원 언어, 레벨 조회
-            "/term/active"  // 활성화된(필수) 약관 조회
+            "/term/active",  // 활성화된(필수) 약관 조회
+            "/app.html",
+            "/admin.html",
+            "/uploads/**"     // 회원가입 화면에서 로그인 전에도 약관 PDF 열람
     };
 
     private final String[] ADMIN_AUTH_URL = {

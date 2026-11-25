@@ -116,5 +116,24 @@ public class ChatroomUserUtil {
         return optionalChatroomUser.get();
     }
 
+    // dm 상대방
+    public ChatroomUser getPersonalChatroomOpposite(Long chatroomId, UUID userUuid) {
+
+        Optional<ChatroomUser> optionalChatroomUser = chatroomUserRepository.findByChatroom_IdAndUser_UuidNot(chatroomId, userUuid);
+        if(optionalChatroomUser.isEmpty()) {
+
+            CustomLogger.warn(LogEventCode.CHAT,
+                    "FAIL",
+                    LogEventReasonCode. CHATROOM_USER_NOT_FOUND,
+                    LogEventReasonCode.CHATROOM_USER_NOT_FOUND.getMessage()
+                            + " - UserUuid: " + userUuid,
+                    userUuid.toString()
+            );
+
+            throw new CustomException(CustomExceptionCode.CHATROOM_USER_NOT_FOUND);
+        }
+
+        return optionalChatroomUser.get();
+    }
 
 }

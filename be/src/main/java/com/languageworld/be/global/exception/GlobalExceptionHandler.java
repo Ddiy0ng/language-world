@@ -1,10 +1,13 @@
 package com.languageworld.be.global.exception;
 
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.response.ApiResponse;
 import com.languageworld.be.global.response.ResponseEntityUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -23,5 +26,13 @@ public class GlobalExceptionHandler {
 
         log.error("undefined exception: {}", exception.getMessage(), exception); // 메시지만으로 원인 파악 불가할 수도 -> 스택 트레이스까지 출력
         return ResponseEntityUtil.fail();
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Void>> fail(MethodArgumentNotValidException methodArgumentNotValidException) {
+
+        String validationMessage = methodArgumentNotValidException.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+
+        return ResponseEntityUtil.fail(CustomExceptionCode.INVALID_ARGUMENT, validationMessage);
     }
 }

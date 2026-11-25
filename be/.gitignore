@@ -5,7 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 .env
-src/main/resources/static/first_setup.html
+src/main/resources/static/
 src/main/resources/data.sql
 
 ### STS ###
