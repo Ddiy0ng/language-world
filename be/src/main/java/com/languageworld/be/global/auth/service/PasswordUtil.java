@@ -46,12 +46,27 @@ public class PasswordUtil {
         }
     }
 
+    public void passwordAndCheckPasswordEqualCheck(String password, String checkPassword) {
+
+        // 비밀번호 확인
+        if(!password.equals(checkPassword)) {
+
+            CustomLogger.warn(
+                    LogEventCode.AUTH,
+                    "FAIL",
+                    LogEventReasonCode.PASSWORD_CHECK_MISMATCH,
+                    LogEventReasonCode.PASSWORD_CHECK_MISMATCH.getMessage(),
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.PASSWORD_CHECK_MISMATCH);
+        }
+    }
+
     // 비밀번호 암호화
     public String encodePassword(String rawPassword) {
 
-        String encodedPassword = bCryptPasswordEncoder.encode(rawPassword);
-
-        return encodedPassword;
+        return bCryptPasswordEncoder.encode(rawPassword);
     }
 
     // 비밀번호 일치 여부

@@ -13,6 +13,13 @@ public enum CustomExceptionCode {
             "UNDEFINED_500",
             "500에러:정의되지 않은 오류가 발생했습니다."),
 
+    // VALID
+    INVALID_ARGUMENT(
+            HttpStatus.BAD_REQUEST,
+            "VALID_400",
+            null
+    ),
+
     // AUTH
     UNAUTHORIZED(
             HttpStatus.UNAUTHORIZED,
@@ -49,6 +56,10 @@ public enum CustomExceptionCode {
             HttpStatus.BAD_REQUEST,
             "AUTH_400",
             "영문, 숫자, 특수문자의 8~20자 이내의 비밀번호여야 합니다"),
+    PASSWORD_CHECK_MISMATCH(
+            HttpStatus.BAD_REQUEST,
+            "AUTH_400",
+            "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
     ACCOUNT_ALREADY_EXIST(
             HttpStatus.BAD_REQUEST,
             "AUTH_400",

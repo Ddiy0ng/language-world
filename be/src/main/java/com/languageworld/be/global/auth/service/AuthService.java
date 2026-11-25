@@ -88,6 +88,7 @@ public class AuthService {
         // 비밀번호 유효성 검사
         String password = serviceSignupRequestDto.password();
         passwordUtil.validatePassword(password);
+        passwordUtil.passwordAndCheckPasswordEqualCheck(password, serviceSignupRequestDto.checkPassword());
 
         // 비밀번호 암호화
         String encodedPassword = passwordUtil.encodePassword(password);

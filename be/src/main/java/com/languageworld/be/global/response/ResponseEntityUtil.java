@@ -51,4 +51,15 @@ public class ResponseEntityUtil {
 
         return ResponseEntity.status(CustomExceptionCode.INTERNAL_SERVER_ERROR.getHttpStatus()).body(apiResponse);
     }
+
+    // valid 예외(@size, @past 등)
+    public static ResponseEntity<ApiResponse<Void>> fail (CustomExceptionCode customExceptionCode, String message) {
+
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+                .customCode(customExceptionCode.getCustomCode())
+                .message(message)
+                .build();
+
+        return ResponseEntity.status(customExceptionCode.getHttpStatus()).body(apiResponse);
+    }
 }

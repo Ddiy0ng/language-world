@@ -18,6 +18,7 @@ public enum LogEventReasonCode {
     PASSWORD_MISMATCH("비밀번호가 일치하지 않습니다."),
     PASSWORD_REQUIRED("비밀번호를 입력해주세요."),
     INVALID_PASSWORD("영문, 숫자, 특수문자의 8~20자 이내의 비밀번호여야 합니다"),
+    PASSWORD_CHECK_MISMATCH("비밀번호와 비밀번호 확인이 일치하지 않습니다."),
 
     // JWT
     EXPIRED_TOKEN("만료된 토큰입니다."),

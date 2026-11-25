@@ -24,6 +24,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileUtil {
 
+    private static final String URL_PREFIX = "/uploads/";
+
     @Value("${file.upload-dir.term}")
     private Path termPath;
 
@@ -35,87 +37,90 @@ public class FileUtil {
 
     public String uploadFile(MultipartFile requestedFile, FilePurposeCode requestedPurpose) {
 
-    // 파일 공백 확인
-    fileEmptyCheck(requestedFile);
+        // 파일 공백 확인
+        fileEmptyCheck(requestedFile);
 
-    // ContentType 검증
-    String contentType = validateContentType(requestedFile);
+        // ContentType 검증
+        String contentType = validateContentType(requestedFile);
 
-    // 확장자 검증
-    Path uploadPath = fileContentTypeCheckByPurpose(contentType, requestedPurpose);
+        // 목적에 따른 확장자 검증
+        fileContentTypeCheckByPurpose(contentType, requestedPurpose);
 
-    // 파일 확장자 추출
-    String extension = contentType.substring(contentType.indexOf("/") + 1);
+        // 업로드 폴더
+        Path uploadPath = getUploadPathByPurpose(requestedPurpose);
 
-    // 파일 이름
-    String fileName = UUID.randomUUID() + "." + extension;
+        // 파일 확장자 추출
+        String extension = contentType.substring(contentType.indexOf("/") + 1);
 
-    // 파일 업로드 경로
-    Path fileUploadedPath = uploadPath.resolve(fileName);
+        // 파일 이름
+        String fileName = UUID.randomUUID() + "." + extension;
 
-    // 확장자에 따른 처리
-    switch(extension) {
-        case("pdf"):
+        // 파일 업로드 경로
+        Path fileUploadedPath = uploadPath.resolve(fileName);
 
-            // 업로드 폴더 생성
-            createFileUploadDir(uploadPath, LogEventReasonCode.CREATE_PDF_DIR_EXCEPTION);
+        // 확장자에 따른 처리
+        switch(extension) {
+            case("pdf"):
 
-            // 파일 이름 + 경로
-            saveFile(requestedFile, fileUploadedPath, LogEventReasonCode.SAVE_PDF_EXCEPTION);
+                // 업로드 폴더 생성
+                createFileUploadDir(uploadPath, LogEventReasonCode.CREATE_PDF_DIR_EXCEPTION);
 
-            break;
-        case("jpeg"):
+                // 파일 이름 + 경로
+                saveFile(requestedFile, fileUploadedPath, LogEventReasonCode.SAVE_PDF_EXCEPTION);
 
-            createFileUploadDir(uploadPath, LogEventReasonCode.CREATE_JPEG_DIR_EXCEPTION);
-            saveFile(requestedFile, fileUploadedPath, LogEventReasonCode.SAVE_JPEG_EXCEPTION);
+                break;
+            case("jpeg"):
 
-            break;
-        case("png"):
+                createFileUploadDir(uploadPath, LogEventReasonCode.CREATE_JPEG_DIR_EXCEPTION);
+                saveFile(requestedFile, fileUploadedPath, LogEventReasonCode.SAVE_JPEG_EXCEPTION);
 
-            createFileUploadDir(uploadPath, LogEventReasonCode.CREATE_PNG_DIR_EXCEPTION);
-            saveFile(requestedFile, fileUploadedPath, LogEventReasonCode.SAVE_PNG_EXCEPTION);
+                break;
+            case("png"):
 
-            break;
-    }
+                createFileUploadDir(uploadPath, LogEventReasonCode.CREATE_PNG_DIR_EXCEPTION);
+                saveFile(requestedFile, fileUploadedPath, LogEventReasonCode.SAVE_PNG_EXCEPTION);
 
-    // 성공 로그
-    CustomLogger.info(LogEventCode.MULTIPART_FILE,
-            "SUCCESS",
-            SuccessCode.FILE_UPLOAD_SUCCESS.getMessage() + " - Purpose: " + requestedPurpose + " - contentType: " + contentType,
-            null);
+                break;
+        }
 
-    return fileUploadedPath.toString();
+        // 성공 로그
+        CustomLogger.info(LogEventCode.MULTIPART_FILE,
+                "SUCCESS",
+                SuccessCode.FILE_UPLOAD_SUCCESS.getMessage() + " - Purpose: " + requestedPurpose + " - contentType: " + contentType,
+                null);
+
+        // 브라우저에서 열 수 있는 주소로 저장: /uploads/post/파일명
+        return URL_PREFIX + requestedPurpose.name().toLowerCase() + "/" + fileName;
     }
 
     public void deleteFile(FilePurposeCode filePurposeCode, String requestedFileUrl) {
 
+         if(requestedFileUrl == null || requestedFileUrl.isEmpty())
+             return;
 
-     if(requestedFileUrl == null || requestedFileUrl.isEmpty()) {
+         // 소셜 계정 프로필 소셜 제공자
+         if (filePurposeCode == FilePurposeCode.PROFILE && (requestedFileUrl.startsWith("https://") || requestedFileUrl.startsWith("http://")))
+             return;
 
-         return;
-     }
+            // 새 주소(/uploads/...)는 업로드 폴더 경로로, 예전 데이터(디스크 경로)는 그대로
+            Path fileUploadedPath = requestedFileUrl.startsWith(URL_PREFIX)
+                    ? getUploadPathByPurpose(filePurposeCode).resolve(requestedFileUrl.substring(requestedFileUrl.lastIndexOf('/') + 1))
+                    : Path.of(requestedFileUrl).toAbsolutePath();
 
-     // 소셜 계정 프로필 소셜 제공자
-     if (filePurposeCode == FilePurposeCode.PROFILE
-             && (requestedFileUrl.startsWith("https://") || requestedFileUrl.startsWith("http://")))
-         return;
+         try {
 
-     Path fileUploadedPath = Path.of(requestedFileUrl).toAbsolutePath();
+             Files.deleteIfExists(fileUploadedPath);
+         } catch(IOException e) {
 
-     try {
-
-         Files.deleteIfExists(fileUploadedPath);
-     } catch(IOException e) {
-
-         CustomLogger.error(
-                 LogEventCode.MULTIPART_FILE,
-                 "FAIL",
-                 LogEventReasonCode.MULTIPART_FILE_DELETE_FAILED,
-                 LogEventReasonCode.MULTIPART_FILE_DELETE_FAILED.getMessage() + " - throw IOException",
-                 null
-         );
-         throw new CustomException(CustomExceptionCode.MULTIPART_FILE_DELETE_FAILED);
-     }
+             CustomLogger.error(
+                     LogEventCode.MULTIPART_FILE,
+                     "FAIL",
+                     LogEventReasonCode.MULTIPART_FILE_DELETE_FAILED,
+                     LogEventReasonCode.MULTIPART_FILE_DELETE_FAILED.getMessage() + " - throw IOException",
+                     null
+             );
+             throw new CustomException(CustomExceptionCode.MULTIPART_FILE_DELETE_FAILED);
+         }
     }
 
     public void registerCleanUp(FilePurposeCode filePurposeCode, List<String> deleteOnCommit, List<String> deleteOnRollback) {
@@ -177,120 +182,113 @@ public class FileUtil {
     }
 
     private void createFileUploadDir(Path uploadPath, LogEventReasonCode logEventReasonCode) {
-    try {
-        Files.createDirectories(uploadPath);
-    } catch (IOException e) {
 
-        CustomLogger.error(
-                LogEventCode.MULTIPART_FILE,
-                "FAIL",
-                logEventReasonCode,
-                logEventReasonCode.getMessage() + " - IOException while creating file upload directory",
-                e
-        );
+        try {
+            Files.createDirectories(uploadPath);
+        } catch (IOException e) {
 
-        throw new CustomException(CustomExceptionCode.CREATE_DIR_EXCEPTION);
-    }
+            CustomLogger.error(
+                    LogEventCode.MULTIPART_FILE,
+                    "FAIL",
+                    logEventReasonCode,
+                    logEventReasonCode.getMessage() + " - IOException while creating file upload directory",
+                    e
+            );
+
+            throw new CustomException(CustomExceptionCode.CREATE_DIR_EXCEPTION);
+        }
     }
 
     private void saveFile(MultipartFile multipartFile, Path fileUploadedPath, LogEventReasonCode logEventReasonCode) {
 
-    try {
-        multipartFile.transferTo(fileUploadedPath);
-    } catch (IOException e) {
+        try {
+            multipartFile.transferTo(fileUploadedPath);
+        } catch (IOException e) {
 
-        CustomLogger.error(
-                LogEventCode.MULTIPART_FILE,
-                "FAIL",
-                logEventReasonCode,
-                logEventReasonCode.getMessage() + " - IOException while saving file",
-                e
-        );
+            CustomLogger.error(
+                    LogEventCode.MULTIPART_FILE,
+                    "FAIL",
+                    logEventReasonCode,
+                    logEventReasonCode.getMessage() + " - IOException while saving file",
+                    e
+            );
 
-        throw new CustomException(CustomExceptionCode.SAVE_FILE_EXCEPTION);
-    }
+            throw new CustomException(CustomExceptionCode.SAVE_FILE_EXCEPTION);
+        }
     }
 
     private void fileEmptyCheck(MultipartFile multipartFile) {
 
-    if(multipartFile == null || multipartFile.isEmpty()) {
-        CustomLogger.warn(
-                LogEventCode.MULTIPART_FILE,
-                "FAIL",
-                LogEventReasonCode.MULTIPART_FILE_REQUIRED,
-                LogEventReasonCode.MULTIPART_FILE_REQUIRED.getMessage() + " - File is null or empty",
-                null
-        );
-
-        throw new CustomException(CustomExceptionCode.MULTIPART_FILE_REQUIRED);
-    }
-    }
-
-    // 경로 결정, 목적 검사
-    private Path fileContentTypeCheckByPurpose(String contentType, FilePurposeCode filePurpose) {
-
-
-    if (filePurpose == null ){
-        CustomLogger.warn(
-                LogEventCode.MULTIPART_FILE,
-                "FAIL",
-                LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST,
-                LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST.getMessage() + " - File purpose is null",
-                null
-        );
-
-        throw new CustomException(CustomExceptionCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST);
-    }
-    else if(filePurpose == FilePurposeCode.TERM) {
-
-        if (!contentType.equals(FileTypeCode.PDF.getContentType())) {
+        if(multipartFile == null || multipartFile.isEmpty()) {
             CustomLogger.warn(
                     LogEventCode.MULTIPART_FILE,
                     "FAIL",
-                    LogEventReasonCode.PDF_REQUIRED,
-                    LogEventReasonCode.PDF_REQUIRED.getMessage() + " - File extension is not pdf",
+                    LogEventReasonCode.MULTIPART_FILE_REQUIRED,
+                    LogEventReasonCode.MULTIPART_FILE_REQUIRED.getMessage() + " - File is null or empty",
                     null
             );
 
-            throw new CustomException(CustomExceptionCode.INVALID_FILE_TYPE);
+            throw new CustomException(CustomExceptionCode.MULTIPART_FILE_REQUIRED);
         }
-
-        return termPath;
     }
 
-    else if(filePurpose == FilePurposeCode.POST || filePurpose == FilePurposeCode.PROFILE) {
+    // 목적 검사
+    private void fileContentTypeCheckByPurpose(String contentType, FilePurposeCode filePurpose) {
 
-        if(!contentType.equals(FileTypeCode.JPEG.getContentType()) && !contentType.equals(FileTypeCode.PNG.getContentType())) {
+        if (filePurpose == null ){
             CustomLogger.warn(
                     LogEventCode.MULTIPART_FILE,
                     "FAIL",
-                    LogEventReasonCode.INVALID_IMAGE_TYPE,
-                    LogEventReasonCode.INVALID_IMAGE_TYPE.getMessage() + " - File extension is not image: jpeg, jpg,png required",
+                    LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST,
+                    LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST.getMessage() + " - File purpose is null",
                     null
             );
 
-            throw new CustomException(CustomExceptionCode.INVALID_FILE_TYPE);
+            throw new CustomException(CustomExceptionCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST);
+        }
+        else if(filePurpose == FilePurposeCode.TERM) {
+
+            if (!contentType.equals(FileTypeCode.PDF.getContentType())) {
+                CustomLogger.warn(
+                        LogEventCode.MULTIPART_FILE,
+                        "FAIL",
+                        LogEventReasonCode.PDF_REQUIRED,
+                        LogEventReasonCode.PDF_REQUIRED.getMessage() + " - File extension is not pdf",
+                        null
+                );
+
+                throw new CustomException(CustomExceptionCode.INVALID_FILE_TYPE);
+            }
         }
 
-        if(filePurpose == FilePurposeCode.POST)
-            return postPath;
-        else
-            return profilePath;
-    }
-    else {
-        CustomLogger.warn(
-                LogEventCode.MULTIPART_FILE,
-                "FAIL",
-                LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST,
-                LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST.getMessage() + " - " + filePurpose.name() + " is unsupported purpose: TERM, POST, PROFILE only supported",
-                null
-        );
+        else if(filePurpose == FilePurposeCode.POST || filePurpose == FilePurposeCode.PROFILE) {
 
-        throw new CustomException(CustomExceptionCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST);
-    }
+            if(!contentType.equals(FileTypeCode.JPEG.getContentType()) && !contentType.equals(FileTypeCode.PNG.getContentType())) {
+                CustomLogger.warn(
+                        LogEventCode.MULTIPART_FILE,
+                        "FAIL",
+                        LogEventReasonCode.INVALID_IMAGE_TYPE,
+                        LogEventReasonCode.INVALID_IMAGE_TYPE.getMessage() + " - File extension is not image: jpeg, jpg,png required",
+                        null
+                );
+
+                throw new CustomException(CustomExceptionCode.INVALID_FILE_TYPE);
+            }
+        }
+        else {
+            CustomLogger.warn(
+                    LogEventCode.MULTIPART_FILE,
+                    "FAIL",
+                    LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST,
+                    LogEventReasonCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST.getMessage() + " - " + filePurpose.name() + " is unsupported purpose: TERM, POST, PROFILE only supported",
+                    null
+            );
+
+            throw new CustomException(CustomExceptionCode.UNSUPPORTED_UPLOAD_PURPOSE_REQUEST);
+        }
     }
 
-    // contentType null check
+    // contentType null 확인
     private String validateContentType(MultipartFile requestedFile) {
 
     String contentType = requestedFile.getContentType();
@@ -309,5 +307,13 @@ public class FileUtil {
     }
 
     return contentType;
+    }
+
+    private Path getUploadPathByPurpose(FilePurposeCode filePurposeCode) {
+        return switch (filePurposeCode) {
+            case TERM -> termPath;
+            case POST -> postPath;
+            case PROFILE -> profilePath;
+        };
     }
 }
