@@ -1,6 +1,6 @@
 package com.languageworld.be.domain.chat.service;
 
-import com.languageworld.be.domain.chat.dto.request.ChatSaveRequestDto;
+import com.languageworld.be.domain.chat.dto.request.ChatRequestDto;
 import com.languageworld.be.domain.chat.dto.response.ChatResponseDto;
 import com.languageworld.be.domain.chat.entity.Chat;
 import com.languageworld.be.domain.chat.entity.Chatroom;
@@ -28,17 +28,17 @@ public class WebSocketChatService {
     private final ChatRepository chatRepository;
 
     @Transactional
-    public ChatResponseDto sendChat(CustomPrincipal customPrincipal, Long chatroomId, ChatSaveRequestDto chatSaveRequestDto) {
+    public ChatResponseDto sendChat(CustomPrincipal customPrincipal, Long chatroomId, ChatRequestDto chatRequestDto) {
 
         UUID userUuid = customPrincipal.uuid();
 
-        chatroomUserUtil.ValidChatroomUserCheck(chatroomId, userUuid);
+        chatroomUserUtil.validChatroomUserCheck(chatroomId, userUuid);
 
         User sender = userUtil.getUserByUuid(userUuid);
 
         Chatroom chatroom = chatroomUtil.getChatroomById(chatroomId, userUuid);
 
-        Chat chat = Chat.of(chatSaveRequestDto.chatMessage(),sender, chatroom);
+        Chat chat = Chat.of(chatRequestDto.chatMessage(),sender, chatroom);
 
         chatRepository.save(chat);
         CustomLogger.info(

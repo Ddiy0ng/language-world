@@ -33,7 +33,8 @@ public class SecurityConfig {
             "/auth/login/**",
             "/auth/reissue",
             "/language",    // 지원 언어, 레벨 조회
-            "/term/active"  // 활성화된(필수) 약관 조회
+            "/term/active",  // 활성화된(필수) 약관 조회
+            "/app.html"
     };
 
     private final String[] ADMIN_AUTH_URL = {

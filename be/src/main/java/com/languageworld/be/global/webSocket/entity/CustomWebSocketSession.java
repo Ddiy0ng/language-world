@@ -1,4 +1,4 @@
-package com.languageworld.be.global.webSocket;
+package com.languageworld.be.global.webSocket.entity;
 
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import lombok.Builder;

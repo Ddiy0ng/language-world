@@ -1,6 +1,11 @@
 package com.languageworld.be.domain.game.service;
 
 import com.languageworld.be.domain.game.entity.GameState;
+import com.languageworld.be.global.exception.CustomException;
+import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
+import com.languageworld.be.global.log.CustomLogger;
+import com.languageworld.be.global.log.enumGroup.LogEventCode;
+import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,6 +23,23 @@ public class GameStateUtil {
 
     public void saveGameroomGameState(GameState gameState) {
         gameStateMap.put(gameState.getGameroomId(), gameState);
+    }
+
+    public GameState getGameStateById(Long gameroomId, UUID userUuid) {
+
+        Optional<GameState> optionalGameState = findOptionalGameState(gameroomId);
+        if(optionalGameState.isEmpty()) {
+            CustomLogger.warn(LogEventCode.GAME,
+                    "FAIL",
+                    LogEventReasonCode.GAMEROOM_NOT_FOUND,
+                    LogEventReasonCode.GAMEROOM_NOT_FOUND.getMessage() + " - (not in memory) gameroomId: " + gameroomId,
+                    userUuid.toString()
+            );
+
+            throw new CustomException(CustomExceptionCode.GAMEROOM_NOT_FOUND);
+        }
+
+        return optionalGameState.get();
     }
 
     public Optional<GameState> findOptionalGameState(Long gameroomId) {

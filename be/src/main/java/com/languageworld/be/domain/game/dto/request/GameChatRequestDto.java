@@ -1,8 +1,8 @@
-package com.languageworld.be.domain.chat.dto.request;
+package com.languageworld.be.domain.game.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record ChatSaveRequestDto(
+public record GameChatRequestDto(
 
         @NotBlank
         String chatMessage

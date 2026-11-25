@@ -18,6 +18,10 @@ import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.webSocket.dto.WebSocketEventResponseDto;
+import com.languageworld.be.global.webSocket.enumGroup.WebSocketEventTypeCode;
+import com.languageworld.be.global.webSocket.enumGroup.WebSocketPurposeCode;
+import com.languageworld.be.global.webSocket.service.WebSocketService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +45,7 @@ public class ChatService {
     private final ChatroomUtil chatroomUtil;
     private final FriendUtil friendUtil;
     private final BlockedUserUtil blockedUserUtil;
+    private final WebSocketService webSocketService;
 
     // 친구창 통해 채팅방 입장(dm)
     @Transactional
@@ -81,10 +86,13 @@ public class ChatService {
 
             // 본인 이전 퇴장 여부 확인, 재입장(quitAt을 null로)
             ChatroomUser chatroomUser = chatroomUserUtil.getChatroomUserByChatroomIdAndUserUuid(chatroom.getId(), authenticatedUserUuid);
-            if(chatroomUser.getQuitAt() != null)
+            if(chatroomUser.getQuitAt() != null) {
                 chatroomUser.reEnterChatroom();
 
-            // TODO 3-3: 상대방이 퇴장 상태일 때 처리(정책 결정 후)
+                WebSocketChatroomMemberResponseDto webSocketChatroomMemberResponseDto = WebSocketChatroomMemberResponseDto.of(chatroom, chatroomUser.getUser());
+                WebSocketEventResponseDto<WebSocketChatroomMemberResponseDto> webSocketEventResponseDto = WebSocketEventResponseDto.from(WebSocketEventTypeCode.JOINED, webSocketChatroomMemberResponseDto);
+                webSocketService.sendToRoom(WebSocketPurposeCode.CHAT, chatroom.getId(), webSocketEventResponseDto);
+            }
 
             return FriendChatroomEnterResponseDto.from(chatroom.getId());
         }
@@ -165,41 +173,47 @@ public class ChatService {
         // 채팅방 조회
         Chatroom chatroom = chatroomUtil.getChatroomById(chatroomId, userUuid);
 
-        // 채팅방 참여 인원 수
-        long participantSize = chatroom.getChatroomUserList().stream().filter(member -> member.getQuitAt() == null).count();
-        if(participantSize < 1)
-            chatroomRepository.delete(chatroom);
-        else {
+        // 이미 퇴장했는지 확인
+        if(chatroomUser.getQuitAt() != null) {
 
-            //이미 퇴장했는지 확인
-            if(chatroomUser.getQuitAt() != null) {
+            CustomLogger.warn(LogEventCode.CHAT,
+                    "FAIL",
+                    LogEventReasonCode.QUIT_CHATROOM_USER,
+                    LogEventReasonCode.QUIT_CHATROOM_USER.getMessage()
+                            + " - chatroomId: " + chatroomId
+                            + " - chatroomUserId: " + chatroomUser.getId(),
+                    userUuid.toString()
+            );
 
-                CustomLogger.warn(LogEventCode.CHAT,
-                        "FAIL",
-                        LogEventReasonCode.QUIT_CHATROOM_USER,
-                        LogEventReasonCode.QUIT_CHATROOM_USER.getMessage()
-                                + " - chatroomId: " + chatroomId
-                                + " - chatroomUserId: " + chatroomUser.getId(),
-                        userUuid.toString()
-                );
-
-                throw new CustomException(CustomExceptionCode.QUIT_CHATROOM_USER);
-            }
-
-            // quitAt 기록
-            chatroomUser.quitChatroom();
-
-            // 방장이면 방장 계승
-            if(chatroom.getHost().getUuid().equals(userUuid)) {
-
-                ChatroomUser newHost = chatroomUserUtil.getOldestChatroomUser(chatroomId, userUuid);
-                chatroom.changeHost(newHost.getUser());
-            }
+            throw new CustomException(CustomExceptionCode.QUIT_CHATROOM_USER);
         }
 
-        // 퇴장하는 본인이 마지막 멤버가 아님: quitAt만 기록
-        // 퇴장하는 본인이 마지막 멤버: 퇴장 후 해당 채팅방 및 채팅 내역도 함께 삭제
-        // 방장 채팅방 퇴장 => 입장 이력이 가장 과거인 사람으로 HOST 갱신
+        // 본인을 뺀, 아직 나가지 않은 인원
+        long remainingSize = chatroom.getChatroomUserList().stream()
+                .filter(member -> member.getQuitAt() == null)
+                .filter(member -> !member.getUser().getUuid().equals(userUuid))
+                .count();
+
+        // 마지막 사람: 채팅방 삭제(채팅 내역·멤버도 cascade로 삭제), 알릴 사람 없음
+        if(remainingSize == 0) {
+            chatroomRepository.delete(chatroom);
+            return;
+        }
+
+        // quitAt 기록
+        chatroomUser.quitChatroom();
+
+        // 방장이면 방장 계승
+        if(chatroom.getHost().getUuid().equals(userUuid)) {
+
+            ChatroomUser newHost = chatroomUserUtil.getOldestChatroomUser(chatroomId, userUuid);
+            chatroom.changeHost(newHost.getUser());
+        }
+
+        // 남은 사람들에게 퇴장 알림
+        WebSocketChatroomMemberResponseDto webSocketChatroomMemberResponseDto = WebSocketChatroomMemberResponseDto.of(chatroom, chatroomUser.getUser());
+        WebSocketEventResponseDto<WebSocketChatroomMemberResponseDto> webSocketEventResponseDto = WebSocketEventResponseDto.from(WebSocketEventTypeCode.LEFT, webSocketChatroomMemberResponseDto);
+        webSocketService.sendToRoom(WebSocketPurposeCode.CHAT, chatroom.getId(), webSocketEventResponseDto);
     }
 
     private Slice<Chat> findChat(Long chatroomId, UUID userUuid, Long cursor) {

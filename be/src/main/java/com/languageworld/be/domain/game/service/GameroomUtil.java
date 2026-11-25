@@ -2,7 +2,6 @@ package com.languageworld.be.domain.game.service;
 
 import com.languageworld.be.domain.game.entity.GameState;
 import com.languageworld.be.domain.game.entity.Gameroom;
-import com.languageworld.be.domain.game.enumGroup.GameroomStatusCode;
 import com.languageworld.be.domain.game.repository.GameroomRepository;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
@@ -25,7 +24,7 @@ public class GameroomUtil {
     public Gameroom getGameroomById(Long gameroomId, UUID userUuid) {
 
         Optional<Gameroom> optionalGameroom = gameroomRepository.findById(gameroomId);
-        if(optionalGameroom.isEmpty() || optionalGameroom.get().getGameroomStatus() == GameroomStatusCode.CLOSED) {
+        if(optionalGameroom.isEmpty()) {
             CustomLogger.warn(
                     LogEventCode.GAME,
                     "FAIL",
@@ -41,20 +40,24 @@ public class GameroomUtil {
         return optionalGameroom.get();
     }
 
-    public GameState getGameStateById(Long gameroomId, UUID userUuid) {
+    public GameState validGameroomMemberCheck(Long gameroomId, UUID userUuid) {
 
-        Optional<GameState> optionalGameState = gameStateUtil.findOptionalGameState(gameroomId);
-        if(optionalGameState.isEmpty()) {
-            CustomLogger.warn(LogEventCode.GAME,
+        GameState gameState = gameStateUtil.getGameStateById(gameroomId, userUuid);
+
+        if(!gameState.contains(userUuid)) {
+
+            CustomLogger.warn(
+                    LogEventCode.GAME,
                     "FAIL",
-                    LogEventReasonCode.GAMEROOM_NOT_FOUND,
-                    LogEventReasonCode.GAMEROOM_NOT_FOUND.getMessage() + " - (not in memory) gameroomId: " + gameroomId,
+                    LogEventReasonCode.NOT_GAMEROOM_MEMBER,
+                    LogEventReasonCode.NOT_GAMEROOM_MEMBER.getMessage()
+                            + " - gameroomId: " + gameroomId,
                     userUuid.toString()
             );
 
-            throw new CustomException(CustomExceptionCode.GAMEROOM_NOT_FOUND);
+            throw new CustomException(CustomExceptionCode.NOT_GAMEROOM_MEMBER);
         }
 
-        return optionalGameState.get();
+        return gameState;
     }
 }

@@ -2,6 +2,7 @@ package com.languageworld.be.global.security.interceptor;
 
 import com.languageworld.be.domain.chat.service.ChatroomUserUtil;
 import com.languageworld.be.domain.chat.service.ChatroomUtil;
+import com.languageworld.be.domain.game.service.GameroomUtil;
 import com.languageworld.be.domain.user.service.UserUtil;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import com.languageworld.be.global.exception.CustomException;
@@ -10,9 +11,10 @@ import com.languageworld.be.global.jwt.JwtUtil;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
-import com.languageworld.be.global.webSocket.CustomWebSocketSession;
-import com.languageworld.be.global.webSocket.WebSocketSessionUtil;
-import com.languageworld.be.global.webSocket.WebSocketUtil;
+import com.languageworld.be.global.webSocket.entity.CustomWebSocketSession;
+import com.languageworld.be.global.webSocket.enumGroup.WebSocketPurposeCode;
+import com.languageworld.be.global.webSocket.service.WebSocketSessionUtil;
+import com.languageworld.be.global.webSocket.service.WebSocketUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
@@ -37,6 +39,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     private final UserUtil userUtil;
     private final ChatroomUtil chatroomUtil;
     private final ChatroomUserUtil chatroomUserUtil;
+    private final GameroomUtil gameroomUtil;
 
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
@@ -77,7 +80,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         switch (stompCommand) {
             case CONNECT-> {
                 // auth header
-                firstAuthenticateByStompHeaderAccessor(stompHeaderAccessor);
+                authenticateByStompHeaderAccessor(stompHeaderAccessor);
 
             }
             case SUBSCRIBE-> {
@@ -86,13 +89,23 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
                 UUID userUuid = getAuthenticatedUserUuid(stompHeaderAccessor);
 
                 // destination 검증 (SUBSCRIBE용 경로: 수신)
-                Long chatroomId = webSocketUtil.extractChatroomId(stompHeaderAccessor, stompCommand);
+                String destination = webSocketUtil.getDestination(stompHeaderAccessor);
+                WebSocketPurposeCode webSocketPurposeCode = webSocketUtil.getWebSocketPurpose(destination);
+                Long roomId = webSocketUtil.extractRoomId(webSocketPurposeCode, destination, stompCommand);
 
-                // 채팅방 존재 확인
-                chatroomUtil.getChatroomById(chatroomId, userUuid);
+                // 목적에 따른 개별 검증
+                switch (webSocketPurposeCode) {
+                    case CHAT -> {
+                        // 채팅방 존재 확인
+                        chatroomUtil.getChatroomById(roomId, userUuid);
 
-                // 유효한 사용자: 채팅방 멤버 + 회원 탈퇴x + 퇴장 상태x + PERSONAL일 경우 차단 X
-                chatroomUserUtil.ValidChatroomUserCheck(chatroomId, userUuid);
+                        // 유효한 사용자: 채팅방 멤버 + 회원 탈퇴x + 퇴장 상태x + PERSONAL일 경우 차단 X
+                        chatroomUserUtil.validChatroomUserCheck(roomId, userUuid);
+                    }
+                    case GAME -> {
+                        gameroomUtil.validGameroomMemberCheck(roomId, userUuid);
+                    }
+                }
             }
             case SEND-> {
 
@@ -100,13 +113,22 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
                 UUID userUuid = getAuthenticatedUserUuid(stompHeaderAccessor);
 
                 // destination 검증 (SEND용 경로: 송신)
-                Long chatroomId = webSocketUtil.extractChatroomId(stompHeaderAccessor, stompCommand);
+                String destination = webSocketUtil.getDestination(stompHeaderAccessor);
+                WebSocketPurposeCode webSocketPurposeCode = webSocketUtil.getWebSocketPurpose(destination);
+                Long roomId = webSocketUtil.extractRoomId(webSocketPurposeCode, destination, stompCommand);
 
-                // 채팅방 존재 확인
-                chatroomUtil.getChatroomById(chatroomId, userUuid);
+                switch (webSocketPurposeCode) {
+                    case CHAT -> {
+                        // 채팅방 존재 확인
+                        chatroomUtil.getChatroomById(roomId, userUuid);
 
-                // 유효한 사용자
-                chatroomUserUtil.ValidChatroomUserCheck(chatroomId, userUuid);
+                        // 유효한 사용자: 채팅방 멤버 + 회원 탈퇴x + 퇴장 상태x + PERSONAL일 경우 차단 X
+                        chatroomUserUtil.validChatroomUserCheck(roomId, userUuid);
+                    }
+                    case GAME -> {
+                        gameroomUtil.validGameroomMemberCheck(roomId, userUuid);
+                    }
+                }
             }
             case UNSUBSCRIBE -> {}
             case DISCONNECT -> {
@@ -190,7 +212,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
     }
 
     // 첫 인증
-    private void firstAuthenticateByStompHeaderAccessor(StompHeaderAccessor stompHeaderAccessor) {
+    private void authenticateByStompHeaderAccessor(StompHeaderAccessor stompHeaderAccessor) {
 
         String authorizationHeader = getAuthorizationHeaderFromStompHeaderAccessor(stompHeaderAccessor);
         String token = jwtUtil.resolveToken(authorizationHeader);

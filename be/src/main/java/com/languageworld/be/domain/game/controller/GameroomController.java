@@ -4,6 +4,7 @@ import com.languageworld.be.domain.game.dto.request.GameroomCreateRequestDto;
 import com.languageworld.be.domain.game.dto.request.GameroomEnterRequestDto;
 import com.languageworld.be.domain.game.dto.response.GameroomCreateResponseDto;
 import com.languageworld.be.domain.game.dto.response.GameroomResponseDto;
+import com.languageworld.be.domain.game.dto.response.WebSocketGameroomMemberResponseDto;
 import com.languageworld.be.domain.game.service.GameroomService;
 import com.languageworld.be.global.auth.entity.CustomPrincipal;
 import com.languageworld.be.global.response.ApiResponse;
@@ -42,13 +43,13 @@ public class GameroomController {
     }
 
     @PostMapping("/{gameroomId}")
-    public ResponseEntity<ApiResponse<Void>> enterGameroom(@AuthenticationPrincipal CustomPrincipal customPrincipal,
-                                                           @PathVariable Long gameroomId,
-                                                           @RequestBody(required = false) @Valid GameroomEnterRequestDto gameroomEnterRequestDto) {
+    public ResponseEntity<ApiResponse<WebSocketGameroomMemberResponseDto>> enterGameroom(@AuthenticationPrincipal CustomPrincipal customPrincipal,
+                                                                                         @PathVariable Long gameroomId,
+                                                                                         @RequestBody(required = false) @Valid GameroomEnterRequestDto gameroomEnterRequestDto) {
 
-        gameroomService.enterGameroom(customPrincipal, gameroomId, gameroomEnterRequestDto);
+        WebSocketGameroomMemberResponseDto webSocketGameroomMemberResponseDto = gameroomService.enterGameroom(customPrincipal, gameroomId, gameroomEnterRequestDto);
 
-        return ResponseEntityUtil.success(SuccessCode.GAMEROOM_ENTER_SUCCESS);
+        return ResponseEntityUtil.success(SuccessCode.GAMEROOM_ENTER_SUCCESS, webSocketGameroomMemberResponseDto);
     }
 
     @DeleteMapping("/{gameroomId}")

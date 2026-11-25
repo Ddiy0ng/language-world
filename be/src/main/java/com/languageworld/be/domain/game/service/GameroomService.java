@@ -4,9 +4,9 @@ import com.languageworld.be.domain.game.dto.request.GameroomCreateRequestDto;
 import com.languageworld.be.domain.game.dto.request.GameroomEnterRequestDto;
 import com.languageworld.be.domain.game.dto.response.GameroomCreateResponseDto;
 import com.languageworld.be.domain.game.dto.response.GameroomResponseDto;
+import com.languageworld.be.domain.game.dto.response.WebSocketGameroomMemberResponseDto;
 import com.languageworld.be.domain.game.entity.GameState;
 import com.languageworld.be.domain.game.entity.Gameroom;
-import com.languageworld.be.domain.game.enumGroup.GameroomStatusCode;
 import com.languageworld.be.domain.game.repository.GameroomRepository;
 import com.languageworld.be.domain.language.entity.Language;
 import com.languageworld.be.domain.language.entity.Level;
@@ -20,6 +20,10 @@ import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.webSocket.dto.WebSocketEventResponseDto;
+import com.languageworld.be.global.webSocket.enumGroup.WebSocketEventTypeCode;
+import com.languageworld.be.global.webSocket.enumGroup.WebSocketPurposeCode;
+import com.languageworld.be.global.webSocket.service.WebSocketService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,6 +41,7 @@ public class GameroomService {
     private final UserUtil userUtil;
     private final LanguageUtil languageUtil;
     private final PasswordUtil passwordUtil;
+    private final WebSocketService webSocketService;
 
     // 생성: DB 저장 → 메모리에 GameState 등록 → 방장 자동 입장
     @Transactional
@@ -105,7 +110,7 @@ public class GameroomService {
         gameState.addParticipant(hostUuid, host.getName());
         gameStateUtil.saveGameroomGameState(gameState);
 
-        return new GameroomCreateResponseDto(gameroom.getId());
+        return GameroomCreateResponseDto.from(gameroom.getId());
     }
 
     // 목록: 메모리에 있고 자리가 남은 방(WAIT, STARTED)
@@ -116,8 +121,8 @@ public class GameroomService {
         if(joinableIdList.isEmpty())
             return List.of();
 
-        return gameroomRepository.findAllByIdInAndGameroomStatusNotOrderByIdDesc(joinableIdList, GameroomStatusCode.CLOSED).stream()
-                .map(gameroom -> GameroomResponseDto.of(
+        return gameroomRepository.findAllByIdInOrderByIdDesc(joinableIdList).stream()
+                .map(gameroom -> GameroomResponseDto.from(
                         gameroom,
                         gameStateUtil.findOptionalGameState(gameroom.getId())
                                 .map(GameState::getParticipantSize)
@@ -127,18 +132,18 @@ public class GameroomService {
 
     // 입장: 대기 중·진행 중 모두 가능
     @Transactional
-    public void enterGameroom(CustomPrincipal customPrincipal, Long gameroomId, GameroomEnterRequestDto dto) {
+    public WebSocketGameroomMemberResponseDto enterGameroom(CustomPrincipal customPrincipal, Long gameroomId, GameroomEnterRequestDto dto) {
 
         UUID userUuid = customPrincipal.uuid();
         userUtil.deletedUserCheckByUserUuid(userUuid);
         User user = userUtil.getUserByUuid(userUuid);
 
         Gameroom gameroom = gameroomUtil.getGameroomById(gameroomId, userUuid);
-        GameState gameState = gameroomUtil.getGameStateById(gameroomId, userUuid);
+        GameState gameState = gameStateUtil.getGameStateById(gameroomId, userUuid);
 
         // 이미 이 방에 있으면 그대로 성공
         if(gameState.contains(userUuid))
-            return;
+            return WebSocketGameroomMemberResponseDto.from(gameState, userUuid);
 
         // 정원 확인
         if(gameState.isFull()) {
@@ -205,7 +210,12 @@ public class GameroomService {
 
         gameState.addParticipant(userUuid, user.getName());
 
-        // PARTICIPANT_JOINED 브로드캐스트
+        // 방에 있는 사람들에게 입장 알림, 입장한 본인에게는 응답으로 참가자 목록
+        WebSocketGameroomMemberResponseDto webSocketGameroomMemberResponseDto = WebSocketGameroomMemberResponseDto.from(gameState, userUuid);
+        WebSocketEventResponseDto<WebSocketGameroomMemberResponseDto> webSocketEventResponseDto = WebSocketEventResponseDto.from(WebSocketEventTypeCode.JOINED, webSocketGameroomMemberResponseDto);
+        webSocketService.sendToRoom(WebSocketPurposeCode.GAME, gameroomId, webSocketEventResponseDto);
+
+        return webSocketGameroomMemberResponseDto;
     }
 
     // 퇴장: 방장이면 가장 먼저 들어온 사람에게 위임, 마지막 사람이면 방 닫기
@@ -214,7 +224,7 @@ public class GameroomService {
 
         UUID userUuid = customPrincipal.uuid();
         Gameroom gameroom = gameroomUtil.getGameroomById(gameroomId, userUuid);
-        GameState gameState = gameroomUtil.getGameStateById(gameroomId, userUuid);
+        GameState gameState = gameStateUtil.getGameStateById(gameroomId, userUuid);
 
         if(!gameState.contains(userUuid)) {
 
@@ -233,13 +243,23 @@ public class GameroomService {
         gameState.removeParticipant(userUuid);
 
         if(gameState.getParticipantSize() == 0) {
-            // 메모리에서 제거 + DB 상태 CLOSED (변경 감지로 커밋 시 UPDATE)
+
+            // 메모리에서 제거 + 방 삭제
             gameStateUtil.remove(gameroomId);
-            gameroom.changeStatus(GameroomStatusCode.CLOSED);
-        } else if(userUuid.equals(gameState.getHostUuid())) {
-            UUID newHostUuid = gameState.getOldestParticipantUuid();
-            gameState.changeHost(newHostUuid);
-            gameroom.changeHost(userUtil.getUserByUuid(newHostUuid));
+            gameroomRepository.delete(gameroom);
+        } else {
+
+            // 방장이면 가장 먼저 들어온 사람에게 위임
+            if(userUuid.equals(gameState.getHostUuid())) {
+                UUID newHostUuid = gameState.getOldestParticipantUuid();
+                gameState.changeHost(newHostUuid);
+                gameroom.changeHost(userUtil.getUserByUuid(newHostUuid));
+            }
+
+            // 남은 사람들에게 퇴장 알림 (hostUuid로 방장 변경도 전달)
+            WebSocketGameroomMemberResponseDto webSocketGameroomMemberResponseDto = WebSocketGameroomMemberResponseDto.from(gameState, userUuid);
+            WebSocketEventResponseDto<WebSocketGameroomMemberResponseDto> webSocketEventResponseDto = WebSocketEventResponseDto.from(WebSocketEventTypeCode.LEFT, webSocketGameroomMemberResponseDto);
+            webSocketService.sendToRoom(WebSocketPurposeCode.GAME, gameroomId, webSocketEventResponseDto);
         }
     }
 }

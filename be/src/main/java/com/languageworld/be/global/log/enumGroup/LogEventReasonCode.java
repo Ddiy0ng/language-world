@@ -126,9 +126,10 @@ public enum LogEventReasonCode {
     DUPLICATE_WEBSOCKET_SESSION("중복된 WebSocket session입니다."),
     NOT_REGISTERED_WEBSOCKET_SESSION("등록되지 않은 WebSocket session입니다."),
     WEBSOCKET_SESSION_IS_NULL_OR_BLANK("WebSocket Session이 비었습니다."),
-    STOMP_HEADER_ACCESSOR_DESTINATION_IS_NULL_OR_BLANK("STOMP Header의 destination이 비었습니다."),
     STOMP_COMMAND_NOT_REQUIRED_EXTRACT_ROOM_ID_METHOD("해당 STOMP COMMAND는 roomId추출이 필요하지 않습니다."),
     DESTINATION_NOT_MATCH_WITH_PATTERN("Destination이 Pattern과 일치하지 않습니다."),
+    DESTINATION_IS_NULL_OR_BLANK("destination이 비었습니다."),
+    INVALID_WEBSOCKET_PREFIX("지원하지 않는 destination 경로입니다."),
 
     // VOCAB
     SAVED_VOCAB_NOT_FOUND("저장된 어휘를 찾을 수 없습니다."),

@@ -17,7 +17,7 @@ public record GameroomResponseDto(
         int maxPlayerSize,
         int roundSize
 ) {
-    public static GameroomResponseDto of(Gameroom gameroom, int currentPlayerSize) {
+    public static GameroomResponseDto from(Gameroom gameroom, int currentPlayerSize) {
 
         return GameroomResponseDto.builder()
                 .gameroomId(gameroom.getId())

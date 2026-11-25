@@ -9,7 +9,6 @@ import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,7 +39,6 @@ public class Gameroom extends CreatableEntity {
     @Column(name = "is_locked", nullable = false)
     private boolean isLocked;
 
-    @Size(min = 1, max = 8)
     private String password;
 
     @Column(name = "game_room_status", nullable = false)

@@ -1,10 +1,11 @@
-package com.languageworld.be.global.webSocket;
+package com.languageworld.be.global.webSocket.service;
 
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.webSocket.entity.CustomWebSocketSession;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;

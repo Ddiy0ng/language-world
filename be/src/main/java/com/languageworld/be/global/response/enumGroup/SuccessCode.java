@@ -304,6 +304,10 @@ public enum SuccessCode {
             HttpStatus.OK,
             "GAME_200",
             "게임 시작에 성공했습니다."),
+    GAME_CHAT_SEND_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "게임 채팅 전송에 성공했습니다."),
     ;
 
     private final HttpStatus httpStatus;
