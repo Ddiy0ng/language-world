@@ -1,33 +1,43 @@
 package com.languageworld.be.domain.game.service;
 
 import com.languageworld.be.domain.game.entity.GameState;
+import com.languageworld.be.domain.game.repository.GameStateManage;
 import com.languageworld.be.global.exception.CustomException;
 import com.languageworld.be.global.exception.enumGroup.CustomExceptionCode;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-// 서버 메모리에서 관리하는 게임방 상태들
 @Component
+@RequiredArgsConstructor
 public class GameStateUtil {
 
-    // gameroomId → 게임방 상태
-    private final Map<Long, GameState> gameStateMap = new ConcurrentHashMap<>();
+    private final GameStateManage gameStateManage;
+
+    // 진행 중이고 같은 매치인 방 상태, 아니면 null(예약 사이에 종료·재시작·삭제됨)
+    public GameState getPlayingGameState(Long gameroomId, UUID matchUuid) {
+
+        return gameStateManage.findOptionalGameState(gameroomId)
+                .filter(GameState::isPlaying)
+                .filter(gameState -> matchUuid.equals(gameState.getMatchUuid()))
+                .orElse(null);
+    }
 
     public void saveGameroomGameState(GameState gameState) {
+
+        Map<Long, GameState> gameStateMap = gameStateManage.getGameStateMap();
         gameStateMap.put(gameState.getGameroomId(), gameState);
     }
 
     public GameState getGameStateById(Long gameroomId, UUID userUuid) {
 
-        Optional<GameState> optionalGameState = findOptionalGameState(gameroomId);
+        Optional<GameState> optionalGameState = gameStateManage.findOptionalGameState(gameroomId);
         if(optionalGameState.isEmpty()) {
             CustomLogger.warn(LogEventCode.GAME,
                     "FAIL",
@@ -42,27 +52,25 @@ public class GameStateUtil {
         return optionalGameState.get();
     }
 
-    public Optional<GameState> findOptionalGameState(Long gameroomId) {
-        return Optional.ofNullable(gameStateMap.get(gameroomId));
+    public void gameroomEnterCheck(UUID userUuid) {
+
+        if(gameStateManage.findGameroomIdByUserUuid(userUuid).isPresent()) {
+
+            CustomLogger.warn(
+                    LogEventCode.GAME,
+                    "FAIL",
+                    LogEventReasonCode.ALREADY_IN_GAMEROOM,
+                    LogEventReasonCode.ALREADY_IN_GAMEROOM.getMessage(),
+                    userUuid.toString()
+            );
+
+            throw new CustomException(CustomExceptionCode.ALREADY_IN_GAMEROOM);
+        }
     }
 
     public void remove(Long gameroomId) {
+
+        Map<Long, GameState> gameStateMap = gameStateManage.getGameStateMap();
         gameStateMap.remove(gameroomId);
-    }
-
-    // 자리가 남은 방(WAIT, STARTED 모두)
-    public List<Long> findJoinableGameroomIdList() {
-        return gameStateMap.values().stream()
-                .filter(gameState -> !gameState.isFull())
-                .map(GameState::getGameroomId)
-                .toList();
-    }
-
-    // 사용자가 참여 중인 방: 모든 방을 돌며 참가자 Map에서 확인
-    public Optional<Long> findGameroomIdByUserUuid(UUID userUuid) {
-        return gameStateMap.values().stream()
-                .filter(gameState -> gameState.contains(userUuid))
-                .map(GameState::getGameroomId)
-                .findFirst();
     }
 }

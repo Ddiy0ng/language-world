@@ -9,14 +9,12 @@ import java.util.UUID;
 public record GameParticipantResponseDto(
 
         UUID userUuid,
-        String name,
-        int score
+        String name
 ) {
-
     public static GameParticipantResponseDto from(Participant participant) {
 
         return GameParticipantResponseDto.builder()
-                .userUuid(participant.getUserUuid()).name(participant.getName()).score(participant.getScore())
+                .userUuid(participant.getUserUuid()).name(participant.getName())
                 .build();
     }
 }

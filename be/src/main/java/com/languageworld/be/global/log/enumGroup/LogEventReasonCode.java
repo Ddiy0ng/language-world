@@ -131,6 +131,8 @@ public enum LogEventReasonCode {
     DESTINATION_NOT_MATCH_WITH_PATTERN("Destination이 Pattern과 일치하지 않습니다."),
     DESTINATION_IS_NULL_OR_BLANK("destination이 비었습니다."),
     INVALID_WEBSOCKET_PREFIX("지원하지 않는 destination 경로입니다."),
+    NOT_USER_DESTINATION_OWNER("본인의 개인 경로가 아닙니다."),
+    REQUIRE_SEND_TO_GAME_USER_METHOD("sendToGameUser()를 호출해야 합니다."),
 
     // VOCAB
     SAVED_VOCAB_NOT_FOUND("저장된 어휘를 찾을 수 없습니다."),
@@ -145,7 +147,19 @@ public enum LogEventReasonCode {
     NOT_GAMEROOM_HOST("방장이 아닙니다."),
     GAMEROOM_PASSWORD_REQUIRED("잠긴 방은 비밀번호가 필요합니다."),
     GAMEROOM_PASSWORD_MISMATCH("게임방 비밀번호가 일치하지 않습니다."),
-    GAMEROOM_LEVEL_LANGUAGE_MISMATCH("학습 언어와 레벨이 일치하지 않습니다.");
+    GAMEROOM_LEVEL_LANGUAGE_MISMATCH("학습 언어와 레벨이 일치하지 않습니다."),
+    NOT_ENOUGH_GAME_QUIZ("학습 언어·레벨에 출제할 단어가 없습니다."),
+    NOT_GAME_DRAWER("그림을 그리는 사람이 아닙니다."),
+    DRAWER_CANNOT_SEND_ANSWER("그리는 사람은 정답을 채팅으로 보낼 수 없습니다."),
+    GAME_SCHEDULED_TASK_FAILED("게임 예약 작업 실행 중 문제가 발생했습니다."),
+    KICK_VOTE_ALREADY_IN_PROGRESS("이미 진행 중인 추방 투표가 있습니다."),
+    KICK_VOTE_NOT_IN_PROGRESS("진행 중인 추방 투표가 없습니다."),
+    INVALID_KICK_TARGET("추방할 수 없는 대상입니다."),
+    KICK_TARGET_CANNOT_VOTE("추방 대상은 투표할 수 없습니다."),
+    ALREADY_KICK_VOTED("이미 추방 투표에 참여했습니다."),
+    GAME_WEBSOCKET_NOT_CONNECTED("실시간 연결 없이 게임방에 들어오려 했습니다."),
+    GAME_RESULT_SAVE_FAILED("게임 기록 저장 중 문제가 발생했습니다."),
+    KICKED_GAMEROOM_USER("추방된 게임방에 다시 들어오려 했습니다.");
 
     private final String message;
 }

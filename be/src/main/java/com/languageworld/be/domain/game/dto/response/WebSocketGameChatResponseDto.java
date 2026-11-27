@@ -6,17 +6,15 @@ import lombok.Builder;
 import java.util.UUID;
 
 @Builder
-public record GameChatResponseDto(
+public record WebSocketGameChatResponseDto(
 
         UUID senderUuid,
-        String senderName,
         String chatMessage
 ) {
-    public static GameChatResponseDto of(Participant sender, String chatMessage) {
+    public static WebSocketGameChatResponseDto of(Participant sender, String chatMessage) {
 
-        return GameChatResponseDto.builder()
+        return WebSocketGameChatResponseDto.builder()
                 .senderUuid(sender.getUserUuid())
-                .senderName(sender.getName())
                 .chatMessage(chatMessage)
                 .build();
     }

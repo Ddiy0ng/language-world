@@ -1,5 +1,7 @@
 package com.languageworld.be.domain.game.entity;
 
+import com.languageworld.be.domain.language.entity.Language;
+import com.languageworld.be.domain.language.entity.Level;
 import com.languageworld.be.domain.user.entity.User;
 import com.languageworld.be.global.baseEntity.CreatableEntity;
 import jakarta.persistence.*;
@@ -34,22 +36,28 @@ public class GameResult extends CreatableEntity {
     @Column(name = "answer_size", nullable = false)
     private int answerSize;
 
-    @ManyToOne
-    @JoinColumn(name = "game_room_id", nullable = false)
-    private Gameroom gameRoom;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "learning_language_id", nullable = false)
+    private Language learningLanguage;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "level_id", nullable = false)
+    private Level level;
 
     @ManyToOne
     @JoinColumn(name = "participant_id", nullable = false)
     private User participant;
 
-    public static GameResult of(UUID matchUuid, int gameRank, int score, int answerSize, Gameroom gameroom, User participant) {
+    public static GameResult of(UUID matchUuid, int gameRank, int score, int answerSize,
+                                Language learningLanguage, Level level, User participant) {
 
         return GameResult.builder()
                 .matchUuid(matchUuid)
                 .gameRank(gameRank)
                 .score(score)
                 .answerSize(answerSize)
-                .gameRoom(gameroom)
+                .learningLanguage(learningLanguage)
+                .level(level)
                 .participant(participant)
                 .build();
     }

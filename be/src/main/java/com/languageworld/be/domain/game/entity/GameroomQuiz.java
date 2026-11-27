@@ -34,18 +34,13 @@ public class GameroomQuiz extends CreatableEntity {
     private boolean isRevealed = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_room_id", nullable = false)
-    private Gameroom gameroom;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vocab_meaning_id", nullable = false)
     private VocabMeaning vocabMeaning;
 
-    public static GameroomQuiz of(UUID matchUuid, int roundNumber, Gameroom gameroom, VocabMeaning vocabMeaning) {
+    public static GameroomQuiz of(UUID matchUuid, int roundNumber, VocabMeaning vocabMeaning) {
         return GameroomQuiz.builder()
                 .matchUuid(matchUuid)
                 .roundNumber(roundNumber)
-                .gameroom(gameroom)
                 .vocabMeaning(vocabMeaning)
                 .build();
     }

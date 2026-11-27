@@ -28,4 +28,9 @@ public class Participant {
         this.score = 0;
         this.answerSize = 0;
     }
+
+    public void addScore(int score) {
+        this.score += score;
+        this.answerSize++;
+    }
 }

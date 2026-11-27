@@ -383,6 +383,38 @@ public enum CustomExceptionCode {
             HttpStatus.BAD_REQUEST,
             "GAME_400",
             "선택한 학습 언어의 레벨이 아닙니다."),
+    NOT_GAME_DRAWER(
+            HttpStatus.FORBIDDEN,
+            "GAME_403",
+            "그림을 그리는 사람만 할 수 있습니다."),
+    KICK_VOTE_ALREADY_IN_PROGRESS(
+            HttpStatus.CONFLICT,
+            "GAME_409",
+            "이미 진행 중인 추방 투표가 있습니다."),
+    KICK_VOTE_NOT_IN_PROGRESS(
+            HttpStatus.BAD_REQUEST,
+            "GAME_400",
+            "진행 중인 추방 투표가 없습니다."),
+    INVALID_KICK_TARGET(
+            HttpStatus.BAD_REQUEST,
+            "GAME_400",
+            "추방할 수 없는 대상입니다."),
+    KICK_TARGET_CANNOT_VOTE(
+            HttpStatus.FORBIDDEN,
+            "GAME_403",
+            "추방 대상은 투표할 수 없습니다."),
+    ALREADY_KICK_VOTED(
+            HttpStatus.CONFLICT,
+            "GAME_409",
+            "이미 추방 투표에 참여했습니다."),
+    GAME_WEBSOCKET_NOT_CONNECTED(
+            HttpStatus.BAD_REQUEST,
+            "GAME_400",
+            "실시간 연결 후 게임방에 들어올 수 있습니다."),
+    KICKED_GAMEROOM_USER(
+            HttpStatus.FORBIDDEN,
+            "GAME_403",
+            "추방된 게임방에는 다시 들어갈 수 없습니다."),
 
     ;
 

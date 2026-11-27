@@ -1,15 +1,33 @@
 package com.languageworld.be.domain.game.entity;
 
+import lombok.Builder;
+import lombok.Getter;
+
 import java.text.Normalizer;
 
-public record Quiz (
+@Getter
+@Builder
+public class Quiz {
 
-        Long vocabMeaningId,
+    public static final int CORRECT_SCORE = 10;
 
-        String answer,
+    private final Long vocabMeaningId;
 
-        int score
-){
+    private final String answer;
+
+    private int score;
+
+    private boolean isSubmitted;
+
+    public static Quiz of(Long vocabMeaningId, String answer) {
+
+        return Quiz.builder()
+                .vocabMeaningId(vocabMeaningId)
+                .answer(answer)
+                .score(CORRECT_SCORE)
+                .isSubmitted(false)
+                .build();
+    }
 
     public boolean matches(String input) {
 
@@ -24,9 +42,8 @@ public record Quiz (
         return normalizedInput.equalsIgnoreCase(normalize(answer));
     }
 
-    private String normalize(String input) {
+    public void submitted() {this.isSubmitted = true;}
 
-        // 공백 제거, 정규화
-        return Normalizer.normalize(input.strip(), Normalizer.Form.NFC);
-    }
+    // 공백 제거, 정규화
+    private String normalize(String input) {return Normalizer.normalize(input.strip(), Normalizer.Form.NFC);}
 }

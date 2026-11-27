@@ -12,6 +12,8 @@ import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -78,5 +80,10 @@ public class UserUtil {
 
             throw new CustomException(CustomExceptionCode.DELETED_USER);
         }
+    }
+
+    // 여러 사용자 한 번에 조회(없는 uuid는 빠짐)
+    public List<User> getUserListByUuidList(Collection<UUID> uuidList) {
+        return userRepository.findAllByUuidIn(uuidList);
     }
 }

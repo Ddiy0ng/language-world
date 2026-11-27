@@ -9,16 +9,17 @@ import java.util.UUID;
 @Builder
 public record WebSocketGameroomMemberResponseDto(
 
-        Long gameroomId,
-        UUID targetUuid,        // 들어오거나 나간 사람
+        //JOIN, LEFT
+        UUID targetUuid,
+        String targetName,
         UUID hostUuid,
         List<GameParticipantResponseDto> participantList   // 입장 순서
 ) {
-    public static WebSocketGameroomMemberResponseDto from(GameState gameState, UUID changedUserUuid) {
+    public static WebSocketGameroomMemberResponseDto from(GameState gameState, UUID targetUuid, String targetName) {
 
         return WebSocketGameroomMemberResponseDto.builder()
-                .gameroomId(gameState.getGameroomId())
-                .targetUuid(changedUserUuid)
+                .targetUuid(targetUuid)
+                .targetName(targetName)
                 .hostUuid(gameState.getHostUuid())
                 .participantList(gameState.getParticipantMap().values().stream()
                         .map(GameParticipantResponseDto::from)

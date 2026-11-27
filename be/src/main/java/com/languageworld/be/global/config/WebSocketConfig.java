@@ -24,6 +24,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws")
                 .addInterceptors()
                 .setAllowedOrigins("http://localhost:8080");
+
+        // 한 연결에서 보낸 메시지를 보낸 순서대로 처리(그림 획 순서·진행 중 입장자 그림 복원)
+        registry.setPreserveReceiveOrder(true);
     }
 
     // 구독 엔드포인트 설정 + 발행 엔드포인트 설정
@@ -32,6 +35,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         registry.enableSimpleBroker("/sub");
         registry.setApplicationDestinationPrefixes("/pub");
+        // 보낸 순서대로 구독자에게 전달
+        registry.setPreservePublishOrder(true);
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override

@@ -15,6 +15,10 @@ public record GameroomCreateRequestDto(
         @Max(20)
         int roundSize,
 
+        @Min(60)
+        @Max(180)
+        int roundTime,
+
         boolean isLocked,
 
         @Size(min = 1, max = 8)

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -55,6 +56,29 @@ public class LanguageUtil {
         }
 
         return optionalLevel.get();
+    }
+
+    // 게임 결과 저장용: 조회 쿼리 없이 FK만 거는 참조
+    public Language getLanguageReference(Long languageId) {return languageRepository.getReferenceById(languageId);}
+
+    public Level getLevelReference(Long levelId) {return levelRepository.getReferenceById(levelId);}
+
+    public void languageLevelMatchCheck(Language language, Level level, UUID userUuid) {
+
+        if(!level.getLanguage().getId().equals(language.getId())) {
+
+            CustomLogger.warn(
+                    LogEventCode.GAME,
+                    "FAIL",
+                    LogEventReasonCode.GAMEROOM_LEVEL_LANGUAGE_MISMATCH,
+                    LogEventReasonCode.GAMEROOM_LEVEL_LANGUAGE_MISMATCH.getMessage()
+                            + " - languageId: " + language.getId()
+                            + ", levelId: " + level.getId(),
+                    userUuid.toString()
+            );
+
+            throw new CustomException(CustomExceptionCode.GAMEROOM_LEVEL_LANGUAGE_MISMATCH);
+        }
     }
 
 }

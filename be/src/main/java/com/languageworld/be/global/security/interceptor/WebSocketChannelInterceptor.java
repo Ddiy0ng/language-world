@@ -11,6 +11,7 @@ import com.languageworld.be.global.jwt.JwtUtil;
 import com.languageworld.be.global.log.CustomLogger;
 import com.languageworld.be.global.log.enumGroup.LogEventCode;
 import com.languageworld.be.global.log.enumGroup.LogEventReasonCode;
+import com.languageworld.be.global.response.enumGroup.SuccessCode;
 import com.languageworld.be.global.webSocket.entity.CustomWebSocketSession;
 import com.languageworld.be.global.webSocket.enumGroup.WebSocketPurposeCode;
 import com.languageworld.be.global.webSocket.service.WebSocketSessionUtil;
@@ -88,6 +89,9 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
                 // 인증 사용자인지 확인
                 UUID userUuid = getAuthenticatedUserUuid(stompHeaderAccessor);
 
+                // 탈퇴 회원 검사
+                userUtil.deletedUserCheckByUserUuid(userUuid);
+
                 // destination 검증 (SUBSCRIBE용 경로: 수신)
                 String destination = webSocketUtil.getDestination(stompHeaderAccessor);
                 WebSocketPurposeCode webSocketPurposeCode = webSocketUtil.getWebSocketPurpose(destination);
@@ -105,15 +109,42 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
                     case GAME -> {
                         gameroomUtil.validGameroomMemberCheck(roomId, userUuid);
                     }
+                    case GAME_USER -> {
+
+                        UUID personalSubUuid = webSocketUtil.extractUserUuid(destination);
+                        if(!personalSubUuid.equals(userUuid)) {
+
+                            CustomLogger.warn(
+                                    LogEventCode.WEBSOCKET,
+                                    "FAIL",
+                                    LogEventReasonCode.NOT_USER_DESTINATION_OWNER,
+                                    LogEventReasonCode.NOT_USER_DESTINATION_OWNER.getMessage()
+                                            + " - destination: " + destination,
+                                    userUuid.toString()
+                            );
+
+                            throw new CustomException(CustomExceptionCode.ACCESS_DENIED);
+                        }
+                        gameroomUtil.validGameroomMemberCheck(roomId, userUuid);
+                    }
+                    // 게임방 목록: 인증만 확인
+                    case GAMEROOM_LIST -> {}
                 }
             }
             case SEND-> {
 
-                // 인증 사용자인지 확인
+                String destination = webSocketUtil.getDestination(stompHeaderAccessor);
+
+                // 토큰 갱신: 연결은 그대로 두고 세션 인증만 새 토큰으로 바꿈, 앱으로 넘기지 않음(null 반환)
+                if(WebSocketUtil.TOKEN_RENEW_PUB_DESTINATION.equals(destination)) {
+                    renewByStompHeaderAccessor(stompHeaderAccessor);
+                    return null;
+                }
+
+                // 인증 사용자인지 확인(탈퇴 여부는 CONNECT·SUBSCRIBE에서 확인, 그림처럼 자주 오는 SEND마다 DB 조회하지 않음)
                 UUID userUuid = getAuthenticatedUserUuid(stompHeaderAccessor);
 
                 // destination 검증 (SEND용 경로: 송신)
-                String destination = webSocketUtil.getDestination(stompHeaderAccessor);
                 WebSocketPurposeCode webSocketPurposeCode = webSocketUtil.getWebSocketPurpose(destination);
                 Long roomId = webSocketUtil.extractRoomId(webSocketPurposeCode, destination, stompCommand);
 
@@ -233,6 +264,29 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         stompHeaderAccessor.setUser(authentication);
     }
 
+    // 인증 갱신: 같은 사용자의 새 access 토큰이면 세션 만료 시각을 바꿈
+    private void renewByStompHeaderAccessor(StompHeaderAccessor stompHeaderAccessor) {
+
+        String authorizationHeader = getAuthorizationHeaderFromStompHeaderAccessor(stompHeaderAccessor);
+        String token = jwtUtil.resolveToken(authorizationHeader);
+        Claims claims = jwtUtil.getValidateClaimsFromToken(JwtUtil.ACCESS, token);
+        Authentication authentication = jwtUtil.createAuthentication(claims);
+        CustomPrincipal customPrincipal = getCustomPrincipalFromAuthentication(authentication);
+
+        //탈퇴 확인
+        userUtil.deletedUserCheckByUserUuid(customPrincipal.uuid());
+
+        // 등록된 세션의 사용자와 같을 때만 갱신
+        webSocketSessionUtil.renewWebSocketSession(stompHeaderAccessor.getSessionId(), CustomWebSocketSession.of(customPrincipal, claims.getExpiration()));
+
+        CustomLogger.info(
+                LogEventCode.WEBSOCKET,
+                "SUCCESS",
+                SuccessCode.WEBSOCKET_SESSION_RENEW_SUCCESS.getMessage(),
+                customPrincipal.uuid().toString()
+        );
+    }
+
     // 인증 확인
     private UUID getAuthenticatedUserUuid(StompHeaderAccessor stompHeaderAccessor) {
 
@@ -258,9 +312,6 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
             throw new CustomException(CustomExceptionCode.UNAUTHORIZED);
         }
-
-        // 탈퇴 회원 검사
-        userUtil.deletedUserCheckByUserUuid(userUuid);
 
         return userUuid;
     }

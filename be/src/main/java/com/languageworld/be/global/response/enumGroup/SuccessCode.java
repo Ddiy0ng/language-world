@@ -308,6 +308,30 @@ public enum SuccessCode {
             HttpStatus.OK,
             "GAME_200",
             "게임 채팅 전송에 성공했습니다."),
+    GAME_END_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "게임이 종료되었습니다."),
+    GAME_QUIZ_FIND_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "출제 단어 조회에 성공했습니다."),
+    KICK_VOTE_START_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "추방 투표를 시작했습니다."),
+    KICK_VOTE_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "추방 투표에 참여했습니다."),
+    GAME_KICK_SUCCESS(
+            HttpStatus.OK,
+            "GAME_200",
+            "추방 투표로 참가자를 내보냈습니다."),
+    WEBSOCKET_SESSION_RENEW_SUCCESS(
+            HttpStatus.OK,
+            "WEBSOCKET_200",
+            "실시간 연결의 인증을 갱신했습니다."),
     ;
 
     private final HttpStatus httpStatus;
